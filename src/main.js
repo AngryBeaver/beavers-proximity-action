@@ -1,6 +1,7 @@
-import {BeaversGamepadManager} from "./apps/BeaversGamepadManager.js";
 import {Settings} from "./Settings.js";
-import {GamepadModuleManager} from "./apps/GamepadModuleManager.js";
+import {ActivityResultStore} from "./ActivityResultStore";
+import {ActivityResultStoreClass} from "./ActivityResultStoreClass";
+
 
 
 export const NAMESPACE = "beavers-proximity-action"
@@ -11,5 +12,6 @@ Hooks.on("ready", async function(){
             game[NAMESPACE]={};
         }
         game[NAMESPACE].Settings = new Settings();
+        game[NAMESPACE].ActivityResultStore = new ActivityResultStoreClass();
         Hooks.call(HOOK_READY);
 })

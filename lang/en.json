@@ -1,4 +1,9 @@
 {
   "beaversProximityAction": {
+    "error": {
+      "canvasGridError": "no canvas grid detected",
+      "noActorOnToken": "token does not have an actor"
+    }
+
   }
 }
