@@ -39,17 +39,24 @@
 type ProximityType = "close" | "cone"
 type TestType = "skill" | "ability" | "hit" | "choices";
 type LocationType = "wall" | "grid" ;
-type ActionType = "always" | "once" | "perGrid" | "perWall" | "perActor" | "each"
+type AvailableType = "always" | "once" | "perGrid" | "perWall" | "perActor" | "each"
 type PriorityType = "fallback" | "normal"
 
 interface ProximityRequest {
-    token:Token
+    token: Token
     type: ProximityType,
     distance: number,
 }
 
+interface ActivityRequest {
+    activityId: string,
+    actorId: string,
+    origin: Point
+    gridIds: string[]
+}
+
 interface VisualActivity extends Activity {
-    origin:Point
+    origin: Point
     gridIds: string[]
 }
 
@@ -68,7 +75,7 @@ interface TestOptions {
 }
 
 interface Test {
-    id:string,
+    name:string,
     choices: {
         [id:string]:{text:string,img?:string}
     }
@@ -85,6 +92,7 @@ interface ActivityResultData extends ActivityResult {
     actorId: string,
     gridIds: string[],
     wallIds: string[],
+    actionResult?: any,
 }
 
 interface Location {
@@ -100,8 +108,11 @@ interface ActionData {
     id: string,
     activityId: string,
     location:Location
-    type: ActionType,
-    onActivate: (result:ActivityResultData)=>string;
+    onActivate: (result:ActivityResultData)=>Promise<any>;
+    available:{
+        type:AvailableType
+        isAvailable?: (gridId:string,actorId:string,wall?:Wall)=>boolean,
+    }
     priority:PriorityType
 }
 
@@ -111,15 +122,13 @@ interface Action {
     isMatchingGrid:(gridId:string)=>boolean,
     isMatchingWall:(wall:Wall)=>boolean,
     isAvailable:(gridId: string, actorId: string, wall?: Wall)=>boolean,
+    activate:(result:ActivityResultData)=>Promise<any>;
 }
 
 interface ActionGrid {
-    activityResults: {
-        [actionId:string]:ActivityResultData[]
-    }
     getProximity: (request:ProximityRequest) => VisualActivity[],
-    executeActivity:(activityId: string, request:ProximityRequest) => Promise<void>,
-    registerAction: (action:ActionData) => string,
+    executeActivity:(request:ActivityRequest) => Promise<void>,
+    registerAction: (action:Action) => string,
     unregisterAction: (id:number)=>void,
 }
 interface Grid {

@@ -18,33 +18,33 @@ export class TestHandler{
         }else if(test.type === "choices") {
             result = await this._testChoices(test);
         }else if(test.type === "hit") {
-            result = {};
+            result = {type:test.type,choice:test.name};
         }
         return result;
     }
 
     async _testAbility(test:Test):Promise<ActivityResult|null>{
-        let roll = await beaversSystemInterface.actorRollAbility(this.actor, test.id);
+        let roll = await beaversSystemInterface.actorRollAbility(this.actor, test.name);
         if( roll != null){
             return null
         }
-        return {rollValue:roll.total};
+        return {value:roll.total,type:test.type};
     }
 
     async _testSkill(test:Test):Promise<ActivityResult|null>{
-        let roll = await beaversSystemInterface.actorRollSkill(this.actor, test.id);
+        let roll = await beaversSystemInterface.actorRollSkill(this.actor, test.name);
         if( roll == null){
             return null;
         }
-        return {rollValue:roll.total};
+        return {value:roll.total,type:test.type};
     }
 
     async _testChoices(test:Test):Promise<ActivityResult|null>{
-        let roll = await beaversSystemInterface.actorRollSkill(this.actor, test.id);
-        if( roll == null){
+        const choice = await beaversSystemInterface.uiDialogSelect(test.choices);
+        if(choice == null){
             return null;
         }
-        return {rollValue:roll.total};
+        return {choice:choice,type:test.type};
     }
 
     async selectTestChoice(testOptions:TestOptions):Promise<Test>{

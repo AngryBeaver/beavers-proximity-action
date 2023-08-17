@@ -20,6 +20,10 @@ export class BaseAction implements Action {
         return this._data.activityId;
     }
 
+    public async activate(data:ActivityResultData){
+        return await this._data.onActivate(data);
+    }
+
     public isMatchingGrid(gridId:string){
         if(this._data.location.isGlobal){
             return true;
@@ -43,9 +47,12 @@ export class BaseAction implements Action {
         return isMatchingWall;
     }
 
-    public isAvailable(gridId: string, actorId: string, wall: Wall | null=null) {
+    public isAvailable(gridId: string, actorId: string, wall: Wall|undefined=undefined) {
         const activityResults = this.activityResultStore.get(this.id);
-        const type = this._data.type;
+        const type = this._data.available.type;
+        if(this._data.available.isAvailable && !this._data.available.isAvailable(gridId,actorId,wall)){
+            return false;
+        }
         return (type === "always")
             || (type === "once" && activityResults.length === 0)
             || (type === "perGrid" && activityResults.filter(a => gridId in a.gridIds).length > 0)
