@@ -15,21 +15,21 @@ export class BeaversProximityAction {
     }={};
     _actionApps:ActionApp[]=[];
 
-    public async getActivityResultStore(sceneId:string){
+    public getActivityResultStore(sceneId:string=this.defaultSceneId()):ActivityResultStore|null{
         if(!this._data[sceneId]){
-            await this.activateScene(sceneId);
+            return null;
         }
         return this._data[sceneId].activityResultStore
     }
 
-    public async getActionGrid(sceneId:string){
+    public getActionGrid(sceneId:string=this.defaultSceneId()):ActionGrid|null{
         if(!this._data[sceneId]){
-            await this.activateScene(sceneId);
+            return null;
         }
         return this._data[sceneId].actionGrid
     }
 
-    public async activateScene(sceneId:string){
+    public async activateScene(sceneId:string=this.defaultSceneId()){
         if(!this._data[sceneId]) {
             const scene = await fromUuid(sceneId) as Scene;
             const activityResultStore = new ActivityResultStoreClass(scene);
@@ -47,11 +47,10 @@ export class BeaversProximityAction {
 
     public registerApp(app:ActionApp){
         this._actionApps.push(app);
-        const sceneId = canvas?.scene?.id||""
-        this._activateAppOnScene(sceneId,app);
+        this._activateAppOnScene(this.defaultSceneId(),app);
     }
 
-    private _activateAppsOnScene(sceneId:string){
+    private _activateAppsOnScene(sceneId:string=this.defaultSceneId()){
         for(const app of this._actionApps){
             this._activateAppOnScene(sceneId,app);
         }
@@ -63,6 +62,10 @@ export class BeaversProximityAction {
             app.enableOnScene(this._data[sceneId].actionGrid)
                 .then(()=>this._data[sceneId].appStatus[app.id] = "loaded");
         }
+    }
+
+    private defaultSceneId(){
+        return canvas?.scene?.uuid || "";
     }
 
 }

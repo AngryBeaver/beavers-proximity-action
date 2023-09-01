@@ -4,20 +4,17 @@ export const PriorityTypeOrder: PriorityType[] = ["normal", "fallback"];
 
 export class ActionGridClass implements ActionGrid {
 
-    private activities: {
+    private _activities: {
         [activityId: string]: Activity;
     } = {};
-    private actions: {
+    private _actions: {
         [actionId: string]: Action;
     } = {};
-    private activityActions: {
-        [activityId: string]: string[],
-    }
-    private wallActions: {
+    private _wallActions: {
         fallback: string[],
         normal: string[],
     } = {fallback: [], normal: []};
-    private gridActions: {
+    private _gridActions: {
         fallback: string[],
         normal: string[],
     } = {fallback: [], normal: []};
@@ -51,10 +48,10 @@ export class ActionGridClass implements ActionGrid {
             const wall = this._getCollisionWall(request.origin, gridId);
             //getAvailableAction on each grid
             const availAbleActions = this._getAvailableActionsFor(gridId, request.actorId, wall);
-            //filter actions for the given activity
+            //filter _actions for the given activity
             if(availAbleActions[request.activityId]){
                 for(const actionId of availAbleActions[request.activityId]){
-                    //store all available actions and their grids/walls.
+                    //store all available _actions and their grids/walls.
                     actions[actionId] = actions[actionId] || {gridIds:[],wallIds:[]};
                     if(wall){
                         actions[actionId].wallIds.push(wall.id)
@@ -68,7 +65,7 @@ export class ActionGridClass implements ActionGrid {
         if(Object.values(actions).length==0){
             throw new Error(game["i18n"].localize("beaversProximityAction.error.noAvailableActionsFound"));
         }
-        const activity = this.activities[request.activityId];
+        const activity = this._activities[request.activityId];
         const actor = await fromUuid(request.actorId) as Actor;
         if(actor) {
             //test activity
@@ -76,9 +73,9 @@ export class ActionGridClass implements ActionGrid {
            const testResult = await new TestHandler(activity.testOptions, actor).test();
            //check if test has been aborted
            if(testResult != null) {
-               //trigger all actions with that testResult
+               //trigger all _actions with that testResult
                for (const [actionId, locations] of Object.entries(actions)) {
-                   const action = this.actions[actionId];
+                   const action = this._actions[actionId];
                    const activityResultData:ActivityResultData = {...testResult,...locations,actorId:request.actorId};
                    activityResultData.actionResult = await action.activate(activityResultData);
                    //store the activityResult
@@ -112,22 +109,30 @@ export class ActionGridClass implements ActionGrid {
             }
         }
         return Object.entries(result).map(([id, gridIds]) => {
-            return {...this.activities[id], gridIds: gridIds, origin: origin}
+            return {...this._activities[id], gridIds: gridIds, origin: origin}
         })
     }
 
-    registerAction(action: Action): string {
-        return "";
+    registerAction(action: Action): void {
+        if(action.locationType === "wall"){
+            this._wallActions[action.priority].push(action.id);
+        }
+        if(action.locationType === "grid"){
+            this._gridActions[action.priority].push(action.id);
+        }
+        this._actions[action.id]=action;
     }
 
     registerActivity(activity: Activity): void {
+        this._activities[activity.id]=activity;
     }
 
-    unregisterAction(id: number): void {
-        delete this.activities[id];
+    unregisterAction(actionId: string): void {
+        delete this._activities[actionId];
     }
 
     unregisterActivity(activityId: string): void {
+        delete this._activities[activityId];
     }
 
     private _getAvailableActionsFor(gridId:string, actorId:string, wall?:Wall): { [activityId: string]:string[] }{
@@ -138,8 +143,8 @@ export class ActionGridClass implements ActionGrid {
             [activityId: string]: PriorityType
         } = {};
         for (const priority of PriorityTypeOrder) {
-            for (const actionId of this.wallActions[priority]) {
-                const action = this.actions[actionId];
+            for (const actionId of this._wallActions[priority]) {
+                const action = this._actions[actionId];
                 const activityId = action.activityId;
                 if ((!activityPriority[activityId] || activityPriority[activityId] === priority)
                     && ((wall && action.isMatchingWall(wall))||(!wall && action.isMatchingGrid(gridId)))

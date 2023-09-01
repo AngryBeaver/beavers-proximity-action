@@ -12,12 +12,14 @@ Hooks.on("ready", async function(){
         Hooks.call(HOOK_READY,game[NAMESPACE].BeaversProximityAction);
         const actionApp = new SecretDoorActionApp();
         game[NAMESPACE].BeaversProximityAction.registerApp(actionApp);
-        game[NAMESPACE].BeaversProximityAction.activateScene(canvas.scene.uuid);
+        if(canvas?.grid.isHex === false) {
+                game[NAMESPACE].BeaversProximityAction.activateScene(canvas.scene.uuid);
+        }
 })
 
 Hooks.on("canvasReady",async function(canvas){
         game[NAMESPACE]=game[NAMESPACE]||{};
-        if(!canvas.grid.isHex){
+        if(canvas.grid.isHex === false){
                 if(game[NAMESPACE].BeaversProximityAction){
                         game[NAMESPACE].BeaversProximityAction.activateScene(canvas.scene.uuid);
                 }

@@ -98,7 +98,7 @@ class SecretDoorActions {
     }
 
     static fallbackData:ActionStoreData = {
-        id: ID,
+        id: ID+"-fallback",
         activityId: ID,
         location:{
             type:"wall",

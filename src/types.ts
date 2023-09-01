@@ -130,6 +130,8 @@ interface ActionStoreData {
 interface Action {
     id:string,
     activityId:string,
+    priority:PriorityType,
+    locationType:LocationType,
     isMatchingGrid:(gridId:string)=>boolean,
     isMatchingWall:(wall:Wall)=>boolean,
     isAvailable:(gridId: string, actorId: string, wall?: Wall)=>boolean,
@@ -139,8 +141,8 @@ interface Action {
 interface ActionGrid {
     getProximity: (request:ProximityRequest) => VisualActivity[],
     executeActivity:(request:ActivityRequest) => Promise<void>,
-    registerAction: (action:Action) => string,
-    unregisterAction: (id:number)=>void,
+    registerAction: (action:Action) => void,
+    unregisterAction: (id:string)=>void,
     registerActivity: (activity:Activity) => void,
     unregisterActivity: (id:string) => void,
 }
@@ -162,9 +164,6 @@ interface ActionApp {
     enableOnScene:(actionGrid:ActionGrid) => Promise<void>,
 
 }
-
-
-
 
 interface InputDialog {
     title?:string,

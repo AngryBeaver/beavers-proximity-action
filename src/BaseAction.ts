@@ -6,11 +6,9 @@ import {NAMESPACE} from "./Settings.js";
 export class BaseAction implements Action {
 
     _data:ActionData;
-    activityResultStore:ActivityResultStore;
 
     constructor(actionData:ActionData){
         this._data = actionData;
-        this.activityResultStore = game[NAMESPACE].ActivityResultStore;
     }
 
     public get id():string {
@@ -19,7 +17,12 @@ export class BaseAction implements Action {
     public get activityId():string {
         return this._data.activityId;
     }
-
+    public get locationType():LocationType {
+        return this._data.location.type;
+    }
+    public get priority():PriorityType {
+        return this._data.priority
+    }
     public async activate(data:ActivityResultData){
         return await this._data.onActivate(data);
     }
@@ -48,7 +51,7 @@ export class BaseAction implements Action {
     }
 
     public isAvailable(gridId: string, actorId: string, wall: Wall|undefined=undefined) {
-        const activityResults = this.activityResultStore.get(this.id);
+        const activityResults = this.getActivityResults();
         const type = this._data.available.type;
         if(this._data.available.isAvailable && !this._data.available.isAvailable(gridId,actorId,wall)){
             return false;
@@ -62,6 +65,10 @@ export class BaseAction implements Action {
                 (wall?.id && activityResults.filter(a => wall?.id in a.wallIds).length > 0)
                 || (!wall && activityResults.filter(a => gridId in a.gridIds).length > 0)
             ));
+    }
+    //TODO fix me ? this is the current sceneID only
+    private getActivityResults(){
+        return game[NAMESPACE].BeaversProximityAction.getActivityResultStore().get(this.id);
     }
 
 }

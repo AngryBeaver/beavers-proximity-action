@@ -4,18 +4,20 @@ export class ProximitySquareGrid implements ProximityGrid{
     public getProximityGrids(request: ProximityRequest):ProximityGrids{
         const proximityGrids:ProximityGrids = [];
         const gridIds: string[] = [];
-        proximityGrids.push([0, this.getGrids(request.token)]);
+        const baseGrids = this.getGrids(request.token);
+        proximityGrids.push([0, baseGrids]);
+        gridIds.push(...baseGrids);
         const direction = Math.round(request.token.rotation / 45);
         const centerGrid = this.getDirectedTokenCenterGrid(direction,request.token.center);
         for (let distance = 1; distance < request.distance; distance++) {
             const grids:string[] = [];
             const distanceSquare = Math.round(1.414 * distance);
-            for (let dx = -distanceSquare; dx < distanceSquare; dx++) {
-                for (let dy = -distanceSquare; dy < distanceSquare; dy++) {
+            for (let dx = -distanceSquare; dx <= distanceSquare; dx++) {
+                for (let dy = -distanceSquare; dy <= distanceSquare; dy++) {
                     const x = centerGrid.x + dx;
                     const y = centerGrid.y + dy;
                     const gridId = this.getGridId(x, y);
-                    if (!(gridId in gridIds)) {
+                    if (!(gridIds.includes(gridId))) {
                         if (x > 0 && y > 0) {
                             if (request.type === "cone") {
                                 if (
@@ -53,13 +55,13 @@ export class ProximitySquareGrid implements ProximityGrid{
 
     public getGrids(token: Token):string[] {
         const grids: string[] = [];
-        const x = Math.round(token.bounds.x / this.gridSize());
-        const y = Math.round(token.bounds.y / this.gridSize());
+        const center = this.getGrid(token.center);
         const width = Math.round(token.bounds.width / this.gridSize());
         const height = Math.round(token.bounds.height / this.gridSize());
-        for (let w = 0; w < width; w++) {
-            for (let h = 0; h < height; h++) {
-                grids.push(this.getGridId(x + w, y + h));
+        const leftUpCenter = {x:Math.round(center.x - width),y:Math.round(center.y-height)};
+        for (let w = 1; w <= width; w++) {
+            for (let h = 1; h <= height; h++) {
+                grids.push(this.getGridId(leftUpCenter.x + w, leftUpCenter.y + h));
             }
         }
         return grids;
