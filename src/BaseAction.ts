@@ -8,7 +8,7 @@ export class BaseAction implements Action {
     _data:ActionData;
     activityResultStore:ActivityResultStore;
 
-    _constructor(actionData:ActionData){
+    constructor(actionData:ActionData){
         this._data = actionData;
         this.activityResultStore = game[NAMESPACE].ActivityResultStore;
     }

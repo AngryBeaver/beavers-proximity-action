@@ -1,13 +1,9 @@
 import {TestHandler} from "./TestHandler.js";
-import {SquareGrid} from "./SquareGrid.js";
-import {NAMESPACE} from "./main";
 
 export const PriorityTypeOrder: PriorityType[] = ["normal", "fallback"];
 
 export class ActionGridClass implements ActionGrid {
 
-    private _grid: Grid;
-    private _activityResultStore:ActivityResultStore;
     private activities: {
         [activityId: string]: Activity;
     } = {};
@@ -25,12 +21,13 @@ export class ActionGridClass implements ActionGrid {
         fallback: string[],
         normal: string[],
     } = {fallback: [], normal: []};
+    private _activityResultStore:ActivityResultStore;
+    private _grid: ProximityGrid;
 
-    constructor(){
-        this._activityResultStore = game[NAMESPACE].ActivityResultStore;
-        this._grid = new SquareGrid();
+    constructor(activityResultStore:ActivityResultStore,grid:ProximityGrid){
+        this._activityResultStore=activityResultStore;
+        this._grid=grid;
     }
-
 
     public async executeActivity(request: ActivityRequest) {
         //getActions for each grid;
@@ -91,6 +88,9 @@ export class ActionGridClass implements ActionGrid {
         }
     }
 
+
+
+
     getProximity(request: ProximityRequest): VisualActivity[] {
         const result: {
             [activityId: string]: string[]
@@ -120,8 +120,7 @@ export class ActionGridClass implements ActionGrid {
         return "";
     }
 
-    registerActivity(register: RegisterActivity): string {
-        return "";
+    registerActivity(activity: Activity): void {
     }
 
     unregisterAction(id: number): void {

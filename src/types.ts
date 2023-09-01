@@ -37,10 +37,12 @@
 //an action isAvailable
 
 type ProximityType = "close" | "cone"
-type TestType = "skill" | "ability" | "hit" | "choices";
+type TestType = "skill" | "ability" | "hit" | "choices" | "input" | "prompt";
 type LocationType = "wall" | "grid" ;
 type AvailableType = "always" | "once" | "perGrid" | "perWall" | "perActor" | "each"
 type PriorityType = "fallback" | "normal"
+
+type ProximityGrids = [distance: number,grids: string[]][];
 
 interface ProximityRequest {
     token: Token
@@ -71,21 +73,25 @@ interface Activity extends RegisterActivity{
 }
 
 interface TestOptions {
-    [key:number]: Test
+    [testId:string]: Test
 }
 
 interface Test {
-    name:string,
-    choices: {
+    id:string,
+    name:string
+    choices?: {
         [id:string]:{text:string,img?:string}
     }
+    inputDialog?: InputDialog
+    promptDialog?: PromptDialog
     type: TestType
 }
 
 interface ActivityResult {
-    choice?: string,
-    value?: number,
-    type: TestType,
+    text?: string,
+    number?: number,
+    isSuccess?:boolean,
+    testId: string,
 }
 
 interface ActivityResultData extends ActivityResult {
@@ -95,7 +101,7 @@ interface ActivityResultData extends ActivityResult {
     actionResult?: any,
 }
 
-interface Location {
+interface ActionLocation {
     type:LocationType
     //or directly actionSpaces
     gridIds: string[],
@@ -104,18 +110,23 @@ interface Location {
     isGlobal:boolean
 }
 
-interface ActionData {
-    id: string,
-    activityId: string,
-    location:Location
+interface ActionData extends ActionStoreData {
     onActivate: (result:ActivityResultData)=>Promise<any>;
     available:{
+        type:AvailableType,
+        isAvailable?: (gridId:string,actorId:string,wall?:Wall)=>boolean
+    }
+}
+
+interface ActionStoreData {
+    id: string,
+    activityId: string,
+    location:ActionLocation
+    available:{
         type:AvailableType
-        isAvailable?: (gridId:string,actorId:string,wall?:Wall)=>boolean,
     }
     priority:PriorityType
 }
-
 interface Action {
     id:string,
     activityId:string,
@@ -130,8 +141,10 @@ interface ActionGrid {
     executeActivity:(request:ActivityRequest) => Promise<void>,
     registerAction: (action:Action) => string,
     unregisterAction: (id:number)=>void,
+    registerActivity: (activity:Activity) => void,
+    unregisterActivity: (id:string) => void,
 }
-interface Grid {
+interface ProximityGrid {
     getProximityGrids: (request: ProximityRequest) => ProximityGrids;
     getGrid: (point: Point) => Point;
     getGrids: (token: Token) => string[];
@@ -143,5 +156,22 @@ interface ActivityResultStore {
     add:(actionId,ActivityResultData)=>void,
 }
 
-type ProximityGrids = [distance: number,grids: string[]][];
+interface ActionApp {
+    id:string,
+    isEnabled:()=>boolean,
+    enableOnScene:(actionGrid:ActionGrid) => Promise<void>,
 
+}
+
+
+
+
+interface InputDialog {
+    title?:string,
+    label?:string,
+    type?:string
+}
+interface PromptDialog {
+    title?:string,
+    label?:string,
+}

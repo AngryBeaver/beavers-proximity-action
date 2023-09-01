@@ -4,7 +4,26 @@
       "canvasGridError": "no canvas grid detected",
       "noActorOnToken": "token does not have an actor",
       "noAvailableActionsFound": "no available Actions found for your request"
+    },
+    "secretDoor": {
+      "activity": {
+        "name": "search hidden doors",
+        "prompt": {
+          "title": "Search hidden door",
+          "label": "Secret door detected ?"
+        }
+      },
+      "error": {
+        "actionTypeNotFound": "action not found"
+      },
+      "fallbackMessage": "Nothing found."
+    },
+    "inputDialog": {
+      "systemAgnosticRoll": {
+        "title": "SystemAgnosticRoll",
+        "label": "enter roll result",
+        "type": "number"
+      },
     }
-
   }
 }

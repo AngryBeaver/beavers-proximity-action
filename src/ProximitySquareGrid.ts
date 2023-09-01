@@ -1,4 +1,4 @@
-export class SquareGrid implements Grid{
+export class ProximitySquareGrid implements ProximityGrid{
 
 
     public getProximityGrids(request: ProximityRequest):ProximityGrids{
