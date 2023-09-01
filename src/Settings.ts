@@ -1,4 +1,5 @@
-import {NAMESPACE} from "./main.js";
+export const NAMESPACE = "beavers-proximity-action"
+
 export class Settings {
 
 

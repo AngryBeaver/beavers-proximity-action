@@ -23,7 +23,7 @@
         "title": "SystemAgnosticRoll",
         "label": "enter roll result",
         "type": "number"
-      },
+      }
     }
   }
 }

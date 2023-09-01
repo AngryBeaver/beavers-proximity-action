@@ -1,4 +1,4 @@
-import {NAMESPACE} from "./main.js";
+import {NAMESPACE} from "./Settings.js";
 
 export class ActivityResultStoreClass implements ActivityResultStore {
 

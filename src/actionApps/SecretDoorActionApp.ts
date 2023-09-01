@@ -1,5 +1,6 @@
-import {NAMESPACE} from "../main.js";
+
 import {BaseAction} from "../BaseAction.js";
+import {NAMESPACE} from "../Settings.js";
 
 /**secret door action app
  * when this actionApp is registered it should be settings enabled

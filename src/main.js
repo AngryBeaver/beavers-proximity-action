@@ -1,22 +1,25 @@
-import {Settings} from "./Settings.js";
-import {BeaversProximityAction} from "./BeaversProximityAction";
-import {SecretDoorActionApp} from "./actionApps/SecretDoorActionApp";
+import {NAMESPACE, Settings} from "./Settings.js";
+import {BeaversProximityAction} from "./BeaversProximityAction.js";
+import {SecretDoorActionApp} from "./actionApps/SecretDoorActionApp.js";
 
-export const NAMESPACE = "beavers-proximity-action"
+
 export const HOOK_READY = NAMESPACE+".ready";
 
 Hooks.on("ready", async function(){
         game[NAMESPACE]=game[NAMESPACE]||{};
         game[NAMESPACE].Settings = new Settings();
         game[NAMESPACE].BeaversProximityAction = new BeaversProximityAction();
-        Hooks.call(HOOK_READY);
+        Hooks.call(HOOK_READY,game[NAMESPACE].BeaversProximityAction);
         const actionApp = new SecretDoorActionApp();
         game[NAMESPACE].BeaversProximityAction.registerApp(actionApp);
+        game[NAMESPACE].BeaversProximityAction.activateScene(canvas.scene.uuid);
 })
 
 Hooks.on("canvasReady",async function(canvas){
         game[NAMESPACE]=game[NAMESPACE]||{};
         if(!canvas.grid.isHex){
-                game[NAMESPACE].BeaversProximityAction.activateScene(canvas.scene);
+                if(game[NAMESPACE].BeaversProximityAction){
+                        game[NAMESPACE].BeaversProximityAction.activateScene(canvas.scene.uuid);
+                }
         }
 });

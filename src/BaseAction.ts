@@ -1,7 +1,7 @@
 //TODO problem with storing and callback method.
 //actions are registered by other modules action ids will change except other modules define the ids "module name prefix ?"
 
-import {NAMESPACE} from "./main";
+import {NAMESPACE} from "./Settings.js";
 
 export class BaseAction implements Action {
 

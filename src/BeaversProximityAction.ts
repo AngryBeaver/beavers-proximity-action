@@ -13,7 +13,7 @@ export class BeaversProximityAction {
             }
         }
     }={};
-    _actionApps:ActionApp[]
+    _actionApps:ActionApp[]=[];
 
     public async getActivityResultStore(sceneId:string){
         if(!this._data[sceneId]){
@@ -30,16 +30,18 @@ export class BeaversProximityAction {
     }
 
     public async activateScene(sceneId:string){
-        const scene = await fromUuid(sceneId) as Scene;
-        const activityResultStore = new ActivityResultStoreClass(scene);
-        const grid = new ProximitySquareGrid();
-        const actionGrid = new ActionGridClass(activityResultStore,grid);
-        this._data[sceneId] = {
-            activityResultStore:activityResultStore,
-            actionGrid:actionGrid,
-            appStatus:{},
+        if(!this._data[sceneId]) {
+            const scene = await fromUuid(sceneId) as Scene;
+            const activityResultStore = new ActivityResultStoreClass(scene);
+            const grid = new ProximitySquareGrid();
+            const actionGrid = new ActionGridClass(activityResultStore, grid);
+            this._data[sceneId] = {
+                activityResultStore: activityResultStore,
+                actionGrid: actionGrid,
+                appStatus: {},
+            }
+            this._activateAppsOnScene(sceneId);
         }
-        this._activateAppsOnScene(sceneId);
     }
 
 
