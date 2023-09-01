@@ -117,23 +117,18 @@ export class TestHandler {
                         return;
                     }
                 });
-            }
-            if (test.type === "ability") {
+            }else if (test.type === "ability") {
                 beaversSystemInterface.configAbilities.forEach(ability => {
                     if (ability.id === test.id) {
                         choices[id] = {text: ability.label};
                         return;
                     }
                 });
-            }
-            if (test.type === "hit") {
-                choices[id] = {text: test.id};
-            }
-            if (test.type === "choices") {
+            }else{
                 choices[id] = {text: test.id};
             }
         }
-        const choice = parseInt(await beaversSystemInterface.uiDialogSelect({choices: choices}));
+        const choice = await beaversSystemInterface.uiDialogSelect({choices: choices});
         return testOptions[choice];
     }
 

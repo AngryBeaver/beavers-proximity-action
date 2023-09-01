@@ -49,8 +49,8 @@ export class ActionGridClass implements ActionGrid {
             //getAvailableAction on each grid
             const availAbleActions = this._getAvailableActionsFor(gridId, request.actorId, wall);
             //filter _actions for the given activity
-            if(availAbleActions[request.activityId]){
-                for(const actionId of availAbleActions[request.activityId]){
+            if(availAbleActions[request.id]){
+                for(const actionId of availAbleActions[request.id]){
                     //store all available _actions and their grids/walls.
                     actions[actionId] = actions[actionId] || {gridIds:[],wallIds:[]};
                     if(wall){
@@ -65,7 +65,7 @@ export class ActionGridClass implements ActionGrid {
         if(Object.values(actions).length==0){
             throw new Error(game["i18n"].localize("beaversProximityAction.error.noAvailableActionsFound"));
         }
-        const activity = this._activities[request.activityId];
+        const activity = this._activities[request.id];
         const actor = await fromUuid(request.actorId) as Actor;
         if(actor) {
             //test activity
@@ -92,7 +92,7 @@ export class ActionGridClass implements ActionGrid {
         const result: {
             [activityId: string]: string[]
         } = {};
-        const actorId = request.token?.actor?.id;
+        const actorId = request.token?.actor?.uuid;
         const origin = request.token.center;
         if (!actorId) {
             throw new Error(game["i18n"].localize("beaversProximityAction.error.noActorOnToken"));
@@ -109,7 +109,7 @@ export class ActionGridClass implements ActionGrid {
             }
         }
         return Object.entries(result).map(([id, gridIds]) => {
-            return {...this._activities[id], gridIds: gridIds, origin: origin}
+            return {...this._activities[id], actorId:actorId, gridIds: gridIds, origin: origin}
         })
     }
 
@@ -178,7 +178,7 @@ export class ActionGridClass implements ActionGrid {
                     result.push([gridId]);
                 } else {
                     //remove wallGrids that had been detected in a closer distance
-                    if (wall.id in previousWalls) {
+                    if (!previousWalls.includes(wall.id)) {
                         currentWalls.push(wall.id);
                         result.push([gridId, wall]);
                     }

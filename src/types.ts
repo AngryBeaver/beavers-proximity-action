@@ -51,7 +51,7 @@ interface ProximityRequest {
 }
 
 interface ActivityRequest {
-    activityId: string,
+    id: string,
     actorId: string,
     origin: Point
     gridIds: string[]
@@ -60,16 +60,14 @@ interface ActivityRequest {
 interface VisualActivity extends Activity {
     origin: Point
     gridIds: string[]
+    actorId: string,
 }
 
-interface RegisterActivity {
+interface Activity {
+    id:string
     name: string,
     mapIcon: string,
     testOptions: TestOptions,
-}
-
-interface Activity extends RegisterActivity{
-    id:string
 }
 
 interface TestOptions {

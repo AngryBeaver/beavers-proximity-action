@@ -118,7 +118,7 @@ class SecretDoorActions {
         }else if(type==="default"){
             return {onActivate:this.defaultAction,...this.defaultData}
         }else{
-            throw Error(game["i18n"].localize(NAMESPACE+".secretDoor.error.actionTypeNotFound"));
+            throw Error(game["i18n"].localize("beaversProximityAction.secretDoor.error.actionTypeNotFound"));
         }
     }
 
@@ -139,7 +139,7 @@ class SecretDoorActions {
     }
 
     static async fallbackAction (result:ActivityResultData){
-        ui.notifications?.info(game["i18n"].localize(NAMESPACE+".secretDoor.fallbackMessage"));
+        ui.notifications?.info(game["i18n"].localize("beaversProximityAction.secretDoor.fallbackMessage"));
     }
 
 }
