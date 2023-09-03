@@ -57,13 +57,13 @@ interface ActivityRequest {
     gridIds: string[]
 }
 
-interface VisualActivity extends Activity {
+interface VisualActivity extends ActivityOld {
     origin: Point
     gridIds: string[]
     actorId: string,
 }
 
-interface Activity {
+interface ActivityOld {
     id:string
     name: string,
     mapIcon: string,
@@ -104,7 +104,7 @@ interface ActionLocation {
     //or directly actionSpaces
     gridIds: string[],
     //or walls
-    wallFilter:[attribute:string,value:string][],
+    wallFilter:[attribute:string,value:any][],
     isGlobal:boolean
 }
 
@@ -141,7 +141,7 @@ interface ActionGrid {
     executeActivity:(request:ActivityRequest) => Promise<void>,
     registerAction: (action:Action) => void,
     unregisterAction: (id:string)=>void,
-    registerActivity: (activity:Activity) => void,
+    registerActivity: (activity:ActivityOld) => void,
     unregisterActivity: (id:string) => void,
 }
 interface ProximityGrid {

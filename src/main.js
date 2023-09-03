@@ -1,6 +1,8 @@
 import {NAMESPACE, Settings} from "./Settings.js";
 import {BeaversProximityAction} from "./BeaversProximityAction.js";
 import {SecretDoorActionApp} from "./actionApps/SecretDoorActionApp.js";
+import {WallActivity} from "./activities/WallActivity.js";
+import {SecretDoorActivity} from "./activities/SecretDoorActivity.js";
 
 
 export const HOOK_READY = NAMESPACE+".ready";
@@ -15,6 +17,7 @@ Hooks.on("ready", async function(){
         if(canvas?.grid.isHex === false) {
                 game[NAMESPACE].BeaversProximityAction.activateScene(canvas.scene.uuid);
         }
+        new SecretDoorActivity();
 })
 
 Hooks.on("canvasReady",async function(canvas){

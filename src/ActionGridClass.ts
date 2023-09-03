@@ -5,7 +5,7 @@ export const PriorityTypeOrder: PriorityType[] = ["normal", "fallback"];
 export class ActionGridClass implements ActionGrid {
 
     private _activities: {
-        [activityId: string]: Activity;
+        [activityId: string]: ActivityOld;
     } = {};
     private _actions: {
         [actionId: string]: Action;
@@ -61,6 +61,9 @@ export class ActionGridClass implements ActionGrid {
                 }
             }
         }
+        //filterHihestPriorityActions
+
+
         //throw if no action has been found.
         if(Object.values(actions).length==0){
             throw new Error(game["i18n"].localize("beaversProximityAction.error.noAvailableActionsFound"));
@@ -123,7 +126,7 @@ export class ActionGridClass implements ActionGrid {
         this._actions[action.id]=action;
     }
 
-    registerActivity(activity: Activity): void {
+    registerActivity(activity: ActivityOld): void {
         this._activities[activity.id]=activity;
     }
 

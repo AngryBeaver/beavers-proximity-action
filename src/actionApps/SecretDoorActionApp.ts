@@ -51,8 +51,8 @@ export class SecretDoorActionApp implements ActionApp {
     /**
      * gets the activity configuration
      */
-    async getActivity():Promise<Activity> {
-        const activity: Activity = {
+    async getActivity():Promise<ActivityOld> {
+        const activity: ActivityOld = {
             id: ID,
             name: game["i18n"].localize("beaversProximityAction.secretDoor.activity.name"),
             mapIcon: "",
@@ -88,7 +88,7 @@ class SecretDoorActions {
         location:{
             type:"wall",
             gridIds:[],
-            wallFilter:[["door","2"]],
+            wallFilter:[["document.door",2]],
             isGlobal:false
         },
         available:{
@@ -128,11 +128,11 @@ class SecretDoorActions {
         for(const wallId of result.wallIds) {
             const wall = canvas?.scene?.walls.get(wallId);
             if (wall) {
-                const dcs = wall.getFlag(ID, "dcs");
+                const dcs = wall["flags"][ID]?.dcs
                 if (result.isSuccess || (result.number && dcs?.[result.testId] >= result.number)) {
                     await wall.update({door: 1});
                 }else{
-                    await this.fallbackAction(result);
+                    await SecretDoorActions.fallbackAction(result);
                 }
             }
         }
