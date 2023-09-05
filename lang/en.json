@@ -3,7 +3,8 @@
     "error": {
       "canvasGridError": "no canvas grid detected",
       "noActorOnToken": "token does not have an actor",
-      "noAvailableActionsFound": "no available Actions found for your request"
+      "noAvailableActionsFound": "no available Actions found for your request",
+      "noActorFound": "no actor found for your request"
     },
     "secretDoor": {
       "activity": {

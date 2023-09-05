@@ -95,8 +95,7 @@ interface ActivityResult {
 interface ActivityResultData extends ActivityResult {
     actorId: string,
     gridIds: string[],
-    wallIds: string[],
-    actionResult?: any,
+    wallIds: string[]
 }
 
 interface ActionLocation {

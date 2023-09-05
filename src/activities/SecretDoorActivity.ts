@@ -11,25 +11,30 @@ export class SecretDoorActivity extends WallActivity{
     static get defaultData():bpa.ActivityData{
         return {
             id:NAMESPACE + ".secret-door",
+            name: game["i18n"].localize("beaversProximityAction.secretDoor.activity.name"),
             testOptions:{
                 "prompt" : {
                     id: "prompt",
                     name: "prompt",
                     type: "prompt",
                     promptDialog:{
-                        title:game["i18n"].localize("beaversProximityAction.activity.prompt.title"),
-                        label:game["i18n"].localize("beaversProximityAction.activity.prompt.label")
+                        title:game["i18n"].localize("beaversProximityAction.secretDoor.activity.prompt.title"),
+                        label:game["i18n"].localize("beaversProximityAction.secretDoor.activity.prompt.label")
                     }
                 }
             },
             actionClasses:{
-                "default":SecretDoorAction,
+                "main":SecretDoorAction,
             },
-            actions:[
-                {
-                    classId: "default"
-                }
-            ],
+            actions:{
+                default: [
+                    {
+                        classId: "main",
+                        priority: "normal"
+                    }
+                ],
+                fallback: [],
+            },
             configurations: {
                 "search-id":{
                     inputData: {
@@ -66,7 +71,7 @@ class SecretDoorAction extends Action{
         }
     }
 
-    async verifyResult(result:ActivityResultData):Promise<boolean>{
+    async execute(result:ActivityResultData):Promise<boolean>{
         let anySuccess = false;
         for(const wallId of result.wallIds) {
             const wall = canvas?.scene?.walls.get(wallId);
