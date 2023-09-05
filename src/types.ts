@@ -36,138 +36,161 @@
 //an action is defined for wall or grids.
 //an action isAvailable
 
+import {Action} from "./activities/Action";
+import {Activity} from "./activities/Activity";
+
 type ProximityType = "close" | "cone"
 type TestType = "skill" | "ability" | "hit" | "choices" | "input" | "prompt";
 type LocationType = "wall" | "grid" ;
 type AvailableType = "always" | "once" | "perGrid" | "perWall" | "perActor" | "each"
 type PriorityType = "fallback" | "normal"
 
-type ProximityGrids = [distance: number,grids: string[]][];
 
-interface ProximityRequest {
-    token: Token
-    type: ProximityType,
-    distance: number,
-}
+export const PriorityTypeOrder: PriorityType[] = ["normal", "fallback"];
 
-interface ActivityRequest {
-    id: string,
-    actorId: string,
-    origin: Point
-    gridIds: string[]
-}
-
-interface VisualActivity extends ActivityOld {
-    origin: Point
-    gridIds: string[]
-    actorId: string,
-}
-
-interface ActivityOld {
-    id:string
-    name: string,
-    mapIcon: string,
-    testOptions: TestOptions,
-}
-
-interface TestOptions {
-    [testId:string]: Test
-}
-
-interface Test {
-    id:string,
-    name:string
-    choices?: {
-        [id:string]:{text:string,img?:string}
+export declare namespace bpa {
+    type ProximityGrids = [distance: number,grids: string[]][];
+    interface ActivityData extends ActivityStoreData {
+        id: string,
+        name: string
+        testOptions: TestOptions,
+        actionClasses: {
+            [actionClassId: string]: bpa.ActionClass
+        },
+        actions: {
+            default: ActionStoreData[],
+            fallback: ActionStoreData[]
+        },
+        configurations: {
+            [configId: string]: {
+                inputData: InputData,
+                defaultValue: any,
+            }
+        },
+        results: ActivityResult[]
     }
-    inputDialog?: InputDialog
-    promptDialog?: PromptDialog
-    type: TestType
-}
 
-interface ActivityResult {
-    text?: string,
-    number?: number,
-    isSuccess?:boolean,
-    testId: string,
-}
+    interface ActionLocation {
+        type: LocationType
+        //or directly actionSpaces
+        gridIds: string[],
+        //or walls
+        wallFilter: [attribute: string, value: any][],
+        isGlobal: boolean
+    }
 
-interface ActivityResultData extends ActivityResult {
-    actorId: string,
-    gridIds: string[],
-    wallIds: string[]
-}
+    interface ActionData extends ActionStoreData {
+        id: string,
+        location: ActionLocation
+        available: {
+            type: AvailableType
+        }
+        priority: PriorityType
+    }
 
-interface ActionLocation {
-    type:LocationType
-    //or directly actionSpaces
-    gridIds: string[],
-    //or walls
-    wallFilter:[attribute:string,value:any][],
-    isGlobal:boolean
-}
+    interface ActionStoreData {
+        classId: string,
+        priority: PriorityType,
+        location?: ActionLocation
+        available?: {
+            type: AvailableType
+        }
+    }
 
-interface ActionData extends ActionStoreData {
-    onActivate: (result:ActivityResultData)=>Promise<any>;
-    available:{
-        type:AvailableType,
-        isAvailable?: (gridId:string,actorId:string,wall?:Wall)=>boolean
+    interface InputData {
+        label: string,
+        type: string,
+    }
+
+    interface ActivityStoreData {
+        results: ActivityResult[],
+        actions: {
+            default: ActionStoreData[],
+            fallback: ActionStoreData[]
+        }
+    }
+
+    interface ActionClass {
+        new(activity: Activity, options?: any): Action
+        [any: string]: any,
+    }
+
+
+    interface ProximityRequest {
+        token: Token,
+        actorId: string,
+        distance: number,
+        type: ProximityType
+    }
+
+    interface ProximityResult {
+        origin: Point
+        actorId: string,
+        activities:
+            {
+                id: string,
+                name: string
+            }[],
+        hitArea:HitArea,
+    }
+
+
+    interface ActivityRequest {
+        actorId: string,
+        activityId: string,
+        hitArea: HitArea
+    }
+
+    interface Grid {
+        getProximityGrids: (request: ProximityRequest) => ProximityGrids;
+        getGrid: (point: Point) => Point;
+        getGrids: (token: Token) => string[];
+        centerOfGridId: (gridId:string)=>Point;
+    }
+
+    type ActivityGrid = [gridId: string, wall?: Wall];
+
+    interface TestResult {
+        text?: string,
+        number?: number,
+        isSuccess?: boolean,
+        testId: string,
+    }
+
+    interface ActivityResult {
+        testResult: TestResult,
+        hitArea: HitArea,
+        actorId: string
+    }
+
+    interface HitArea {
+        gridIds: string[],
+        wallIds: string[]
+    }
+
+    interface TestOptions {
+        [testId:string]: Test
+    }
+
+    interface Test {
+        id:string,
+        name:string
+        choices?: {
+            [id:string]:{text:string,img?:string}
+        }
+        inputDialog?: InputDialog
+        promptDialog?: PromptDialog
+        type: TestType
+    }
+
+    interface InputDialog {
+        title?:string,
+        label?:string,
+        type?:string
+    }
+    interface PromptDialog {
+        title?:string,
+        label?:string,
     }
 }
 
-interface ActionStoreData {
-    id: string,
-    activityId: string,
-    location:ActionLocation
-    available:{
-        type:AvailableType
-    }
-    priority:PriorityType
-}
-interface Action {
-    id:string,
-    activityId:string,
-    priority:PriorityType,
-    locationType:LocationType,
-    isMatchingGrid:(gridId:string)=>boolean,
-    isMatchingWall:(wall:Wall)=>boolean,
-    isAvailable:(gridId: string, actorId: string, wall?: Wall)=>boolean,
-    activate:(result:ActivityResultData)=>Promise<any>;
-}
-
-interface ActionGrid {
-    getProximity: (request:ProximityRequest) => VisualActivity[],
-    executeActivity:(request:ActivityRequest) => Promise<void>,
-    registerAction: (action:Action) => void,
-    unregisterAction: (id:string)=>void,
-    registerActivity: (activity:ActivityOld) => void,
-    unregisterActivity: (id:string) => void,
-}
-interface ProximityGrid {
-    getProximityGrids: (request: ProximityRequest) => ProximityGrids;
-    getGrid: (point: Point) => Point;
-    getGrids: (token: Token) => string[];
-    centerOfGridId: (gridId:string)=>Point;
-}
-
-interface ActivityResultStore {
-    get:(actionId)=>ActivityResultData[],
-    add:(actionId,ActivityResultData)=>void,
-}
-
-interface ActionApp {
-    id:string,
-    isEnabled:()=>boolean,
-    enableOnScene:(actionGrid:ActionGrid) => Promise<void>,
-
-}
-
-interface InputDialog {
-    title?:string,
-    label?:string,
-    type?:string
-}
-interface PromptDialog {
-    title?:string,
-    label?:string,
-}

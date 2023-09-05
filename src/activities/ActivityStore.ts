@@ -1,5 +1,5 @@
 import {NAMESPACE} from "../Settings.js";
-import {bpa} from "./Activity.js";
+import {bpa} from "../types.js";
 
 export class ActivityStore {
 

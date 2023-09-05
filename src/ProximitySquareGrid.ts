@@ -1,8 +1,10 @@
-export class ProximitySquareGrid implements ProximityGrid{
+import {bpa} from "./types";
+
+export class ProximitySquareGrid implements bpa.Grid{
 
 
-    public getProximityGrids(request: ProximityRequest):ProximityGrids{
-        const proximityGrids:ProximityGrids = [];
+    public getProximityGrids(request: bpa.ProximityRequest):bpa.ProximityGrids{
+        const proximityGrids:bpa.ProximityGrids = [];
         const gridIds: string[] = [];
         const baseGrids = this.getGrids(request.token);
         proximityGrids.push([0, baseGrids]);

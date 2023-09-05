@@ -1,113 +1,10 @@
 import {NAMESPACE} from "../Settings.js";
 import {BPAEngine} from "./BPAEngine.js";
 import {Action} from "./Action.js";
-import {TestHandler} from "../TestHandler";
-
-export declare namespace bpa {
-    interface ActivityData extends ActivityStoreData {
-        id: string,
-        name: string
-        testOptions: TestOptions,
-        actionClasses: {
-            [actionClassId: string]: bpa.ActionClass
-        },
-        actions: {
-            default: ActionStoreData[],
-            fallback: ActionStoreData[]
-        },
-        configurations: {
-            [configId: string]: {
-                inputData: InputData,
-                defaultValue: any,
-            }
-        },
-        results: ActivityResult[]
-    }
-
-    interface ActionData extends ActionStoreData {
-        id: string,
-        location: ActionLocation
-        available: {
-            type: AvailableType
-        }
-        priority: PriorityType
-    }
-
-    interface ActionStoreData {
-        classId: string,
-        priority: PriorityType,
-        location?: ActionLocation
-        available?: {
-            type: AvailableType
-        }
-    }
-
-    interface InputData {
-        label: string,
-        type: string,
-    }
-
-    interface ActivityStoreData {
-        results: ActivityResult[],
-        actions: {
-            default: ActionStoreData[],
-            fallback: ActionStoreData[]
-        }
-    }
-
-    interface ActionClass {
-        new(activity: Activity, options?: any): Action
-        [any: string]: any,
-    }
+import {TestHandler} from "../TestHandler.js";
+import {bpa, PriorityTypeOrder} from "../types.js";
 
 
-    interface ProximityRequest {
-        token: Token,
-        actorId: string,
-        distance: number,
-        type: ProximityType
-    }
-
-    interface ProximityResult {
-        origin: Point
-        actorId: string,
-        activities:
-            {
-                id: string,
-                name: string
-            }[],
-        hitArea:HitArea,
-    }
-
-
-    interface ActivityRequest {
-        actorId: string,
-        activityId: string,
-        hitArea: HitArea
-    }
-
-    type ActivityGrid = [gridId: string, wall?: Wall];
-
-    interface TestResult {
-        text?: string,
-        number?: number,
-        isSuccess?: boolean,
-        testId: string,
-    }
-
-    interface ActivityResult {
-        testResult: TestResult,
-        hitArea: HitArea,
-        actorId: string
-    }
-
-    interface HitArea {
-        gridIds: string[],
-        wallIds: string[]
-    }
-}
-
-export const PriorityTypeOrder: PriorityType[] = ["normal", "fallback"];
 
 /**
  * There is exactly one activity instance per scene
@@ -268,27 +165,5 @@ export class Activity {
         return false;
     }
 
-
-    //TODO move this to parent
-    private _flattenActivityGrids(activityGrids: bpa.ActivityGrid[]): bpa.HitArea {
-        const result: bpa.HitArea = {
-            gridIds: [],
-            wallIds: []
-        }
-        for (const [gridId, wall] of activityGrids) {
-            if (wall !== undefined) {
-                const wallId = wall.id
-                if (wallId && !result.wallIds.includes(wallId)) {
-                    result.wallIds.push(wallId);
-                }
-
-            } else {
-                if (!result.gridIds.includes(gridId)) {
-                    result.gridIds.push(gridId);
-                }
-            }
-        }
-        return result;
-    }
 
 }

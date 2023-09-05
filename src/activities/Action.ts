@@ -1,4 +1,6 @@
-import {Activity, bpa} from "./Activity.js";
+import {Activity} from "./Activity.js";
+import {bpa} from "../types.js";
+
 
 export abstract class Action {
     _parent: Activity;

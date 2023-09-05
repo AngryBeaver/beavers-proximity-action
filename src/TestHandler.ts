@@ -1,3 +1,9 @@
+import {bpa} from "./activities/Activity";
+import TestOptions = bpa.TestOptions;
+import Test = bpa.Test;
+import PromptDialog = bpa.PromptDialog;
+import InputDialog = bpa.InputDialog;
+
 export class TestHandler {
     testOptions: TestOptions
     actor: Actor

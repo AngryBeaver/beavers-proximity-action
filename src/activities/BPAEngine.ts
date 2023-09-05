@@ -1,10 +1,11 @@
 import {ActivityStore} from "./ActivityStore.js";
 import {ProximitySquareGrid} from "../ProximitySquareGrid.js";
-import {Activity, bpa} from "./Activity.js";
+import {Activity} from "./Activity.js";
+import {bpa} from "../types.js";
 
 export class BPAEngine {
     public readonly activityStore:ActivityStore;
-    public readonly grid:ProximityGrid;
+    public readonly grid:bpa.Grid;
     private _activities:Activity[];
 
     constructor(scene:Scene){
@@ -60,7 +61,7 @@ export class BPAEngine {
     /**
      * add wallIds and remove grids behind walls
      */
-    private _filterGridsThatHitWalls(origin: Point, proximityGrids: ProximityGrids): bpa.HitArea {
+    private _filterGridsThatHitWalls(origin: Point, proximityGrids: bpa.ProximityGrids): bpa.HitArea {
         const hitArea:bpa.HitArea = {
             gridIds:[],
             wallIds:[]
