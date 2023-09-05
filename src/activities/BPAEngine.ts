@@ -1,7 +1,6 @@
 import {ActivityStore} from "./ActivityStore.js";
 import {ProximitySquareGrid} from "../ProximitySquareGrid.js";
 import {Activity, bpa} from "./Activity.js";
-import {ActivityGrids, activityGrids} from "./Activity";
 
 export class BPAEngine {
     public readonly activityStore:ActivityStore;
@@ -26,21 +25,21 @@ export class BPAEngine {
     }
 
     /**
-     * users can get Activities around them
+     * users can get Activities around a token
+     * tokens have a center and a rotation
      */
     public getProximityActivities(request:bpa.ProximityRequest): bpa.ProximityResult{
-        const result: bpa.ProximityResult = {
-            origin:request.origin,
-            actorId: request.actorId,
-            activities:[]
-        }
-        //TODO fix used to be token now point what is better.
-        const proximityGrids = this.grid.getProximityGrids(request);
-        const activityGrids: bpa.ActivityGrid[] = this._filterGridsThatHitWalls(request.origin, proximityGrids);
 
+        const proximityGrids = this.grid.getProximityGrids(request);
+        const hitArea: bpa.HitArea = this._filterGridsThatHitWalls(request.token.center, proximityGrids);
+        const result: bpa.ProximityResult = {
+            origin:request.token.center,
+            actorId: request.actorId,
+            activities:[],
+            hitArea: hitArea
+        }
         for(const activity of this._activities){
-            //TODO fix this.
-            if(activity.isAvailable(request.actorId,activityGrids)){
+            if(activity.isAvailable(request.actorId,hitArea)){
                 result.activities.push({
                     id: activity.id,
                     name:activity.name,
@@ -53,31 +52,32 @@ export class BPAEngine {
     /**
      * users can execute an activity within proximity range.
      */
-    public executeProximityActivity(){
-        //TODO
+    public async executeActivity(request:bpa.ActivityRequest){
+        const activity:Activity = this._activities[request.activityId];
+        await activity.execute(request.actorId,request.hitArea);
     }
 
-    //add wallgrids and remove grids behind wallgrids.
-    private _filterGridsThatHitWalls(origin: Point, proximityGrids: ProximityGrids): bpa.ActivityGrid[] {
-        const result: [gridId: string, wall?: Wall][] = [];
-        const previousWalls: string[] = [];
+    /**
+     * add wallIds and remove grids behind walls
+     */
+    private _filterGridsThatHitWalls(origin: Point, proximityGrids: ProximityGrids): bpa.HitArea {
+        const hitArea:bpa.HitArea = {
+            gridIds:[],
+            wallIds:[]
+        }
         for (const [distance, grids] of proximityGrids) {
-            const currentWalls: string[] = [];
             for (const gridId of grids) {
                 const wall = this._getCollisionWall(origin, gridId);
                 if (!wall) {
-                    result.push([gridId]);
+                    hitArea.gridIds.push(gridId);
                 } else {
-                    //remove wallGrids that had been detected in a closer distance
-                    if (!previousWalls.includes(wall.id)) {
-                        currentWalls.push(wall.id);
-                        result.push([gridId, wall]);
+                    if (! hitArea.wallIds.includes(wall.id)) {
+                        hitArea.wallIds.push(wall.id);
                     }
                 }
             }
-            previousWalls.push(...currentWalls);
         }
-        return result;
+        return hitArea;
     }
 
     private _getCollisionWall(origin: Point, gridId: string): Wall | undefined {

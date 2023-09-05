@@ -71,15 +71,14 @@ class SecretDoorAction extends Action{
         }
     }
 
-    async execute(result:ActivityResultData):Promise<boolean>{
+    async execute(result: bpa.ActivityResult):Promise<boolean>{
         let anySuccess = false;
-        for(const wallId of result.wallIds) {
+        for(const wallId of result.hitArea.wallIds) {
             const wall = canvas?.scene?.walls.get(wallId);
             if (wall) {
                 const dc:number = wall["flags"][this.parentId]?.[CONFIGURATION_ID]
                     || this._parent.getConfigValue(CONFIGURATION_ID);
-                if (result.isSuccess || (result.number && dc >= result.number)) {
-                    //TODO do we want to wait for it ?
+                if (result.testResult.isSuccess || (result.testResult.number && dc >= result.testResult.number)) {
                     this.success(wall);
                     anySuccess = true;
                 }

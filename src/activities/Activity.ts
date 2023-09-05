@@ -57,8 +57,15 @@ export declare namespace bpa {
 
     interface ActionClass {
         new(activity: Activity, options?: any): Action
-
         [any: string]: any,
+    }
+
+
+    interface ProximityRequest {
+        token: Token,
+        actorId: string,
+        distance: number,
+        type: ProximityType
     }
 
     interface ProximityResult {
@@ -68,17 +75,18 @@ export declare namespace bpa {
             {
                 id: string,
                 name: string
-            }[]
+            }[],
+        hitArea:HitArea,
     }
 
-    interface ProximityRequest {
-        origin: Point,
+
+    interface ActivityRequest {
         actorId: string,
-        distance: number,
-        type: ProximityType
+        activityId: string,
+        hitArea: HitArea
     }
 
-    type ActivityGrid = [gridId: string, wall?: WallDocument];
+    type ActivityGrid = [gridId: string, wall?: Wall];
 
     interface TestResult {
         text?: string,
@@ -156,16 +164,14 @@ export class Activity {
     }
 
     /**
-     * bpa can detect if this activity is available on grid
+     * bpa can detect if this activity is available on hitArea
      * it will be true if any action is available to this request.
      */
-    public isAvailable(actorId: string, activityGrids: bpa.ActivityGrid[]): boolean {
+    public isAvailable(actorId: string, hitArea: bpa.HitArea): boolean {
         for (const priority of PriorityTypeOrder) {
             for (const actionData of this._data.actions[priority]) {
-                for (const activityGrid of activityGrids) {
-                    if (this._isActionAvailable(actionData, actorId, activityGrid)) {
-                        return true;
-                    }
+                if (this._isActionAvailable(actionData, actorId, hitArea)) {
+                    return true;
                 }
             }
         }
@@ -177,8 +183,8 @@ export class Activity {
      * actions are executed in priority order
      * if an action executed with success it will stop execution for all lower priority ordered executions.
      */
-    public async execute(actorId: string, activityGrids: bpa.ActivityGrid[]) {
-        if (!this.isAvailable(actorId, activityGrids)) {
+    public async execute(actorId: string, hitArea:bpa.HitArea) {
+        if (!this.isAvailable(actorId, hitArea)) {
             throw new Error(game["i18n"].localize("beaversProximityAction.error.noAvailableActionsFound"));
         }
         const actor = await fromUuid(actorId) as Actor;
@@ -190,7 +196,7 @@ export class Activity {
         if (testResult !== null) {
             const result: bpa.ActivityResult = {
                 testResult: testResult,
-                hitArea: this._flattenActivityGrids(activityGrids),
+                hitArea: hitArea,
                 actorId: actorId
             }
             this._executeActions(result);
@@ -206,13 +212,13 @@ export class Activity {
      * @param testResult
      * @private
      */
-    private async _executeActions(testResult: bpa.ActivityResult) {
+    private async _executeActions(activityResult: bpa.ActivityResult) {
         let stopExecution = false;
         for (const priority of PriorityTypeOrder) {
             if (!stopExecution) {
                 for (const actionData of this._data.actions[priority]) {
                     const action = this._getAction(actionData);
-                    stopExecution = await action.execute(testResult)
+                    stopExecution = await action.execute(activityResult)
                 }
             }
         }
@@ -237,22 +243,33 @@ export class Activity {
         return new clazz(this, actionData);
     }
 
-    private _isActionAvailable(actionData: bpa.ActionData, actorId: string, activityGrid: bpa.ActivityGrid): boolean {
+    private _isActionAvailable(actionData: bpa.ActionData, actorId: string, hitArea: bpa.HitArea): boolean {
         const activityResults = this._data.results;
         const type = actionData.available.type;
-        const gridId = activityGrid[0];
-        const wall = activityGrid[1];
-        return (type === "always")
-            || (type === "once" && activityResults.length === 0)
-            || (type === "perGrid" && activityResults.filter(a => gridId in a.gridIds).length > 0)
-            || (type === "perWall" && wall?.id && activityResults.filter(a => wall?.id in a.wallIds).length > 0)
-            || (type === "perActor" && activityResults.filter(a => actorId === a.actorId).length > 0)
-            || (type === "each" && activityResults.filter(a => actorId === a.actorId).length > 0 && (
-                (wall?.id && activityResults.filter(a => wall?.id in a.wallIds).length > 0)
-                || (!wall && activityResults.filter(a => gridId in a.gridIds).length > 0)
-            ));
+        let result = (type === "always") || (type === "once" && activityResults.length === 0)
+            || (type === "perActor" && activityResults.filter(a => actorId === a.actorId).length === 0)
+        if(result) {
+            return true;
+        }
+        for (const gridId of hitArea.gridIds) {
+            result = (type === "perGrid" && activityResults.filter(a => a.hitArea.gridIds.includes(gridId)).length === 0)
+                || (type === "each" && activityResults.filter(a =>(actorId === a.actorId && a.hitArea.gridIds.includes(gridId))).length === 0)
+            if(result){
+                return true;
+            }
+        }
+        for (const wallId of hitArea.wallIds) {
+            result = (type === "perWall"  && activityResults.filter(a => a.hitArea.wallIds.includes(wallId)).length === 0)
+                || (type === "each" && activityResults.filter(a =>(actorId === a.actorId && a.hitArea.wallIds.includes(wallId))).length === 0)
+            if(result){
+                return true;
+            }
+        }
+        return false;
     }
 
+
+    //TODO move this to parent
     private _flattenActivityGrids(activityGrids: bpa.ActivityGrid[]): bpa.HitArea {
         const result: bpa.HitArea = {
             gridIds: [],
