@@ -1,40 +1,19 @@
-//activities can be registered and are either globally or only on ActionSpaces active.
-//each grid can have multiple activities.
-//you can execute one activity in your proximity area e.g. on multiple grid spaces next to you.
-//you can not execute one action in your proximity area each action correspond to one activity.
-//an action can share activities or define a unique activity
-//one activity on one grid can trigger multiple Actions. //e.g. overlapping traps.
-
-// for each grid you get all actions
-// for each action you get all unique activities. activties + grids = VisualActivities.
-// user can choose an activity for all grids available  -> he does not know which actions he triggers
-// for an activity on a list of grids you trigger actions to this activity.
-// for each action you store the grids and result of the activity.
 
 //usecases
-//detect secret doors all "wallAction" -> one action global walls -> test parameter Wall.
-//detect traps room "gridAction" global -> one activity global grids
-//search for loot "gridAction" global -> usually nothing -> one activity multiple actions per treasure drop.
-//place traps -> trap action
-//open locked doors -> doorWallAction -> one specific activity per door
-//open locked chests -> drag and drop -> one specific activity per chest
-//investigate clues -> drag and drop -> one activity multiple actions per clue drop
-//enter passphrase for quiz.
-//hover icon above token.
+//interact with wall:
+//- detect secret doors all "wallAction" -> one action global walls -> test parameter Wall.
+//- unlock door || strength break || pickLock || enter passphrase
+//- later for gamepad use open doors
+//interact with grid:
+//- investigate clues on grids + drop clues.
+//- advanced search for loot + drop loot || maybe other module e.g. make itempiles visible.
+//- advanced search for traps + drop traps || it needs not to trigger the trap that is another module.
+//- advanced disable found traps.
+//interact with token:
+//- advanced quest-giver || other module beavers-crafting
+//- advanced anvil || other module beavers-crafting
+//- advanced openShop || other module shop ?
 
-
-//an activity describes how to test.
-//when an activity is triggered it executes one test or no test.
-//activities can have one or many actions
-//an action describe what happens with the result of an activityCheck it returns a success string.
-//an action defines if it is available.
-//fallbackActions: actions have priority on each grid only the actions with the highest priority will get executed.
-//all actions with the same priority on each grid will be executed in parallel.
-
-//detect action is available
-//an action can store the gridId, wallId, actorId and successString
-//an action is defined for wall or grids.
-//an action isAvailable
 
 import {Action} from "./activities/Action";
 import {Activity} from "./activities/Activity";
