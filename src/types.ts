@@ -28,7 +28,6 @@ type PriorityType = "fallback" | "normal"
 export const PriorityTypeOrder: PriorityType[] = ["normal", "fallback"];
 
 export declare namespace bpa {
-    type ProximityGrids = [distance: number,grids: string[]][];
 
     interface ActivityStoreData {
         results: ActivityResult[],
@@ -120,10 +119,11 @@ export declare namespace bpa {
     }
 
     interface Grid {
-        getProximityGrids: (request: ProximityRequest) => ProximityGrids;
+        getProximityGrids: (request: ProximityRequest) => Point[];
         getGrid: (point: Point) => Point;
         getGrids: (token: Token) => string[];
         centerOfGridId: (gridId:string)=>Point;
+        getGridId: (point: Point) => string;
     }
 
     type ActivityGrid = [gridId: string, wall?: Wall];

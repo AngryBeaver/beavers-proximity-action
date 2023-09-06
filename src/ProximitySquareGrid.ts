@@ -1,52 +1,21 @@
 import {bpa} from "./types.js";
+import {ConeShapedSquareGrid} from "./ConeShapedSquareGrid.js";
+import {CloseSquareGrid} from "./CloseSquareGrid.js";
 
-export class ProximitySquareGrid implements bpa.Grid{
+export class ProximitySquareGrid implements bpa.Grid {
 
 
-    public getProximityGrids(request: bpa.ProximityRequest):bpa.ProximityGrids{
-        const proximityGrids:bpa.ProximityGrids = [];
-        const gridIds: string[] = [];
-        const baseGrids = this.getGrids(request.token);
-        proximityGrids.push([0, baseGrids]);
-        gridIds.push(...baseGrids);
-        const direction = Math.round(request.token.rotation / 45);
-        const centerGrid = this.getDirectedTokenCenterGrid(direction,request.token.center);
-        for (let distance = 1; distance < request.distance; distance++) {
-            const grids:string[] = [];
-            const distanceSquare = Math.round(1.414 * distance);
-            for (let dx = -distanceSquare; dx <= distanceSquare; dx++) {
-                for (let dy = -distanceSquare; dy <= distanceSquare; dy++) {
-                    const x = centerGrid.x + dx;
-                    const y = centerGrid.y + dy;
-                    const gridId = this.getGridId(x, y);
-                    if (!(gridIds.includes(gridId))) {
-                        if (x > 0 && y > 0) {
-                            if (request.type === "cone") {
-                                if (
-                                    (direction === 0 && dx >= -distance && dx <= distance && dy < 0 && dy >= -distance)
-                                    || (direction === 2 && dy >= -distance && dy <= distance && dx > 0 && dx <= distance)
-                                    || (direction === 4 && dx >= -distance && dx <= distance && dy > 0 && dy <= distance)
-                                    || (direction === 6 && dy >= -distance && dy <= distance && dx < 0 && dx >= -distance)
-                                    || (direction === 1 && dx >= 0 && dy <= 0 && dx - dy <= distanceSquare)
-                                    || (direction === 3 && dx >= 0 && dy >= 0 && dx + dy <= distanceSquare)
-                                    || (direction === 5 && dx <= 0 && dy >= 0 && -dx + dy <= distanceSquare)
-                                    || (direction === 7 && dx <= 0 && dy <= 0 && -dx - dy <= distanceSquare)
-                                ) {
-                                    gridIds.push(gridId);
-                                    grids.push(gridId);
-                                }
-                            }
-                            if (request.type == "close" && dx >= -distance && dx <= distance && dy >= -distance && dy <= distance) {
-                                gridIds.push(gridId);
-                                grids.push(gridId);
-                            }
-                        }
-                    }
-                }
-            }
-            proximityGrids.push([distance,grids]);
+    public getProximityGrids(request: bpa.ProximityRequest): Point[] {
+        if (!canvas?.grid?.grid) {
+            throw Error("no grid found");
         }
-        return proximityGrids;
+        const gridArray = canvas.grid.grid.getGridPositionFromPixels(request.token.center.x, request.token.center.y);
+        const grid = {x: gridArray[0], y: gridArray[1]};
+        if (request.type === "cone") {
+            return new ConeShapedSquareGrid(request.distance, grid, request.token.rotation).getGrids();
+        } else {
+            return new CloseSquareGrid(request.distance, grid, request.token.rotation).getGrids();
+        }
     }
 
     public getGrid(point: Point): Point {
@@ -55,26 +24,26 @@ export class ProximitySquareGrid implements bpa.Grid{
         return {x: x, y: y}
     }
 
-    public getGrids(token: Token):string[] {
+    public getGrids(token: Token): string[] {
         const grids: string[] = [];
         const center = this.getGrid(token.center);
         const width = Math.round(token.bounds.width / this.gridSize());
         const height = Math.round(token.bounds.height / this.gridSize());
-        const leftUpCenter = {x:Math.round(center.x - width),y:Math.round(center.y-height)};
+        const leftUpCenter = {x: Math.round(center.x - width), y: Math.round(center.y - height)};
         for (let w = 1; w <= width; w++) {
             for (let h = 1; h <= height; h++) {
-                grids.push(this.getGridId(leftUpCenter.x + w, leftUpCenter.y + h));
+                grids.push(this.getGridId({x:leftUpCenter.x + w, y:leftUpCenter.y + h}));
             }
         }
         return grids;
     }
 
-    public centerOfGridId(gridId:string):Point{
+    public centerOfGridId(gridId: string): Point {
         const size = this.gridSize();
-        const [gx,gy] = gridId.split(":");
-        const x = Math.round(-gx*-size+size/2);
-        const y = Math.round(-gy*-size+size/2);
-        return {x:x,y:y}
+        const [gx, gy] = gridId.split(":");
+        const x = Math.round(-gx * -size + size / 2);
+        const y = Math.round(-gy * -size + size / 2);
+        return {x: x, y: y}
     }
 
     private gridSize(): number {
@@ -86,28 +55,27 @@ export class ProximitySquareGrid implements bpa.Grid{
     }
 
 
-
-    private getGridId(x: number, y: number): string {
-        return x + ":" + y;
+    public getGridId(point:Point): string {
+        return point.x + ":" + point.y;
     }
 
-    private getDirectedTokenCenterGrid(direction:number,center:Point) {
+    private getDirectedTokenCenterGrid(direction: number, center: Point) {
         let x = center.x;
         let y = center.y;
         if (direction in [0, 1, 7]) {
-            y = y -1;
+            y = y - 1;
         }
         if (direction in [3, 4, 5]) {
-            y = y +1;
+            y = y + 1;
         }
         if (direction in [1, 2, 3]) {
-            x = x +1;
+            x = x + 1;
         }
 
         if (direction in [5, 6, 7]) {
-            x= x-1;
+            x = x - 1;
         }
-        return this.getGrid({x:x,y:y});
+        return this.getGrid({x: x, y: y});
     }
 
 }
