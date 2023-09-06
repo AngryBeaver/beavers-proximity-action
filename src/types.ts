@@ -1,7 +1,7 @@
 
 //usecases
 //interact with wall:
-//- detect secret doors all "wallAction" -> one action global walls -> test parameter Wall.
+//- detect secret doors && add testOptions to walls/secretdoors
 //- unlock door || strength break || pickLock || enter passphrase
 //- later for gamepad use open doors
 //interact with grid:

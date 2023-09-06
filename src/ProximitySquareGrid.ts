@@ -1,4 +1,4 @@
-import {bpa} from "./types";
+import {bpa} from "./types.js";
 
 export class ProximitySquareGrid implements bpa.Grid{
 
@@ -109,4 +109,5 @@ export class ProximitySquareGrid implements bpa.Grid{
         }
         return this.getGrid({x:x,y:y});
     }
+
 }
