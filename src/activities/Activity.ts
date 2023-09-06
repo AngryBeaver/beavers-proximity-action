@@ -5,7 +5,6 @@ import {TestHandler} from "../TestHandler.js";
 import {bpa, PriorityTypeOrder} from "../types.js";
 
 
-
 /**
  * There is exactly one activity instance per scene
  */
@@ -14,13 +13,18 @@ export class Activity {
     _parent: BPAEngine;
     _sceneId: string;
 
+    static getId():string{
+        throw new Error("overwrite static getID() in your activity");
+    }
+
     constructor(parent: BPAEngine, sceneId: string) {
         if (new.target === Activity) {
             throw new TypeError("Cannot construct Abstract instances directly");
         }
         this._parent = parent;
         this._sceneId = sceneId;
-        const storedOptions = this._parent.activityStore.get(this.id) || {};
+        // @ts-ignore
+        const storedOptions = this._parent.activityStore.get(this.constructor.getId()) || {};
 
         // merge Activity defaultData with activityStoreData
         // @ts-ignore

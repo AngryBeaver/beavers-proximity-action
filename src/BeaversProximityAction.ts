@@ -1,5 +1,3 @@
-import {ProximitySquareGrid} from "./ProximitySquareGrid.js";
-import {ActivityStore} from "./activities/ActivityStore.js";
 import {Activity} from "./activities/Activity.js";
 import {BPAEngine} from "./activities/BPAEngine.js";
 
@@ -15,14 +13,18 @@ export class BeaversProximityAction {
     }={};
     _activityClasses:{
         [activityId:string]:typeof Activity
-    }
+    }={};
 
     /**
      * Modules can add activityClasses
      * They are not stored and needs to be registered each time with a ready hook.
      */
-    public addActivityClass(activityId:string, activityClass:typeof Activity){
-        this._activityClasses[activityId] = activityClass;
+    public addActivityClass(activityClass:typeof Activity){
+        this._activityClasses[activityClass.getId()] = activityClass;
+        const currentSceneId = this.defaultSceneId();
+        if(this._data[currentSceneId]){
+            this._activateActivity(activityClass.getId(), currentSceneId);
+        }
     }
 
     /**
@@ -49,7 +51,14 @@ export class BeaversProximityAction {
         if(!this._data[sceneId]) {
             const scene = await fromUuid(sceneId) as Scene;
             this._data[sceneId] = new BPAEngine(scene);
+            for(const activityId of Object.keys(this._activityClasses)){
+                this._activateActivity(activityId, sceneId);
+            }
         }
+    }
+
+    private _activateActivity(activityId:string,sceneId:string){
+        new this._activityClasses[activityId](this._data[sceneId],sceneId);
     }
 
 

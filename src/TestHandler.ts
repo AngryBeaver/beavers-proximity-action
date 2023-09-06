@@ -1,8 +1,9 @@
-import {bpa} from "./activities/Activity";
+
 import TestOptions = bpa.TestOptions;
 import Test = bpa.Test;
 import PromptDialog = bpa.PromptDialog;
 import InputDialog = bpa.InputDialog;
+import {bpa} from "./types.js";
 
 export class TestHandler {
     testOptions: TestOptions
@@ -16,9 +17,9 @@ export class TestHandler {
     //Todo sendrequest to player
     //Todo allow gm requests e.g. for prompts.
 
-    async test(): Promise<ActivityResult | null> {
+    async test(): Promise<bpa.TestResult | null> {
         const test = await this.selectTestChoice(this.testOptions);
-        let result: ActivityResult | null = null;
+        let result: bpa.TestResult | null = null;
         if (test.type === "ability") {
             result = await this._testAbility(test);
         } else if (test.type === "skill") {
@@ -36,7 +37,7 @@ export class TestHandler {
         return result;
     }
 
-    async _testAbility(test: Test): Promise<ActivityResult | null> {
+    async _testAbility(test: Test): Promise<bpa.TestResult | null> {
         let roll = await beaversSystemInterface.actorRollAbility(this.actor, test.name);
         if (roll != null) {
             return null
@@ -44,7 +45,7 @@ export class TestHandler {
         return {number: roll.total, testId: test.id};
     }
 
-    async _testSkill(test: Test): Promise<ActivityResult | null> {
+    async _testSkill(test: Test): Promise<bpa.TestResult | null> {
         let roll = await beaversSystemInterface.actorRollSkill(this.actor, test.name);
         if (roll == null) {
             return null;
@@ -52,7 +53,7 @@ export class TestHandler {
         return {number: roll.total, testId: test.id};
     }
 
-    async _testChoices(test: Test): Promise<ActivityResult | null> {
+    async _testChoices(test: Test): Promise<bpa.TestResult | null> {
         const choice = await beaversSystemInterface.uiDialogSelect(test.choices);
         if (choice == null) {
             return null;
@@ -60,7 +61,7 @@ export class TestHandler {
         return {text: choice, testId: test.id};
     }
 
-    async _testInput(test: Test): Promise<ActivityResult | null> {
+    async _testInput(test: Test): Promise<bpa.TestResult | null> {
         const input = await this.uiDialogInput(test.inputDialog || {})
         if (input == null) {
             return null;
@@ -71,7 +72,7 @@ export class TestHandler {
         return {text: input, testId: test.id};
     }
 
-    async _testPrompt(test:Test): Promise<ActivityResult | null>{
+    async _testPrompt(test:Test): Promise<bpa.TestResult | null>{
         const prompt = await this.uiDialogPrompt(test.promptDialog || {})
         if (prompt == null) {
             return null;

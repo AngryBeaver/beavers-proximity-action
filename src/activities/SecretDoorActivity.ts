@@ -2,10 +2,14 @@ import {NAMESPACE} from "../Settings.js";
 import {WallActivity} from "./WallActivity.js";
 import {Action} from "./Action.js";
 import {bpa} from "../types.js";
-const ID = NAMESPACE + ".secret-door"
+export const ID = NAMESPACE + ".secret-door"
 const CONFIGURATION_ID = "search-dc";
 
 export class SecretDoorActivity extends WallActivity{
+
+    static getId():string{
+        return ID;
+    }
 
     static get defaultData():bpa.ActivityData{
         return {
