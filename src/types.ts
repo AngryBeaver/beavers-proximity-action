@@ -29,6 +29,14 @@ export const PriorityTypeOrder: PriorityType[] = ["normal", "fallback"];
 
 export declare namespace bpa {
     type ProximityGrids = [distance: number,grids: string[]][];
+
+    interface ActivityStoreData {
+        results: ActivityResult[],
+        actions: {
+            default: ActionStoreData[],
+            fallback: ActionStoreData[]
+        }
+    }
     interface ActivityData extends ActivityStoreData {
         id: string,
         name: string
@@ -81,14 +89,6 @@ export declare namespace bpa {
         type: string,
     }
 
-    interface ActivityStoreData {
-        results: ActivityResult[],
-        actions: {
-            default: ActionStoreData[],
-            fallback: ActionStoreData[]
-        }
-    }
-
     interface ActionClass {
         new(activity: Activity, options?: any): Action
         [any: string]: any,
@@ -112,7 +112,6 @@ export declare namespace bpa {
             }[],
         hitArea:HitArea,
     }
-
 
     interface ActivityRequest {
         actorId: string,
