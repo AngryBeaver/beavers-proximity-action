@@ -51,9 +51,9 @@ export class BeaversProximityAction {
         if(!this._data[sceneId]) {
             const scene = await fromUuid(sceneId) as Scene;
             this._data[sceneId] = new BPAEngine(scene);
-            for(const activityId of Object.keys(this._activityClasses)){
-                this._activateActivity(activityId, sceneId);
-            }
+        }
+        for(const activityId of Object.keys(this._activityClasses)){
+            this._activateActivity(activityId, sceneId);
         }
     }
 

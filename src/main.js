@@ -15,10 +15,6 @@ Hooks.on("ready", async function(){
         game[NAMESPACE].BeaversProximityAction = new BeaversProximityAction();
         Hooks.call(HOOK_READY,game[NAMESPACE].BeaversProximityAction);
         activateScene();
-
-
-        //TODO register SecretDoorAction
-        //TODO activate after scene is activated ?
 })
 
 Hooks.on("canvasReady",async function(canvas){

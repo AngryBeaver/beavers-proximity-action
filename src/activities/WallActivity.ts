@@ -1,4 +1,6 @@
 import {Activity} from "./Activity.js";
+import {BPAEngine} from "./BPAEngine.js";
+import {NAMESPACE} from "../Settings.js";
 
 /**
  * Activities are instanciated when active on a Scene
@@ -7,5 +9,42 @@ import {Activity} from "./Activity.js";
  */
 export class WallActivity extends Activity {
 
+    constructor(parent: BPAEngine, sceneId: string) {
+        super(parent, sceneId);
+        Hooks.on("renderWallConfig", (app, html, options) => {
+            if (html.find("nav").length == 0) {
+                const button = html.find("button [type=submit]");
+                button.detach();
+                const old = html.find("form").html();
+                html.find("form").html(`
+<nav class="sheet-tabs tabs aria-role="Form Tab Navigation">
+    <a class="item active" data-tab="basic"><i class="fas fa-university"></i> Basic</a>
+    <a class="item" data-tab="proximity"><i class="fas fa-street-view"></i> Proximity</a>
+</nav>
+<div class="tab active" data-tab="basic"></div>
+<div class="tab" data-tab="proximity"></div>
+                `);
+                html.find("form").after(button);
+                html.find(".tab.active").html(old);
+            }
+            html.find(".tab[data-tab=proximity]").append(`
+                <fieldset>
+                    <legend>${this.name}</legend>
+                </fieldset>
+            `);
+            for (const [id,configuration] of Object.entries(this._data.configurations)) {
+                html.find(`.tab[data-tab=proximity] fieldset`).append(`
+<div class="form-group">
+    <label>${configuration.inputData.label}</label>
+    <input placeholder="${configuration.defaultValue}" name="flags.${NAMESPACE}.${id}." type="${configuration.inputData.type}"/>
+</div>
+            `);
+            }
+            app.options.tabs = [{ navSelector: ".tabs", contentSelector: "form", initial: "basic" }];
+            app._tabs = app._createTabHandlers();
+            app._tabs.forEach(t => t.bind(html[0]));
+            app.setPosition({ height: "auto" });
+        });
+    }
 
 }
