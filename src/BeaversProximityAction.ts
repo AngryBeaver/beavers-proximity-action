@@ -14,6 +14,9 @@ export class BeaversProximityAction {
     _activityClasses:{
         [activityId:string]:typeof Activity
     }={};
+    _activities:{
+        [activityId:string]:Activity
+    }={};
 
     /**
      * Modules can add activityClasses
@@ -58,7 +61,10 @@ export class BeaversProximityAction {
     }
 
     private _activateActivity(activityId:string,sceneId:string){
-        new this._activityClasses[activityId](this._data[sceneId],sceneId);
+        if(this._activities[activityId]){
+            this._activities[activityId].destruct();
+        }
+        this._activities[activityId] = new this._activityClasses[activityId](this._data[sceneId],sceneId);
     }
 
 

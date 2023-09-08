@@ -9,9 +9,12 @@ import {NAMESPACE} from "../Settings.js";
  */
 export class WallActivity extends Activity {
 
+
+
     constructor(parent: BPAEngine, sceneId: string) {
         super(parent, sceneId);
-        Hooks.on("renderWallConfig", (app, html, options) => {
+
+        function _addTabs(app, html) {
             if (html.find("nav").length == 0) {
                 const button = html.find("button [type=submit]");
                 button.detach();
@@ -26,13 +29,21 @@ export class WallActivity extends Activity {
                 `);
                 html.find("form").after(button);
                 html.find(".tab.active").html(old);
+                app.options.tabs = [{navSelector: ".tabs", contentSelector: "form", initial: "basic"}];
+                app._tabs = app._createTabHandlers();
+                app._tabs.forEach(t => t.bind(html[0]));
+                app.setPosition({height: "auto"});
             }
+        }
+
+        this._hooks["renderWallConfig"] = Hooks.on("renderWallConfig", (app, html, options) => {
+            _addTabs(app, html);
             html.find(".tab[data-tab=proximity]").append(`
-                <fieldset>
+                <fieldset data-id="${this.id}">
                     <legend>${this.name}</legend>
                 </fieldset>
             `);
-            for (const [id,configuration] of Object.entries(this._data.configurations)) {
+            for (const [id, configuration] of Object.entries(this._data.configurations)) {
                 html.find(`.tab[data-tab=proximity] fieldset`).append(`
 <div class="form-group">
     <label>${configuration.inputData.label}</label>
@@ -40,11 +51,7 @@ export class WallActivity extends Activity {
 </div>
             `);
             }
-            app.options.tabs = [{ navSelector: ".tabs", contentSelector: "form", initial: "basic" }];
-            app._tabs = app._createTabHandlers();
-            app._tabs.forEach(t => t.bind(html[0]));
-            app.setPosition({ height: "auto" });
         });
-    }
 
+    }
 }

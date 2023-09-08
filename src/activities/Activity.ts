@@ -12,6 +12,9 @@ export class Activity {
     _data: bpa.ActivityData;
     _parent: BPAEngine;
     _sceneId: string;
+    _hooks:{
+        [id:string]:number,
+    } = {};
 
     static getId():string{
         throw new Error("overwrite static getID() in your activity");
@@ -35,6 +38,8 @@ export class Activity {
             inplace: false
         });
     }
+
+
 
     get id(): string {
         return this._data.id;
@@ -169,5 +174,10 @@ export class Activity {
         return false;
     }
 
+    public destruct():void{
+        for(const [id,value] of Object.entries(this._hooks)){
+            Hooks.off(id,value);
+        }
+    }
 
 }
