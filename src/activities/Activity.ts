@@ -16,10 +16,6 @@ export class Activity {
         [id:string]:number,
     } = {};
 
-    static getId():string{
-        throw new Error("overwrite static getID() in your activity");
-    }
-
     constructor(parent: BPAEngine, sceneId: string) {
         if (new.target === Activity) {
             throw new TypeError("Cannot construct Abstract instances directly");
@@ -27,7 +23,7 @@ export class Activity {
         this._parent = parent;
         this._sceneId = sceneId;
         // @ts-ignore
-        const storedOptions = this._parent.activityStore.get(this.constructor.getId()) || {};
+        const storedOptions = this._parent.activityStore.get(this.constructor.defaultData.id) || {};
 
         // merge Activity defaultData with activityStoreData
         // @ts-ignore
@@ -98,7 +94,7 @@ export class Activity {
             throw new Error(game["i18n"].localize("beaversProximityAction.error.noActorOnToken"));
         }
         //TODO throw this back to caller client.
-        const testResult = await new TestHandler(this._data.testOptions, actor).test();
+        const testResult = await new TestHandler(this._data.test.options, actor).test();
         if (testResult !== null) {
             const result: bpa.ActivityResult = {
                 testResult: testResult,

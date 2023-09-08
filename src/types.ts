@@ -17,6 +17,7 @@
 
 import {Action} from "./activities/Action";
 import {Activity} from "./activities/Activity";
+import {BPAEngine} from "./activities/BPAEngine";
 
 type ProximityType = "close" | "cone"
 type TestType = "skill" | "ability" | "hit" | "choices" | "input" | "prompt";
@@ -38,8 +39,11 @@ export declare namespace bpa {
     }
     interface ActivityData extends ActivityStoreData {
         id: string,
-        name: string
-        testOptions: TestOptions,
+        name: string,
+        test:{
+            name:string,
+            options: TestOptions
+        }
         actionClasses: {
             [actionClassId: string]: bpa.ActionClass
         },
@@ -90,6 +94,12 @@ export declare namespace bpa {
 
     interface ActionClass {
         new(activity: Activity, options?: any): Action
+        [any: string]: any,
+    }
+
+    interface ActivityClass {
+        new(parent: BPAEngine, sceneId: string): Activity
+        defaultData:ActivityData
         [any: string]: any,
     }
 

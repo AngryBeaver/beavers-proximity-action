@@ -1,5 +1,7 @@
 import {Activity} from "./activities/Activity.js";
 import {BPAEngine} from "./activities/BPAEngine.js";
+import {bpa} from "./types.js";
+import {NAMESPACE} from "./Settings.js";
 
 export class BeaversProximityAction {
 
@@ -12,7 +14,7 @@ export class BeaversProximityAction {
         }
     }={};
     _activityClasses:{
-        [activityId:string]:typeof Activity
+        [activityId:string]:bpa.ActivityClass
     }={};
     _activities:{
         [activityId:string]:Activity
@@ -22,11 +24,12 @@ export class BeaversProximityAction {
      * Modules can add activityClasses
      * They are not stored and needs to be registered each time with a ready hook.
      */
-    public addActivityClass(activityClass:typeof Activity){
-        this._activityClasses[activityClass.getId()] = activityClass;
+    public addActivityClass(activityClass:bpa.ActivityClass){
+        this._activityClasses[activityClass.defaultData.id] = activityClass;
         const currentSceneId = this.defaultSceneId();
+        game[NAMESPACE].Settings.addActivity(activityClass);
         if(this._data[currentSceneId]){
-            this._activateActivity(activityClass.getId(), currentSceneId);
+            this._activateActivity(activityClass.defaultData.id, currentSceneId);
         }
     }
 

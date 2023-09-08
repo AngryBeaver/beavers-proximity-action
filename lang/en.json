@@ -7,12 +7,10 @@
       "noActorFound": "no actor found for your request"
     },
     "secretDoor": {
-      "activity": {
+      "name": "Secret door activity",
+      "test": {
         "name": "search hidden doors",
-        "prompt": {
-          "title": "Search hidden door",
-          "label": "Secret door detected ?"
-        }
+        "prompt": "secret door detected ?"
       },
       "error": {
         "actionTypeNotFound": "action not found"

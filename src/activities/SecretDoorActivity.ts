@@ -14,15 +14,18 @@ export class SecretDoorActivity extends WallActivity{
     static get defaultData():bpa.ActivityData{
         return {
             id:NAMESPACE + ".secret-door",
-            name: game["i18n"].localize("beaversProximityAction.secretDoor.activity.name"),
-            testOptions:{
-                "prompt" : {
-                    id: "prompt",
-                    name: "prompt",
-                    type: "prompt",
-                    promptDialog:{
-                        title:game["i18n"].localize("beaversProximityAction.secretDoor.activity.prompt.title"),
-                        label:game["i18n"].localize("beaversProximityAction.secretDoor.activity.prompt.label")
+            name: game["i18n"].localize("beaversProximityAction.secretDoor.name"),
+            test:{
+                name: game["i18n"].localize("beaversProximityAction.secretDoor.test.name"),
+                options: {
+                    "prompt": {
+                        id: "prompt",
+                        name: "prompt",
+                        type: "prompt",
+                        promptDialog: {
+                            title: game["i18n"].localize("beaversProximityAction.secretDoor.test.name"),
+                            label: game["i18n"].localize("beaversProximityAction.secretDoor.test.prompt")
+                        }
                     }
                 }
             },
