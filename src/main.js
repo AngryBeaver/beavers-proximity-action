@@ -8,8 +8,11 @@ export const HOOK_READY = NAMESPACE+".ready";
 Hooks.on(HOOK_READY,async function(){
         game[NAMESPACE].BeaversProximityAction.addActivityClass(SecretDoorActivity);
 });
+Hooks.on("beavers-system-interface.init", async function(){
+        beaversSystemInterface.addModule(NAMESPACE);
+});
 
-Hooks.on("ready", async function(){
+Hooks.once("beavers-system-interface.ready", async function(){
         game[NAMESPACE]=game[NAMESPACE]||{};
         game[NAMESPACE].Settings = new Settings();
         game[NAMESPACE].BeaversProximityAction = new BeaversProximityAction();

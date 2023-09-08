@@ -20,7 +20,6 @@ import {Activity} from "./activities/Activity";
 import {BPAEngine} from "./activities/BPAEngine";
 
 type ProximityType = "close" | "cone"
-type TestType = "skill" | "ability" | "hit" | "choices" | "input" | "prompt";
 type LocationType = "wall" | "grid" ;
 type AvailableType = "always" | "once" | "perGrid" | "perWall" | "perActor" | "each"
 type PriorityType = "fallback" | "normal"
@@ -30,35 +29,7 @@ export const PriorityTypeOrder: PriorityType[] = ["normal", "fallback"];
 
 export declare namespace bpa {
 
-    interface ActivityStoreData {
-        results: ActivityResult[],
-        actions: {
-            default: ActionStoreData[],
-            fallback: ActionStoreData[]
-        }
-    }
-    interface ActivityData extends ActivityStoreData {
-        id: string,
-        name: string,
-        test:{
-            name:string,
-            options: TestOptions
-        }
-        actionClasses: {
-            [actionClassId: string]: bpa.ActionClass
-        },
-        actions: {
-            default: ActionStoreData[],
-            fallback: ActionStoreData[]
-        },
-        configurations: {
-            [configId: string]: {
-                inputData: InputData,
-                defaultValue: any,
-            }
-        },
-        results: ActivityResult[]
-    }
+    type TestType = "skill" | "ability" | "hit" | "choices" | "input" | "prompt";
 
     interface ActionLocation {
         type: LocationType
@@ -103,6 +74,48 @@ export declare namespace bpa {
         [any: string]: any,
     }
 
+    interface ActivityStoreData {
+        results: ActivityResult[],
+        actions: {
+            default: ActionStoreData[],
+            fallback: ActionStoreData[]
+        }
+    }
+    interface ActivityData extends ActivityStoreData {
+        id: string,
+        name: string,
+        test:{
+            name:string,
+            options: TestOptions
+        }
+        actionClasses: {
+            [actionClassId: string]: bpa.ActionClass
+        },
+        configurations: {
+            [configId: string]: {
+                inputData: InputData,
+                defaultValue: any,
+            }
+        }
+    }
+
+    interface ActivitySettings {
+        enabled:boolean,
+        test:{
+            options: TestOptions
+        }
+    }
+
+    interface ActivityRequest {
+        actorId: string,
+        activityId: string,
+        hitArea: HitArea
+    }
+    interface ActivityResult {
+        testResult: TestResult,
+        hitArea: HitArea,
+        actorId: string
+    }
 
     interface ProximityRequest {
         token: Token,
@@ -122,11 +135,6 @@ export declare namespace bpa {
         hitArea:HitArea,
     }
 
-    interface ActivityRequest {
-        actorId: string,
-        activityId: string,
-        hitArea: HitArea
-    }
 
     interface Grid {
         getProximityGrids: (request: ProximityRequest) => Point[];
@@ -136,19 +144,11 @@ export declare namespace bpa {
         getGridId: (point: Point) => string;
     }
 
-    type ActivityGrid = [gridId: string, wall?: Wall];
-
     interface TestResult {
         text?: string,
         number?: number,
         isSuccess?: boolean,
         testId: string,
-    }
-
-    interface ActivityResult {
-        testResult: TestResult,
-        hitArea: HitArea,
-        actorId: string
     }
 
     interface HitArea {
@@ -162,7 +162,6 @@ export declare namespace bpa {
 
     interface Test {
         id:string,
-        name:string
         choices?: {
             [id:string]:{text:string,img?:string}
         }

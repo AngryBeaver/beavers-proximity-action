@@ -6,6 +6,40 @@
       "noAvailableActionsFound": "no available Actions found for your request",
       "noActorFound": "no actor found for your request"
     },
+    "activitySettings": {
+      "testOptions": "test options",
+      "enabled": {
+        "label": "enable activity",
+        "hint": "enable {name}"
+      },
+      "prompt": {
+        "label": "Prompt",
+        "hint": "Question to answer with yes (success) or no (fail)"
+      },
+      "input": {
+        "label": "UserInput",
+        "hint": "Add a label and a type for the user input field"
+      },
+      "hit": {
+        "label": "Success",
+        "hint": "No user input needed. It just succeeds"
+      },
+      "choices": {
+        "label": "Choices",
+        "hint": "User can select on of your choices"
+      },
+      "ability": {
+        "label": "Ability",
+        "hint": "Ability check of the current actor"
+      },
+      "skill": {
+        "label": "Skill",
+        "hint": "Skill check of the current actor"
+      },
+      "add": {
+        "placeholder": "enter id"
+      }
+    },
     "secretDoor": {
       "name": "Secret door activity",
       "test": {

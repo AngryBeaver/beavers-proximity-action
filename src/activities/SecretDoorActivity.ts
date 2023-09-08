@@ -20,7 +20,6 @@ export class SecretDoorActivity extends WallActivity{
                 options: {
                     "prompt": {
                         id: "prompt",
-                        name: "prompt",
                         type: "prompt",
                         promptDialog: {
                             title: game["i18n"].localize("beaversProximityAction.secretDoor.test.name"),

@@ -27,7 +27,7 @@ export class TestHandler {
         } else if (test.type === "choices") {
             result = await this._testChoices(test);
         } else if (test.type === "hit") {
-            result = {testId: test.id, text: test.name, isSuccess:true};
+            result = {testId: test.id, text: test.id, isSuccess:true};
         } else if (test.type === "input") {
             result = await this._testInput(test);
         } else if (test.type === "prompt") {
@@ -38,7 +38,7 @@ export class TestHandler {
     }
 
     async _testAbility(test: Test): Promise<bpa.TestResult | null> {
-        let roll = await beaversSystemInterface.actorRollAbility(this.actor, test.name);
+        let roll = await beaversSystemInterface.actorRollAbility(this.actor, test.id);
         if (roll != null) {
             return null
         }
@@ -46,7 +46,7 @@ export class TestHandler {
     }
 
     async _testSkill(test: Test): Promise<bpa.TestResult | null> {
-        let roll = await beaversSystemInterface.actorRollSkill(this.actor, test.name);
+        let roll = await beaversSystemInterface.actorRollSkill(this.actor, test.id);
         if (roll == null) {
             return null;
         }

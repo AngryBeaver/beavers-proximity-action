@@ -17,7 +17,7 @@ export class Settings {
         if (!(game instanceof Game)) {
             throw new Error("Settings called before game has been initialized");
         }
-        game.settings.register(NAMESPACE, activityClass.defaultData.id, {
+        game.settings.register(NAMESPACE, "activity-"+activityClass.defaultData.id, {
             name: activityClass.defaultData.name,
             scope: "world",
             config: false,
@@ -25,13 +25,17 @@ export class Settings {
             type: Object
         });
 
-        game.settings.registerMenu(NAMESPACE, activityClass.defaultData.id + "-button", {
+        game.settings.registerMenu(NAMESPACE, "activity-"+activityClass.defaultData.id + "-button", {
             name: activityClass.defaultData.name,
             label: activityClass.defaultData.name,
             // @ts-ignore
             type: ActivitySettings.build(activityClass),
             restricted: true
         });
+    }
+
+    private getActivitySetting(activityId){
+        return this.get("activity-"+activityId);
     }
 
     private get(key) {
