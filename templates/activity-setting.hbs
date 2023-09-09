@@ -12,112 +12,118 @@
         <fieldset>
             <legend>{{localize "beaversProximityAction.activitySettings.testOptions"}}</legend>
             {{#each data.test.options}}
-                {{#if (eq this.type "skill")}}
-                    <div class="form-group">
-                        <label>{{localize "beaversProximityAction.activitySettings.skill.label"}}</label>
-                        <div class="form-fields">
-                            <select name="test.options.{{@key}}.name">
-                                {{#select this.name}}
-                                    <option selected disabled value=""></option>
-                                    {{#each ../skills}}
-                                        <option value="{{this.id}}">{{this.label}}</option>
-                                    {{/each}}
-                                {{/select}}
-                            </select>
-                        </div>
-                        <p class="notes">
-                            {{localize "beaversProximityAction.activitySettings.skill.hint" localizeData}}
-                        </p>
-                    </div>
-                {{/if}}
-                {{#if (eq this.type "ability")}}
-                    <div class="form-group">
-                        <label>{{localize "beaversProximityAction.activitySettings.ability.label"}}</label>
-                        <div class="form-fields">
-                            <select name="test.options.{{@key}}.name">
-                                {{#select this.name}}
-                                    <option selected disabled value=""></option>
-                                    {{#each ../abilities}}
-                                        <option value="{{this.id}}">{{this.label}}</option>
-                                    {{/each}}
-                                {{/select}}
-                            </select>
-                        </div>
-                        <p class="notes">
-                            {{localize "beaversProximityAction.activitySettings.ability.hint" localizeData}}
-                        </p>
-                    </div>
+                <div class="flexrow" style="border:2px white groove;margin-bottom:5px;">
+                    <div style="padding:5px">
+                        <div style="border-bottom:2px white groove;margin-bottom:5px">{{@key}}</div>
+                        {{#if (eq this.type "skill")}}
+                            <div class="form-group">
+                                <label>{{localize "beaversProximityAction.activitySettings.skill.label"}}</label>
+                                <div class="form-fields">
+                                    <select name="test.options.{{@key}}.name">
+                                        {{#select this.name}}
+                                            <option selected disabled value=""></option>
+                                            {{#each ../skills}}
+                                                <option value="{{this.id}}">{{this.label}}</option>
+                                            {{/each}}
+                                        {{/select}}
+                                    </select>
+                                </div>
+                                <p class="notes">
+                                    {{localize "beaversProximityAction.activitySettings.skill.hint" }}
+                                </p>
+                            </div>
+                        {{/if}}
+                        {{#if (eq this.type "ability")}}
+                            <div class="form-group">
+                                <label>{{localize "beaversProximityAction.activitySettings.ability.label"}}</label>
+                                <div class="form-fields">
+                                    <select name="test.options.{{@key}}.name">
+                                        {{#select this.name}}
+                                            <option selected disabled value=""></option>
+                                            {{#each ../abilities}}
+                                                <option value="{{this.id}}">{{this.label}}</option>
+                                            {{/each}}
+                                        {{/select}}
+                                    </select>
+                                </div>
+                                <p class="notes">
+                                    {{localize "beaversProximityAction.activitySettings.ability.hint"}}
+                                </p>
+                            </div>
 
-                {{/if}}
-                {{#if (eq this.type "hit")}}
-                    {{localize "beaversProximityAction.activitySettings.hit.label"}}
-                {{/if}}
-                {{#if (eq this.type "choices")}}
-                    {{#each this.choices}}
-                        <input name="test.options.{{@../key}}.choices[{{@key}}]"/>
-                    {{/each}}
-                    <div class="action flexrow choice"
-                         title="{{localize "beaversProximityAction.activitySettings.choices.add"}}">
-                        <a class="item-add" data-or="{{@key}}">
-                            <i class="fas fa-plus"></i>
+                        {{/if}}
+                        {{#if (eq this.type "hit")}}
+                            {{localize "beaversProximityAction.activitySettings.hit.label"}}
+                        {{/if}}
+                        {{#if (eq this.type "choices")}}
+                            {{#each this.choices}}
+                                <input name="test.options.{{@../key}}.choices[{{@key}}]"/>
+                            {{/each}}
+                            <div class="action flexrow choice"
+                                 title="{{localize "beaversProximityAction.activitySettings.choices.add"}}">
+                                <a class="item-add" data-or="{{@key}}">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                            </div>
+                        {{/if}}
+                        {{#if (eq this.type "input")}}
+                            <div class="form-group">
+                                <label>{{localize "beaversProximityAction.activitySettings.input.label"}}</label>
+                                <div class="form-fields">
+                                    <input type="text" name="test.options.{{@key}}.inputDialog.label"
+                                           value="{{this.inputDialog.label}}"/>
+                                    <select name="test.options.{{@key}}.inputDialog.type"/>
+                                    {{#select this.inputDialog.type}}
+                                        <option value="number">number</option>
+                                        <option value="text">text</option>
+                                    {{/select}}
+                                    </select>
+                                </div>
+                                <p class="notes">
+                                    {{localize "beaversProximityAction.activitySettings.input.hint"}}
+                                </p>
+                            </div>
+
+                        {{/if}}
+                        {{#if (eq this.type "prompt")}}
+                            <div class="form-group">
+                                <label>{{localize "beaversProximityAction.activitySettings.prompt.label"}}</label>
+                                <div class="form-fields">
+                                    <input type="text" name="test.options.{{@key}}.promptDialog.label"
+                                           value="{{this.promptDialog.label}}"/>
+                                </div>
+                                <p class="notes">
+                                    {{localize "beaversProximityAction.activitySettings.prompt.hint"}}
+                                </p>
+                            </div>
+                        {{/if}}
+                    </div>
+                    <div style="flex:0; padding:5px; border-left:2px white groove">
+                        <a class="delete-test-option" data-or="{{@key}}">
+                            <i class="fas fa-trash"></i>
                         </a>
                     </div>
-                {{/if}}
-                {{#if (eq this.type "input")}}
-                    <div class="form-group">
-                        <label>{{localize "beaversProximityAction.activitySettings.input.label"}}</label>
-                        <div class="form-fields">
-                            <input name="test.options.{{@key}}.inputDialog.label" value="this.inputDialog.label"/>
-                            <select name="test.options.{{@key}}.inputDialog.type"/>
-                            {{#select this.inputDialog.type}}
-                                <option value="number">number</option>
-                                <option value="text">text</option>
-                            {{/select}}
-                            </select>
-                        </div>
-                        <p class="notes">
-                            {{localize "beaversProximityAction.activitySettings.input.hint" localizeData}}
-                        </p>
-                    </div>
-
-                {{/if}}
-                {{#if (eq this.type "prompt")}}
-                    <div class="form-group">
-                        <label>{{localize "beaversProximityAction.activitySettings.prompt.label"}}</label>
-                        <div class="form-fields">
-                            <input name="test.options.{{@key}}.promptDialog.label" value="this.promptDialog.label"/>
-                        </div>
-                        <p class="notes">
-                            {{localize "beaversProximityAction.activitySettings.prompt.hint" localizeData}}
-                        </p>
-                    </div>
-                {{/if}}
-                <div class="attribute" style="width:20px; text-align: center;">
-                    <a class="item-delete" data-or="{{@key}}">
-                        <i class="fas fa-trash"></i>
-                    </a>
                 </div>
             {{/each}}
             <div class="flexrow">
-                <input placeholder="{{localize "beaversProximityAction.activitySettings.add.placeholder"}}"/>
+                <input type="text" class="add-id"
+                       placeholder="{{localize "beaversProximityAction.activitySettings.add.placeholder"}}"/>
                 <select style="flex:0">
-                    {{#select this.type}}
-                        <option value="skill">{{localize
-                                "beaversProximityAction.activitySettings.skill.label"}}</option>
-                        {{#if ../canRollAbility}}
-                            <option value="ability">{{localize
-                                    "beaversProximityAction.activitySettings.ability.label"}}</option>
-                        {{/if}}
-                        <option value="prompt">{{localize
-                                "beaversProximityAction.activitySettings.prompt.label"}}</option>
-                        <option value="input">{{localize
-                                "beaversProximityAction.activitySettings.input.label"}}</option>
-                        <option value="choices">{{localize
-                                "beaversProximityAction.activitySettings.choices.label"}}</option>
-                        <option value="hit">{{localize "beaversProximityAction.activitySettings.hit.label"}}</option>
-                    {{/select}}
+                    <option value="skill">{{localize
+                            "beaversProximityAction.activitySettings.skill.label"}}</option>
+                    {{#if canRollAbility}}
+                        <option value="ability">{{localize
+                                "beaversProximityAction.activitySettings.ability.label"}}</option>
+                    {{/if}}
+                    <option value="prompt">{{localize
+                            "beaversProximityAction.activitySettings.prompt.label"}}</option>
+                    <option value="input">{{localize
+                            "beaversProximityAction.activitySettings.input.label"}}</option>
+                    <!--option value="choices">{{localize
+                            "beaversProximityAction.activitySettings.choices.label"}}</option-->
+                    <option value="hit">{{localize "beaversProximityAction.activitySettings.hit.label"}}</option>
                 </select>
-                <button class="add-test-option" style="flex:0;line-height:22px">
+                <button type="button" class="add-test-option" style="flex:0;line-height:22px">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>

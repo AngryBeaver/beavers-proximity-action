@@ -21,12 +21,20 @@ export class ActivitySettings {
                     resizable: true,
                     classes: ["beavers-proximity-actions", "activity-setting"]
                 })
-
             }
 
             async getData(options):Promise<any>{
-                //TODO merge with defaultData
-                this.data = game[NAMESPACE].Settings.getActivitySetting(activityClass.defaultData.id);
+                const blankSettings:bpa.ActivitySettings = {
+                    enabled: false,
+                    test: {options: {}}
+                };
+                const mergedData = foundry.utils.mergeObject(blankSettings,game[NAMESPACE].Settings.getActivitySetting(activityClass.defaultData.id),{
+                    insertKeys: false,
+                    insertValues: true,
+                    overwrite: true,
+                    inplace: false
+                });
+                this.data = mergedData;
                 return {
                     skills: beaversSystemInterface.configSkills,
                     abilities: beaversSystemInterface.configCanRollAbility?beaversSystemInterface.configAbilities:[],
@@ -37,20 +45,25 @@ export class ActivitySettings {
             }
 
             async _updateObject(event, formData) {
-                this.data = formData;
+                for(const [key,value] of Object.entries(formData)){
+                    beaversSystemInterface.objectAttributeSet(this.data,key,value);
+                }
                 this._updateData();
             }
             async _updateData(){
-                game[NAMESPACE].Settings.set("activity-"+activityClass.defaultData.id, this.data);
+                await game[NAMESPACE].Settings.set("activity-"+activityClass.defaultData.id, this.data);
                 this.render();
             }
 
 
             activateListeners(html) {
                 super.activateListeners(html);
-                html.find("add-test-option").on("click",(e)=>{
+                html.find(".add-test-option").on("click",(e)=>{
                     const parent = $(e.currentTarget).parent();
-                    const id = parent.find("input").val() as string;
+                    let id = parent.find("input.add-id").val() as string;
+                    if(!id || id === ""){
+                       id = foundry.utils.randomID();
+                    }
                     const type = parent.find("select").val() as bpa.TestType;
                     this.data.test.options = this.data.test.options || {};
                     this.data.test.options[id] = {
@@ -59,7 +72,11 @@ export class ActivitySettings {
                     }
                     this._updateData();
                 });
-
+                html.find(".delete-test-option").on("click",(e)=>{
+                    const testId = $(e.currentTarget).data("or");
+                    delete this.data.test.options[testId];
+                    this._updateData();
+                });
             }
 
 
