@@ -21,6 +21,7 @@ import {BPAEngine} from "./activities/BPAEngine";
 
 type ProximityType = "close" | "cone"
 type LocationType = "wall" | "grid" ;
+//version1 only use "always" until we can clean up the grids again.
 type AvailableType = "always" | "once" | "perGrid" | "perWall" | "perActor" | "each"
 type PriorityType = "fallback" | "normal"
 
@@ -28,7 +29,7 @@ type PriorityType = "fallback" | "normal"
 export const PriorityTypeOrder: PriorityType[] = ["normal", "fallback"];
 
 export declare namespace bpa {
-
+    //version1 do not use "choices" until ui is build for it.
     type TestType = "skill" | "ability" | "hit" | "choices" | "input" | "prompt";
 
     interface ActionLocation {
@@ -36,7 +37,7 @@ export declare namespace bpa {
         //or directly actionSpaces
         gridIds: string[],
         //or walls
-        wallFilter: [attribute: string, value: any][],
+        wallFilter: {attribute: string, value: any}[],
         isGlobal: boolean
     }
 

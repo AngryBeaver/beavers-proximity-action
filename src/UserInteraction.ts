@@ -18,9 +18,6 @@ export class UserInteraction {
             type: "cone"
         }
         const result = this.beaversProximityAction.getBPAEngine().getProximityActivities(proximityRequest);
-        if (result.activities.length > 0) {
-            return;
-        }
         const choices = {
             "": {text:game["i18n"].localize("beaversProximityAction.userInteraction.noActivity")}
         };

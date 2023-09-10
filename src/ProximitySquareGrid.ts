@@ -9,12 +9,15 @@ export class ProximitySquareGrid implements bpa.Grid {
         if (!canvas?.grid?.grid) {
             throw Error("no grid found");
         }
+        //!"§(?)=?§% who the fuck defines a gridArray with y=0 and x=1 and not the otherway around !!!!
         const gridArray = canvas.grid.grid.getGridPositionFromPixels(request.token.center.x, request.token.center.y);
-        const grid = {x: gridArray[0], y: gridArray[1]};
+        const grid = {x: gridArray[1], y: gridArray[0]};
+        // @ts-ignore
+        const rotation = request.token.document.rotation;
         if (request.type === "cone") {
-            return new ConeShapedSquareGrid(request.distance, grid, request.token.rotation).getGrids();
+            return new ConeShapedSquareGrid(request.distance, grid, rotation).getGrids();
         } else {
-            return new CloseSquareGrid(request.distance, grid, request.token.rotation).getGrids();
+            return new CloseSquareGrid(request.distance, grid, rotation).getGrids();
         }
     }
 

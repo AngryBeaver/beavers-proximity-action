@@ -77,8 +77,10 @@ export class BPAEngine {
         }
         if (canvas?.grid?.grid) {
             for (const point of grids) {
-                const pixel = canvas.grid.grid.getCenter(point.x, point.y);
-                const wall = this._getCollisionWall(origin, pixel);
+                //!"§&(/)=$ again who defines first row then col a.k.a y,x why not x,y !!!! and ofc it had been other way around at least typescript claims that is had been x,y !!!
+                const pixel = canvas.grid.grid.getPixelsFromGridPosition(point.y,point.x);
+                const center = canvas.grid.grid.getCenter(pixel[1], pixel[0]);
+                const wall = this._getCollisionWall(origin, center);
                 if (!wall) {
                     hitArea.gridIds.push(this.grid.getGridId(point));
                 } else {
@@ -93,7 +95,8 @@ export class BPAEngine {
     }
 
     private _getCollisionWall(origin: Point, destination: PointArray): Wall | undefined {
-        const result = CONFIG.Canvas["losBackend"].testCollision(origin, {x:destination[0],y:destination[1]}, {type: "move", mode: "closest"});
+        const result = CONFIG.Canvas["losBackend"].testCollision(origin, {x:destination[1],y:destination[0]}, {type: "move", mode: "closest"});
+        //TODO fix when it hits an edge with two walls it can get the wrong wall !
         return result?.edges?.values()?.next()?.value?.wall;
     }
 

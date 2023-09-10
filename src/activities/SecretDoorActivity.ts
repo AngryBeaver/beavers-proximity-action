@@ -11,7 +11,7 @@ export class SecretDoorActivity extends WallActivity{
         return ID;
     }
 
-    static get defaultData():bpa.ActivityData{
+    static get defaultData():bpa.ActivityData {
         return {
             id:NAMESPACE + ".secret-door",
             name: game["i18n"].localize("beaversProximityAction.secretDoor.name"),
@@ -66,11 +66,13 @@ class SecretDoorAction extends Action{
             location:{
                 type:"wall",
                 gridIds:[],
-                wallFilter:[["document.door",2]],
+                wallFilter:[
+                    {attribute:"document.door",value:2}
+                ],
                 isGlobal:false
             },
             available:{
-                type:"once",
+                type:"always",
             },
             priority: "normal"
         }
