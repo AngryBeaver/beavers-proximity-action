@@ -3,6 +3,8 @@ import {bpa} from "./types.js";
 
 export class ActivitySettings {
 
+
+    //TODO configure everything in activitySettings
     static build(activityClass:bpa.ActivityClass) {
         return class ActivitySetting extends FormApplication {
 
@@ -42,6 +44,12 @@ export class ActivitySettings {
                     data: this.data,
                     localizeData: {hash:activityClass.defaultData}
                 }
+            }
+
+            async close(options?){
+                super.close(options);
+                // @ts-ignore
+                SettingsConfig.reloadConfirm({world: true});
             }
 
             async _updateObject(event, formData) {

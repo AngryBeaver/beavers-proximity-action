@@ -24,15 +24,16 @@ export class Activity {
         this._sceneId = sceneId;
         // @ts-ignore
         const storedOptions = this._parent.activityStore.get(this.constructor.defaultData.id) || {};
-
-        // merge Activity defaultData with activityStoreData
         // @ts-ignore
-        this._data = foundry.utils.mergeObject(this.constructor.defaultData, storedOptions, {
+        const settingsData = game[NAMESPACE].Settings.getActivitySetting(this.constructor.defaultData.id);
+        // @ts-ignore
+        this._data = foundry.utils.mergeObject(this.constructor.defaultData, settingsData, {
             insertKeys: true,
             insertValues: true,
             overwrite: true,
             inplace: false
         });
+        this._data = {...this._data,...storedOptions}
     }
 
 
@@ -58,11 +59,11 @@ export class Activity {
      * They are persisted with activityStore.
      * @param actionData
      */
-    public async addAction(actionData: bpa.ActionStoreData): Promise<void> {
-        if (actionData.priority)
-            this._data.actions[actionData.priority] = this._data.actions[actionData.priority] || [];
-        this._data.actions[actionData.priority].push(actionData);
-        return this._parent.activityStore.addAction(this.id, actionData);
+    public async addAction(actionStoreData: bpa.ActionStoreData): Promise<void> {
+        if (actionStoreData.priority)
+            this._data.actions[actionStoreData.priority] = this._data.actions[actionStoreData.priority] || [];
+        this._data.actions[actionStoreData.priority].push(actionStoreData);
+        return this._parent.activityStore.addAction(this.id, actionStoreData);
     }
 
     /**
@@ -71,8 +72,9 @@ export class Activity {
      */
     public isAvailable(actorId: string, hitArea: bpa.HitArea): boolean {
         for (const priority of PriorityTypeOrder) {
-            for (const actionData of this._data.actions[priority]) {
-                if (this._isActionAvailable(actionData, actorId, hitArea)) {
+            for (const actionStoreData of this._data.actions[priority]) {
+                const action = this._getAction(actionStoreData)
+                if (this._isActionAvailable(action, actorId, hitArea)) {
                     return true;
                 }
             }
@@ -140,14 +142,16 @@ export class Activity {
      * @param actionData
      * @private
      */
-    private _getAction(actionData: bpa.ActionData): Action {
-        const clazz = this.getActionClasses()[actionData.classId];
-        return new clazz(this, actionData);
+    //TODO maybe not instanciate everytime ?
+    private _getAction(actionStoreData: bpa.ActionStoreData): Action {
+        const clazz = this.getActionClasses()[actionStoreData.classId];
+        //initialize with the storedData
+        return new clazz(this, actionStoreData);
     }
-
-    private _isActionAvailable(actionData: bpa.ActionData, actorId: string, hitArea: bpa.HitArea): boolean {
+    // TODO move to Action;
+    private _isActionAvailable(action: Action, actorId: string, hitArea: bpa.HitArea): boolean {
         const activityResults = this._data.results;
-        const type = actionData.available.type;
+        const type = action._data.available.type;
         let result = (type === "always") || (type === "once" && activityResults.length === 0)
             || (type === "perActor" && activityResults.filter(a => actorId === a.actorId).length === 0)
         if(result) {

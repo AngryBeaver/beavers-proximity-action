@@ -1,6 +1,7 @@
 import {NAMESPACE, Settings} from "./Settings.js";
 import {BeaversProximityAction} from "./BeaversProximityAction.js";
 import {SecretDoorActivity} from "./activities/SecretDoorActivity.js";
+import {UserInteraction} from "./UserInteraction.js";
 
 
 export const HOOK_READY = NAMESPACE+".ready";
@@ -12,10 +13,15 @@ Hooks.on("beavers-system-interface.init", async function(){
         beaversSystemInterface.addModule(NAMESPACE);
 });
 
-Hooks.once("beavers-system-interface.ready", async function(){
+Hooks.once('init', () => {
         game[NAMESPACE]=game[NAMESPACE]||{};
         game[NAMESPACE].Settings = new Settings();
+})
+
+Hooks.once("beavers-system-interface.ready", async function(){
+        game[NAMESPACE]=game[NAMESPACE]||{};
         game[NAMESPACE].BeaversProximityAction = new BeaversProximityAction();
+        game[NAMESPACE].UserInteraction = new UserInteraction(game[NAMESPACE].BeaversProximityAction);
         Hooks.call(HOOK_READY,game[NAMESPACE].BeaversProximityAction);
         activateScene();
 })

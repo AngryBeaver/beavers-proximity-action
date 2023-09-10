@@ -10,8 +10,15 @@ export class Settings {
         if (!(game instanceof Game)) {
             throw new Error("Settings called before game has been initialized");
         }
-
+        game.keybindings.register(NAMESPACE, 'current Token', {
+            name: 'beaversProximityAction.keybinding.name',
+            editable: [{key: 'KeyF', modifiers: ['Shift']}],
+            onDown: () => {
+                game[NAMESPACE].UserInteraction.request();
+            }
+        });
     }
+
     private addActivity(activityClass: bpa.ActivityClass) {
         if (!(game instanceof Game)) {
             throw new Error("Settings called before game has been initialized");
@@ -30,8 +37,9 @@ export class Settings {
             name: activityClass.defaultData.name,
             scope: "world",
             config: false,
-            default: {...mergedData},
+            default: mergedData,
             type: Object
+
         });
         game.settings.registerMenu(NAMESPACE, "activity-"+activityClass.defaultData.id + "-button", {
             name: activityClass.defaultData.name,

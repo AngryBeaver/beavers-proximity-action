@@ -4,15 +4,19 @@ import {Activity} from "./Activity.js";
 import {bpa} from "../types.js";
 
 export class BPAEngine {
+    private readonly _sceneId:string;
     public readonly activityStore: ActivityStore;
     public readonly grid: bpa.Grid;
-    private _activities: Activity[];
+    private _activities: {
+        [activityId:string]:Activity
+    } = {};
 
     constructor(scene: Scene) {
         this.activityStore = new ActivityStore(scene);
         if (scene["grid"].type === 1) {
             this.grid = new ProximitySquareGrid()
         }
+        this._sceneId = scene.uuid;
     }
 
     /**
@@ -20,9 +24,11 @@ export class BPAEngine {
      * settings can enable activities
      * scene config can enable activities
      */
-    public enableActivity(activity: Activity) {
-        //TODO activate configurations
-        this._activities.push(activity);
+    public addActivity(activityClass: bpa.ActivityClass) {
+        if(this._activities[activityClass.defaultData.id]){
+            this._activities[activityClass.defaultData.id].destruct();
+        }
+        this._activities[activityClass.defaultData.id] = new activityClass(this,this._sceneId);
     }
 
     /**
@@ -32,14 +38,18 @@ export class BPAEngine {
     public getProximityActivities(request: bpa.ProximityRequest): bpa.ProximityResult {
         const grids: Point[] = this.grid.getProximityGrids(request);
         const hitArea: bpa.HitArea = this._filterGridsBehindWalls(request.token.center, grids);
+        const actorId = request.token.actor?.uuid;
+        if(!actorId){
+            throw new Error(game["i18n"].localize("beaversProximityAction.error.noActorOnToken"));
+        }
         const result: bpa.ProximityResult = {
             origin: request.token.center,
-            actorId: request.actorId,
+            actorId: actorId,
             activities: [],
             hitArea: hitArea
         }
-        for (const activity of this._activities) {
-            if (activity.isAvailable(request.actorId, hitArea)) {
+        for (const activity of Object.values(this._activities)) {
+            if (activity.isAvailable(actorId, hitArea)) {
                 result.activities.push({
                     id: activity.id,
                     name: activity.name,

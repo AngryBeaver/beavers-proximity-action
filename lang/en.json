@@ -1,5 +1,8 @@
 {
   "beaversProximityAction": {
+    "keybinding": {
+      "name": "Show Current Token 's Activities"
+    },
     "error": {
       "canvasGridError": "no canvas grid detected",
       "noActorOnToken": "token does not have an actor",
@@ -40,6 +43,9 @@
         "placeholder": "enter id"
       }
     },
+    "userInteraction": {
+      "noActivity": "do nothing"
+    },
     "secretDoor": {
       "name": "Secret door activity",
       "test": {
@@ -50,13 +56,6 @@
         "actionTypeNotFound": "action not found"
       },
       "fallbackMessage": "Nothing found."
-    },
-    "inputDialog": {
-      "systemAgnosticRoll": {
-        "title": "SystemAgnosticRoll",
-        "label": "enter roll result",
-        "type": "number"
-      }
     }
   }
 }

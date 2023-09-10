@@ -21,7 +21,7 @@ export class ActivityStore {
         this._data[activityId] = this._data[activityId] || {
             results:[],
             actions:{
-                default:[],
+                normal:[],
                 fallback:[]
             }
         };
@@ -33,8 +33,8 @@ export class ActivityStore {
      * They are persisted with activityStore.
      * @param actionData
      */
-    public async addAction(activityId:string,actionData:bpa.ActionStoreData){
-        this.get(activityId)[actionData.priority].push(actionData);
+    public async addAction(activityId:string,actionStoreData:bpa.ActionStoreData){
+        this.get(activityId)[actionStoreData.priority].push(actionStoreData);
         //TODO this will always store all activity data maybe only update the change.
         await this._scene.setFlag(NAMESPACE,"activity",this._data);
     }

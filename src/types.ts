@@ -46,7 +46,6 @@ export declare namespace bpa {
         available: {
             type: AvailableType
         }
-        priority: PriorityType
     }
 
     interface ActionStoreData {
@@ -77,7 +76,7 @@ export declare namespace bpa {
     interface ActivityStoreData {
         results: ActivityResult[],
         actions: {
-            default: ActionStoreData[],
+            normal: ActionStoreData[],
             fallback: ActionStoreData[]
         }
     }
@@ -119,7 +118,6 @@ export declare namespace bpa {
 
     interface ProximityRequest {
         token: Token,
-        actorId: string,
         distance: number,
         type: ProximityType
     }

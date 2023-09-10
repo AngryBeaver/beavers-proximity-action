@@ -16,9 +16,14 @@ export class BeaversProximityAction {
     _activityClasses:{
         [activityId:string]:bpa.ActivityClass
     }={};
-    _activities:{
-        [activityId:string]:Activity
-    }={};
+
+    /**
+     * User can get current bpa engine
+     */
+    public getBPAEngine(): BPAEngine{
+        return this._data[this.defaultSceneId()];
+    }
+
 
     /**
      * Modules can add activityClasses
@@ -29,7 +34,7 @@ export class BeaversProximityAction {
         const currentSceneId = this.defaultSceneId();
         game[NAMESPACE].Settings.addActivity(activityClass);
         if(this._data[currentSceneId]){
-            this._activateActivity(activityClass.defaultData.id, currentSceneId);
+            this._data[currentSceneId].addActivity(activityClass);
         }
     }
 
@@ -58,18 +63,10 @@ export class BeaversProximityAction {
             const scene = await fromUuid(sceneId) as Scene;
             this._data[sceneId] = new BPAEngine(scene);
         }
-        for(const activityId of Object.keys(this._activityClasses)){
-            this._activateActivity(activityId, sceneId);
+        for(const activityClass of Object.values(this._activityClasses)){
+            this._data[sceneId].addActivity(activityClass)
         }
     }
-
-    private _activateActivity(activityId:string,sceneId:string){
-        if(this._activities[activityId]){
-            this._activities[activityId].destruct();
-        }
-        this._activities[activityId] = new this._activityClasses[activityId](this._data[sceneId],sceneId);
-    }
-
 
     private defaultSceneId(){
         return canvas?.scene?.uuid || "";

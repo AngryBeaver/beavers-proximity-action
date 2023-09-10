@@ -32,7 +32,7 @@ export class SecretDoorActivity extends WallActivity{
                 "main":SecretDoorAction,
             },
             actions:{
-                default: [
+                normal: [
                     {
                         classId: "main",
                         priority: "normal"
