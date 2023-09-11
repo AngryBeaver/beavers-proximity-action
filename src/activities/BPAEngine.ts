@@ -96,8 +96,19 @@ export class BPAEngine {
 
     private _getCollisionWall(origin: Point, destination: PointArray): Wall | undefined {
         const result = CONFIG.Canvas["losBackend"].testCollision(origin, {x:destination[1],y:destination[0]}, {type: "move", mode: "closest"});
-        //TODO fix when it hits an edge with two walls it can get the wrong wall !
-        return result?.edges?.values()?.next()?.value?.wall;
+        let wall = undefined;
+        let lastDistance:number|undefined = undefined;
+        //when hitting multiple walls in the same distance e.g. on an edge get the wall that is closest to origin.
+        for(const pEdge of result?.edges?.values() || []){
+            const centerX = (pEdge.A.x+pEdge.B.x)/2;
+            const centerY = (pEdge.A.y+pEdge.B.y)/2;
+            const squareDistance = Math.pow((centerX-origin.x),2)+Math.pow((centerY-origin.y),2);
+            if(lastDistance == undefined || lastDistance>squareDistance){
+                wall = pEdge.wall;
+                lastDistance = squareDistance;
+            }
+        }
+        return wall;
     }
 
 
