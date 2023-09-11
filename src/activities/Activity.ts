@@ -36,7 +36,6 @@ export class Activity {
         }
     }
 
-
     get id(): string {
         return this._data.id;
     }

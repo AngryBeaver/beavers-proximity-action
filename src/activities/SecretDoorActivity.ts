@@ -67,7 +67,7 @@ class SecretDoorAction extends Action{
                 type:"wall",
                 gridIds:[],
                 wallFilter:[
-                    {attribute:"document.door",value:2}
+                    {attribute:"door",value:2}
                 ],
                 isGlobal:false
             },

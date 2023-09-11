@@ -25,7 +25,7 @@ export class UserInteraction {
             choices[activity.id] = {text: activity.name}
         }
         const activityId = await beaversSystemInterface.uiDialogSelect({choices:choices});
-        if(activityId === ""){
+        if(activityId===undefined || activityId === ""){
             return;
         }
         //TODO scene might have changed between actions
