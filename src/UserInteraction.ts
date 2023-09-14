@@ -29,13 +29,12 @@ export class UserInteraction {
             return;
         }
         //TODO scene might have changed between actions
-        //TODO sent this to gm ! while sent user request to player.
         const activityRequest: bpa.ActivityRequest = {
             activityId: activityId,
             actorId: result.actorId,
             hitArea: result.hitArea,
         }
-        this.beaversProximityAction.getBPAEngine().executeActivity(activityRequest);
+        await this.beaversProximityAction.getBPAEngine().testActivity(activityRequest);
     }
 
     private _currentToken(): Token {

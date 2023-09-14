@@ -6,24 +6,16 @@ import InputDialog = bpa.InputDialog;
 import {bpa} from "./types.js";
 
 export class TestHandler {
-    testOptions: TestOptions
-    actor: Actor
-
-    constructor(testOptions: TestOptions, actor: Actor) {
-        this.testOptions = testOptions;
-        this.actor = actor;
-    }
 
     //Todo sendrequest to player
     //Todo allow gm requests e.g. for prompts.
-
-    async test(): Promise<bpa.TestResult | null> {
-        const test = await this.selectTestChoice(this.testOptions);
+    static async test(testOptions: TestOptions, actor: Actor): Promise<bpa.TestResult | null> {
+        const test = await this.selectTestChoice(testOptions);
         let result: bpa.TestResult | null = null;
         if (test.type === "ability") {
-            result = await this._testAbility(test);
+            result = await this._testAbility(actor,test);
         } else if (test.type === "skill") {
-            result = await this._testSkill(test);
+            result = await this._testSkill(actor,test);
         } else if (test.type === "choices") {
             result = await this._testChoices(test);
         } else if (test.type === "hit") {
@@ -33,27 +25,26 @@ export class TestHandler {
         } else if (test.type === "prompt") {
             result = await this._testPrompt(test);
         }
-
         return result;
     }
 
-    async _testAbility(test: Test): Promise<bpa.TestResult | null> {
-        let roll = await beaversSystemInterface.actorRollAbility(this.actor, test.id);
+    static async _testAbility(actor:Actor, test: Test): Promise<bpa.TestResult | null> {
+        let roll = await beaversSystemInterface.actorRollAbility(actor, test.id);
         if (roll != null) {
             return null
         }
         return {number: roll.total, testId: test.id};
     }
 
-    async _testSkill(test: Test): Promise<bpa.TestResult | null> {
-        let roll = await beaversSystemInterface.actorRollSkill(this.actor, test.id);
+    static async _testSkill(actor:Actor,test: Test): Promise<bpa.TestResult | null> {
+        let roll = await beaversSystemInterface.actorRollSkill(actor, test.id);
         if (roll == null) {
             return null;
         }
         return {number: roll.total, testId: test.id};
     }
 
-    async _testChoices(test: Test): Promise<bpa.TestResult | null> {
+    static async _testChoices(test: Test): Promise<bpa.TestResult | null> {
         const choice = await beaversSystemInterface.uiDialogSelect(test.choices);
         if (choice == null) {
             return null;
@@ -61,7 +52,7 @@ export class TestHandler {
         return {text: choice, testId: test.id};
     }
 
-    async _testInput(test: Test): Promise<bpa.TestResult | null> {
+    static async _testInput(test: Test): Promise<bpa.TestResult | null> {
         const input = await this.uiDialogInput(test.inputDialog || {})
         if (input == null) {
             return null;
@@ -72,7 +63,7 @@ export class TestHandler {
         return {text: input, testId: test.id};
     }
 
-    async _testPrompt(test:Test): Promise<bpa.TestResult | null>{
+    static async _testPrompt(test:Test): Promise<bpa.TestResult | null>{
         const prompt = await this.uiDialogPrompt(test.promptDialog || {})
         if (prompt == null) {
             return null;
@@ -81,7 +72,7 @@ export class TestHandler {
     }
 
 
-    async uiDialogPrompt({title = "", label = ""}: PromptDialog): Promise<boolean | null> {
+    static async uiDialogPrompt({title = "", label = ""}: PromptDialog): Promise<boolean | null> {
         return new Promise((resolve, reject) => {
             const dialog = Dialog.confirm({
                 title: title,
@@ -92,7 +83,7 @@ export class TestHandler {
         });
     }
 
-    async uiDialogInput({title = "", type = "text", label = ""}: InputDialog): Promise<string | null> {
+    static async uiDialogInput({title = "", type = "text", label = ""}: InputDialog): Promise<string | null> {
         const form = '<form><label>' + label + '<input name="input-1" type="' + type + '/></label></form>';
         return new Promise((resolve, reject) => {
             const dialog = new Dialog({
@@ -114,7 +105,7 @@ export class TestHandler {
     }
 
 
-    async selectTestChoice(testOptions: TestOptions): Promise<Test> {
+    static async selectTestChoice(testOptions: TestOptions): Promise<Test> {
         const choices = {};
         for (const [id, test] of Object.entries(testOptions)) {
             if (test.type === "skill") {

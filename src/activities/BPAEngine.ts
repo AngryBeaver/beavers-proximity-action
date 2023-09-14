@@ -2,6 +2,8 @@ import {ActivityStore} from "./ActivityStore.js";
 import {ProximitySquareGrid} from "../ProximitySquareGrid.js";
 import {Activity} from "./Activity.js";
 import {bpa} from "../types.js";
+import {NAMESPACE} from "../Settings";
+import {SOCKET_EXECUTE_ACTIVITY} from "../main.js";
 
 export class BPAEngine {
     private readonly _sceneId:string;
@@ -62,9 +64,30 @@ export class BPAEngine {
     /**
      * users can execute an activity within proximity range.
      */
-    public async executeActivity(request: bpa.ActivityRequest) {
+    public async testActivity(request: bpa.ActivityRequest) {
         const activity: Activity = this._activities[request.activityId];
-        await activity.execute(request.actorId, request.hitArea);
+        const testResult: bpa.TestResult|null = await activity.test(request.actorId, request.hitArea);
+        if(testResult!= null){
+            const activityResult: bpa.ActivityResult = {
+                testResult: testResult,
+                hitArea: request.hitArea,
+                actorId: request.actorId
+            }
+            await game[NAMESPACE].socket.executeAsGM(SOCKET_EXECUTE_ACTIVITY,request.activityId,activityResult);
+        }
+    }
+    /**
+     * this should always be executed on gm client
+     * @param testResult
+     * @param hitArea
+     * @param actorId
+     */
+    public async executeActivity(activityId:string,activityResult:bpa.ActivityResult){
+        const activity: Activity = this._activities[activityId];
+        await activity.executeActions(activityResult);
+        //store global proximityHitArea not individual ActionHitAreas
+        //todo update all clients activity data
+        await this.activityStore.addResult(activityId, activityResult);
     }
 
     /**

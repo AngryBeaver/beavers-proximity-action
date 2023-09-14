@@ -29,7 +29,7 @@ export class SecretDoorActivity extends WallActivity{
                 }
             },
             actionClasses:{
-                "main":SecretDoorAction,
+                "main":SecretDoorAction
             },
             actions:{
                 normal: [

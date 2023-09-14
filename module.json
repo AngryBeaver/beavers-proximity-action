@@ -39,6 +39,13 @@
             "minimum" : "2.1.4",
             "verified": "2.1.4"
           }
+        },
+        {
+          "id": "socketlib",
+          "type": "module",
+          "compatibility": {
+            "verified": "1.0.13"
+          }
         }
       ]
     },

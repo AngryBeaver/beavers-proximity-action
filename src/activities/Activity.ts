@@ -86,7 +86,7 @@ export class Activity {
      * actions are executed in priority order
      * if an action executed with success it will stop execution for all lower priority ordered executions.
      */
-    public async execute(actorId: string, hitArea: bpa.HitArea) {
+    public async test(actorId: string, hitArea: bpa.HitArea):Promise<bpa.TestResult|null> {
         if (!this.isAvailable(actorId, hitArea)) {
             throw new Error(game["i18n"].localize("beaversProximityAction.error.noAvailableActionsFound"));
         }
@@ -94,40 +94,26 @@ export class Activity {
         if (!actor) {
             throw new Error(game["i18n"].localize("beaversProximityAction.error.noActorOnToken"));
         }
-        //TODO throw this back to caller client.
-        const testResult = await new TestHandler(this._data.test.options, actor).test();
-        if (testResult !== null) {
-            this._executeActions(testResult,hitArea,actorId);
-            //store global proximityHitArea not individual ActionHitAreas
-            const result: bpa.ActivityResult = {
-                testResult: testResult,
-                hitArea: hitArea,
-                actorId: actorId
-            }
-            this._data.results.push(result)
-            this._parent.activityStore.addResult(this.id, result)
-        }
+        return await TestHandler.test(this._data.test.options, actor);
     }
 
-
     /**
+     * this should always be executed on gm client via BPAEngine
      * executes all actions on activity in priority order
      * will stop at a priority if any action of that priority returned success
-     * @param testResult
-     * @private
      */
-    private async _executeActions(testResult:bpa.TestResult, hitArea:bpa.HitArea,actorId:string) {
+    public async executeActions(activityResult:bpa.ActivityResult) {
         let stopExecution = false;
         for (const priority of PriorityTypeOrder) {
             if (!stopExecution) {
                 for (const actionData of this._data.actions[priority]) {
                     const action = this._getAction(actionData);
-                    const result: bpa.ActivityResult = {
-                        testResult: testResult,
-                        hitArea: action.filterHitArea(hitArea),
-                        actorId: actorId
+                    const activityResultWithFilteredHitArea: bpa.ActivityResult = {
+                        testResult: activityResult.testResult,
+                        hitArea: action.filterHitArea(activityResult.hitArea),
+                        actorId: activityResult.actorId
                     }
-                    stopExecution = await action.execute(result)
+                    stopExecution = await action.execute(activityResultWithFilteredHitArea)
                 }
             }
         }
