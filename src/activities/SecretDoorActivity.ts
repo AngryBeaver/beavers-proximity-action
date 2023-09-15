@@ -81,7 +81,7 @@ class SecretDoorAction extends Action{
     async execute(result: bpa.ActivityResult):Promise<boolean>{
         let anySuccess = false;
         for(const wallId of result.hitArea.wallIds) {
-            const wall = canvas?.scene?.walls.get(wallId);
+            const wall = this._getWall(wallId);
             if (wall) {
                 const dc:number = wall["flags"][this.parentId]?.[CONFIGURATION_ID]
                     || this._parent.getConfigValue(CONFIGURATION_ID);

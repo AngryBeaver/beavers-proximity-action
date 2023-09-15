@@ -1,4 +1,3 @@
-import {Activity} from "./activities/Activity.js";
 import {BPAEngine} from "./activities/BPAEngine.js";
 import {bpa} from "./types.js";
 import {NAMESPACE} from "./Settings.js";
@@ -18,7 +17,15 @@ export class BeaversProximityAction {
     }={};
 
     /**
-     * User can get current bpa engine
+     * socket can execute Activity on scene
+     */
+    public async executeActivity(sceneId:string,activityId:string,activityResult:bpa.ActivityResult){
+        await this.activateScene(sceneId)
+        await this._data[sceneId].executeActivity(activityId,activityResult);
+    }
+
+    /**
+     * UserInteraction can get current bpa engine synchronous if available
      */
     public getBPAEngine(): BPAEngine{
         return this._data[this.defaultSceneId()];
@@ -40,7 +47,7 @@ export class BeaversProximityAction {
 
     /**
      * Modules can extend existing Activities by register additional ActionClasses.
-     * They are not stored and needs to be registered each time when with a ready hook.
+     * They are not stored and needs to be registered each time with a ready hook.
      */
     public addActionClass(activityId:string, actionClassId:string,actionClass){
         this._actionClasses[activityId] = this.getActionClasses(activityId);

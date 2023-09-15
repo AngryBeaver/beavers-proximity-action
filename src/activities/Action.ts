@@ -39,13 +39,17 @@ export abstract class Action {
         return this._data.location.gridIds.includes(gridId);
     }
     private _validateWallId(wallId:string):boolean{
-        const wall = canvas?.scene?.walls.get(wallId);
+        const wall = this._getWall(wallId);
         for(const wallFilter of this._data.location.wallFilter) {
             if (beaversSystemInterface.objectAttributeGet(wall, wallFilter.attribute) != wallFilter.value) {
                 return false;
             }
         }
         return true;
+    }
+
+    protected _getWall(wallId:string):WallDocument|undefined {
+        return this._parent._parent._scene.walls.get(wallId)
     }
 
     /**

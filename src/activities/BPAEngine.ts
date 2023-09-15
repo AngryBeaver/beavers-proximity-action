@@ -2,11 +2,11 @@ import {ActivityStore} from "./ActivityStore.js";
 import {ProximitySquareGrid} from "../ProximitySquareGrid.js";
 import {Activity} from "./Activity.js";
 import {bpa} from "../types.js";
-import {NAMESPACE} from "../Settings";
+import {NAMESPACE} from "../Settings.js";
 import {SOCKET_EXECUTE_ACTIVITY} from "../main.js";
 
 export class BPAEngine {
-    private readonly _sceneId:string;
+    public readonly _scene:Scene;
     public readonly activityStore: ActivityStore;
     public readonly grid: bpa.Grid;
     private _activities: {
@@ -18,7 +18,7 @@ export class BPAEngine {
         if (scene["grid"].type === 1) {
             this.grid = new ProximitySquareGrid()
         }
-        this._sceneId = scene.uuid;
+        this._scene = scene;
     }
 
     /**
@@ -30,7 +30,7 @@ export class BPAEngine {
         if(this._activities[activityClass.defaultData.id]){
             this._activities[activityClass.defaultData.id].destruct();
         }
-        this._activities[activityClass.defaultData.id] = new activityClass(this,this._sceneId);
+        this._activities[activityClass.defaultData.id] = new activityClass(this,this._scene.uuid);
     }
 
     /**
@@ -73,7 +73,7 @@ export class BPAEngine {
                 hitArea: request.hitArea,
                 actorId: request.actorId
             }
-            await game[NAMESPACE].socket.executeAsGM(SOCKET_EXECUTE_ACTIVITY,request.activityId,activityResult);
+            await game[NAMESPACE].socket.executeAsGM(SOCKET_EXECUTE_ACTIVITY,this._scene.uuid,request.activityId,activityResult);
         }
     }
     /**
@@ -92,6 +92,7 @@ export class BPAEngine {
 
     /**
      * add wallIds and remove grids behind walls
+     * can only be executed on current scene e.g on userClient.
      */
     private _filterGridsBehindWalls(origin: Point, grids: Point[]): bpa.HitArea {
         const hitArea: bpa.HitArea = {

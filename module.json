@@ -3,6 +3,7 @@
     "description": "Enable actions available around your token",
     "id": "beavers-proximity-action",
     "version": "1.0.0",
+    "socket": true,
     "authors": [
       {
         "name": "angryBeaver",

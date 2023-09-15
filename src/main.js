@@ -2,6 +2,7 @@ import {NAMESPACE, Settings} from "./Settings.js";
 import {BeaversProximityAction} from "./BeaversProximityAction.js";
 import {SecretDoorActivity} from "./activities/SecretDoorActivity.js";
 import {UserInteraction} from "./UserInteraction.js";
+import {TestHandler} from "./TestHandler.js";
 
 
 export const HOOK_READY = NAMESPACE+".ready";
@@ -20,6 +21,8 @@ Hooks.once("beavers-system-interface.ready", async function(){
         game[NAMESPACE]=game[NAMESPACE]||{};
         game[NAMESPACE].BeaversProximityAction = new BeaversProximityAction();
         game[NAMESPACE].UserInteraction = new UserInteraction(game[NAMESPACE].BeaversProximityAction);
+        game[NAMESPACE].socket.register(SOCKET_EXECUTE_ACTIVITY, game[NAMESPACE].BeaversProximityAction.executeActivity.bind(game[NAMESPACE].BeaversProximityAction));
+        game[NAMESPACE].socket.register("test", TestHandler.test);
         Hooks.call(HOOK_READY,game[NAMESPACE].BeaversProximityAction);
         activateScene();
 })
@@ -44,9 +47,4 @@ function activateScene(){
 Hooks.once("socketlib.ready", () => {
         game[NAMESPACE]=game[NAMESPACE]||{};
         game[NAMESPACE].socket = socketlib.registerModule(NAMESPACE);
-        if(game.user.role === 4){
-            //TODO test gm needs to be on the same scene as the client
-            game[NAMESPACE].socket.register(SOCKET_EXECUTE_ACTIVITY, game[NAMESPACE].BeaversProximityAction.getBPAEngine().executeActivity);
-        }
-        game[NAMESPACE].socket.register("test", TestHandler.test);
 });
