@@ -1,6 +1,8 @@
 import {Activity} from "./Activity.js";
 import {BPAEngine} from "./BPAEngine.js";
 import {NAMESPACE} from "../Settings.js";
+import {bpa} from "../types";
+import TestOptions = bpa.TestOptions;
 
 /**
  * Activities are instanciated when active on a Scene
@@ -8,8 +10,6 @@ import {NAMESPACE} from "../Settings.js";
  * specific WallActivities can add a configuration section to a wall
  */
 export class WallActivity extends Activity {
-
-
 
     constructor(parent: BPAEngine, sceneId: string) {
         super(parent, sceneId);
@@ -35,23 +35,26 @@ export class WallActivity extends Activity {
                 app.setPosition({height: "auto"});
             }
         }
-
-        this._hooks["renderWallConfig"] = Hooks.on("renderWallConfig", (app, html, options) => {
-            _addTabs(app, html);
-            html.find(".tab[data-tab=proximity]").append(`
+        this._hookRegistry.push({
+            hookId: "renderWallConfig",
+            method: (app, html, options) => {
+                _addTabs(app, html);
+                const configurations:bpa.TestConfigurations = this._getConfigurations()
+                html.find(".tab[data-tab=proximity]").append(`
                 <fieldset data-id="${this.id}">
-                    <legend>${this.name}</legend>
+                    <legend>${this.test.name}</legend>
                 </fieldset>
             `);
-            for (const [id, configuration] of Object.entries(this._data.configurations)) {
-                html.find(`.tab[data-tab=proximity] fieldset`).append(`
+                for (const [id, configuration] of Object.entries(configurations)) {
+                    html.find(`.tab[data-tab=proximity] fieldset`).append(`
 <div class="form-group">
     <label>${configuration.inputData.label}</label>
     <input placeholder="${configuration.defaultValue}" name="flags.${NAMESPACE}.${id}." type="${configuration.inputData.type}"/>
+    <p class="notes">${id}</p>
 </div>
             `);
+                }
             }
         });
-
     }
 }

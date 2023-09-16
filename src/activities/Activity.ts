@@ -12,6 +12,11 @@ export class Activity {
     _data: bpa.ActivityData;
     _parent: BPAEngine;
     _sceneId: string;
+    _hookRegistry:
+        {
+            hookId:string,
+            method:any
+        }[] = [];
     _hooks: {
         [id: string]: number,
     } = {};
@@ -28,7 +33,7 @@ export class Activity {
         const settingsData = game[NAMESPACE].Settings.getActivitySetting(this.constructor.defaultData.id);
         // @ts-ignore
         //settingsData overwrite existing defaultData;
-        this._data = {...this.constructor.defaultData, settingsData};
+        this._data = {...this.constructor.defaultData, ...settingsData};
         //storedOptions extend existing actions and overwrite existing results
         this._data.results = storedOptions.results;
         for (const priority of PriorityTypeOrder) {
@@ -120,12 +125,76 @@ export class Activity {
     }
 
     /**
-     * Activities can load a global configuration value either from scene or settings
-     * @param configId
+     * Activities use this to display configuration Settings on the object
      */
-    public getConfigValue(configId: string): any {
-        //TODO load from scene or settings;
-        return this._data.configurations.value
+    protected _getConfigurations(): bpa.TestConfigurations {
+        const result: bpa.TestConfigurations = {}
+        for (const [id, test] of Object.entries(this._data.test.options)) {
+            if (test.type === "skill") {
+                const skill = beaversSystemInterface.configSkills.find(s => s.id === test.name);
+                if (skill) {
+                    result[id] = {
+                        inputData: {
+                            label: skill.label,
+                            type: "number"
+                        },
+                        defaultValue: test.defaultValue || 20
+                    }
+                }
+            }
+            if (test.type === "ability") {
+                const ability = beaversSystemInterface.configAbilities.find(a => a.id === test.name);
+                if (ability) {
+                    result[id] = {
+                        inputData: {
+                            label: ability.label,
+                            type: "number"
+                        },
+                        defaultValue: test.defaultValue || 20
+                    }
+                }
+            }
+            if (test.type === "input" && test.inputDialog) {
+                result[id] = {
+                    inputData: {
+                        label: "UserInput",
+                        type: test.inputDialog.type
+                    },
+                    defaultValue: test.defaultValue || "password"
+                }
+            }
+            if (test.type === "choices" && test.choices) {
+                result[id] = {
+                    inputData: {
+                        label: "Dropdown",
+                        type: "text",
+                    },
+                    defaultValue: test.defaultValue || ""
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Actions can validate tests
+     */
+    public validateTest(testResult:bpa.TestResult,storedValue?:any){
+        const test = this._data.test.options[testResult.testId];
+        const value = storedValue || test.defaultValue;
+        if(!test){
+            throw new Error("testId not available");
+        }
+        if(test.type === "skill" || test.type === "ability"){
+            return testResult.number && testResult.number >= value;
+        }
+        if(test.type === "input"){
+            return testResult.text === value;
+        }
+        if(test.type === "prompt" || test.type === "hit"){
+            return testResult.isSuccess;
+        }
+        throw new Error(test.type + "is not yet implemented");
     }
 
     /**
@@ -182,12 +251,22 @@ export class Activity {
     }
 
     /**
-     * destruct needs to be called whenever another instance is generated to reduce amount of Hooks.
-     * bpa engine is currently calling this.
+     * disableHooks needs to be called whenever another instance is generated and whenever
+     * a scene this activity is on gets activated
      */
-    public destruct(): void {
+    public disableHooks(): void {
         for (const [id, value] of Object.entries(this._hooks)) {
             Hooks.off(id, value);
+        }
+        this._hooks = {};
+    }
+
+    /**
+     * enableHooks needs to be called whenever a scene this activity is on gets activated
+     */
+    public enableHooks(): void {
+        for (const data of this._hookRegistry) {
+            this._hooks[data.hookId] = Hooks.on(data.hookId,data.method)
         }
     }
 

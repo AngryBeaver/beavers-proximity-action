@@ -4,23 +4,25 @@ import {NAMESPACE} from "./Settings.js";
 
 export class BeaversProximityAction {
 
+    public currentSceneId:string;
     private _data:{
         [sceneId:string]:BPAEngine
     }={};
-    _actionClasses:{
+    private _actionClasses:{
         [activityId:string]:{
             [actionClassId:string]:any
         }
     }={};
-    _activityClasses:{
+    private _activityClasses:{
         [activityId:string]:bpa.ActivityClass
     }={};
+
 
     /**
      * socket can execute Activity on scene
      */
     public async executeActivity(sceneId:string,activityId:string,activityResult:bpa.ActivityResult){
-        await this.activateScene(sceneId)
+        await this.initializeBPAEngine(sceneId)
         await this._data[sceneId].executeActivity(activityId,activityResult);
     }
 
@@ -28,7 +30,7 @@ export class BeaversProximityAction {
      * UserInteraction can get current bpa engine synchronous if available
      */
     public getBPAEngine(): BPAEngine{
-        return this._data[this.defaultSceneId()];
+        return this._data[this.currentSceneId];
     }
 
 
@@ -38,10 +40,9 @@ export class BeaversProximityAction {
      */
     public addActivityClass(activityClass:bpa.ActivityClass){
         this._activityClasses[activityClass.defaultData.id] = activityClass;
-        const currentSceneId = this.defaultSceneId();
         game[NAMESPACE].Settings.addActivity(activityClass);
-        if(this._data[currentSceneId]){
-            this._data[currentSceneId].addActivity(activityClass);
+        for(const bpaEngine of Object.values(this._data)){
+            bpaEngine.addActivity(activityClass);
         }
     }
 
@@ -62,16 +63,27 @@ export class BeaversProximityAction {
     }
 
     /**
-     * instanciate BPAEngine for scene if not exists
+     * is called on each client whenever a scene is changing
      * @param sceneId
      */
-    public async activateScene(sceneId:string=this.defaultSceneId()){
+    public async activateScene(){
+        if(this._data[this.currentSceneId]){
+            this._data[this.currentSceneId].disableHooks();
+        }
+        const currentSceneId = this.defaultSceneId();
+        await this.initializeBPAEngine(currentSceneId);
+        this.currentSceneId = currentSceneId;
+        this._data[this.currentSceneId].enableHooks();
+    }
+
+    private async initializeBPAEngine(sceneId:string){
         if(!this._data[sceneId]) {
+            this.currentSceneId = "";
             const scene = await fromUuid(sceneId) as Scene;
             this._data[sceneId] = new BPAEngine(scene);
-        }
-        for(const activityClass of Object.values(this._activityClasses)){
-            this._data[sceneId].addActivity(activityClass)
+            for(const activityClass of Object.values(this._activityClasses)){
+                this._data[sceneId].addActivity(activityClass)
+            }
         }
     }
 

@@ -49,7 +49,7 @@ export class TestHandler {
     }
 
     static async _testInput(test: bpa.Test): Promise<bpa.TestResult | null> {
-        const input = await this.uiDialogInput(test.inputDialog || {})
+        const input = await this.uiDialogInput(test.inputDialog || {type:"text",label:""})
         if (input == null) {
             return null;
         }
@@ -60,7 +60,7 @@ export class TestHandler {
     }
 
     static async _testPrompt(test:bpa.Test): Promise<bpa.TestResult | null>{
-        const prompt = await this.uiDialogPrompt(test.promptDialog || {})
+        const prompt = await this.uiDialogPrompt(test.promptDialog || {label:""})
         if (prompt == null) {
             return null;
         }

@@ -40,15 +40,6 @@ export class SecretDoorActivity extends WallActivity{
                 ],
                 fallback: [],
             },
-            configurations: {
-                "search-id":{
-                    inputData: {
-                        label: "search dc",
-                        type: "number",
-                    },
-                    defaultValue: 20
-                }
-            },
             results:[]
         };
     }
@@ -83,10 +74,9 @@ class SecretDoorAction extends Action{
         for(const wallId of result.hitArea.wallIds) {
             const wall = this._getWall(wallId);
             if (wall) {
-                const dc:number = wall["flags"][this.parentId]?.[CONFIGURATION_ID]
-                    || this._parent.getConfigValue(CONFIGURATION_ID);
-                if (result.testResult.isSuccess || (result.testResult.number && dc >= result.testResult.number)) {
-                    this.success(wall);
+                const value = getProperty(wall,`flags.${this.parentId}.${result.testResult.testId}`);
+                if(this._parent.validateTest(value)){
+                    await this.success(wall);
                     anySuccess = true;
                 }
             }
@@ -94,7 +84,7 @@ class SecretDoorAction extends Action{
         if(!anySuccess){
             this.failure();
         }
-        return true;
+        return false;
     }
 
     private async success(wall:WallDocument){

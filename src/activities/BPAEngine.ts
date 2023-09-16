@@ -28,9 +28,12 @@ export class BPAEngine {
      */
     public addActivity(activityClass: bpa.ActivityClass) {
         if(this._activities[activityClass.defaultData.id]){
-            this._activities[activityClass.defaultData.id].destruct();
+            this._activities[activityClass.defaultData.id].disableHooks();
         }
         this._activities[activityClass.defaultData.id] = new activityClass(this,this._scene.uuid);
+        if(this._scene.uuid === game[NAMESPACE].BeaversProximityAction.currentSceneId){
+            this.enableHooks();
+        }
     }
 
     /**
@@ -88,6 +91,24 @@ export class BPAEngine {
         //store global proximityHitArea not individual ActionHitAreas
         //todo update all clients activity data
         await this.activityStore.addResult(activityId, activityResult);
+    }
+
+    /**
+     * this is called with every scene change so only hooks of actual scene are active
+     */
+    public disableHooks(){
+        for(const activity of Object.values(this._activities)){
+            activity.disableHooks();
+        }
+    }
+
+    /**
+     * this is called with every scene change so only hooks of actual scene are active
+     */
+    public enableHooks(){
+        for(const activity of Object.values(this._activities)){
+            activity.enableHooks();
+        }
     }
 
     /**

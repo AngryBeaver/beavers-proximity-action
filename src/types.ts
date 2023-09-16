@@ -90,12 +90,6 @@ export declare namespace bpa {
         }
         actionClasses: {
             [actionClassId: string]: bpa.ActionClass
-        },
-        configurations: {
-            [configId: string]: {
-                inputData: InputData,
-                defaultValue: any,
-            }
         }
     }
 
@@ -161,22 +155,31 @@ export declare namespace bpa {
 
     interface Test {
         id:string,
+        type: TestType
+        name?: string //contains selected skill/ability id
         choices?: {
             [id:string]:{text:string,img?:string}
         }
         inputDialog?: InputDialog
         promptDialog?: PromptDialog
-        type: TestType
+        defaultValue?:any
     }
+    interface TestConfigurations {
+        [configId: string]: {
+            inputData: InputData,
+            defaultValue: any,
+        }
+    }
+
 
     interface InputDialog {
         title?:string,
-        label?:string,
-        type?:string
+        label:string,
+        type:string
     }
     interface PromptDialog {
         title?:string,
-        label?:string,
+        label:string,
     }
 }
 
