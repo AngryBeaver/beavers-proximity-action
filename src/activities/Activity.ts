@@ -181,18 +181,21 @@ export class Activity {
      */
     public validateTest(testResult:bpa.TestResult,storedValue?:any){
         const test = this._data.test.options[testResult.testId];
-        const value = storedValue || test.defaultValue;
+        let value = storedValue || test.defaultValue;
         if(!test){
             throw new Error("testId not available");
         }
         if(test.type === "skill" || test.type === "ability"){
+            value = value || 20;
             return testResult.number && testResult.number >= value;
         }
         if(test.type === "input"){
             if(testResult.number){
-                return testResult.number === value;
+                value = value || 42;
+                return testResult.number == value;
             }
-            return testResult.text === value;
+            value = value || "password";
+            return testResult.text == value;
         }
         if(test.type === "prompt" || test.type === "hit"){
             return testResult.isSuccess;

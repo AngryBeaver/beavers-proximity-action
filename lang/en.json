@@ -15,6 +15,9 @@
         "label": "enable activity",
         "hint": "enable {name}"
       },
+      "submit": "Save changes",
+      "warning": "This will change the activity behaviour over all ! E.g. when you delete TestOptions you might end up loosing all individual configured values of any scene.",
+      "defaultValue": "Default value",
       "prompt": {
         "label": "Prompt",
         "hint": "Question to answer with yes (success) or no (fail)"

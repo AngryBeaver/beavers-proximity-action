@@ -74,9 +74,9 @@ class SecretDoorAction extends Action{
         for(const wallId of result.hitArea.wallIds) {
             const wall = this._getWall(wallId);
             if (wall) {
-                //TODO fix this
                 const value = getProperty(wall,`flags.${this.parentId}`)[result.testResult.testId];
                 if(this._parent.validateTest(result.testResult,value)){
+                    //TODO chat message
                     await this.success(wall);
                     anySuccess = true;
                 }
@@ -93,6 +93,7 @@ class SecretDoorAction extends Action{
     }
 
     private failure(){
+        //TODO chat message
         ui.notifications?.info(game["i18n"].localize("beaversProximityAction.secretDoor.fallbackMessage"));
     }
 
