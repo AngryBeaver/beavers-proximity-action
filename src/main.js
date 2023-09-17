@@ -7,6 +7,7 @@ import {TestHandler} from "./TestHandler.js";
 
 export const HOOK_READY = NAMESPACE+".ready";
 export const SOCKET_EXECUTE_ACTIVITY = "executeActivity";
+export const SOCKET_TEST_PROMPT = "testPrompt";
 
 Hooks.on("beavers-system-interface.init", async function(){
         beaversSystemInterface.addModule(NAMESPACE);
@@ -22,7 +23,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
         game[NAMESPACE].BeaversProximityAction = new BeaversProximityAction();
         game[NAMESPACE].UserInteraction = new UserInteraction(game[NAMESPACE].BeaversProximityAction);
         game[NAMESPACE].socket.register(SOCKET_EXECUTE_ACTIVITY, game[NAMESPACE].BeaversProximityAction.executeActivity.bind(game[NAMESPACE].BeaversProximityAction));
-        game[NAMESPACE].socket.register("test", TestHandler.test);
+        game[NAMESPACE].socket.register(SOCKET_TEST_PROMPT, TestHandler.testPrompt.bind(TestHandler));
         Hooks.call(HOOK_READY,game[NAMESPACE].BeaversProximityAction);
         activateScene();
 })

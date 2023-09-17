@@ -92,6 +92,10 @@ export declare namespace bpa {
             [actionClassId: string]: bpa.ActionClass
         }
     }
+    interface ActivityTest {
+        name:string,
+        options: TestOptions
+    }
 
     interface ActivitySettings {
         enabled:boolean,

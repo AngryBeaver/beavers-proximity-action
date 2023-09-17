@@ -1,12 +1,12 @@
 
 import {bpa} from "./types.js";
+import {NAMESPACE} from "./Settings.js";
+import {SOCKET_TEST_PROMPT} from "./main.js";
 
 export class TestHandler {
 
-    //Todo sendrequest to player
-    //Todo allow gm requests e.g. for prompts.
-    static async test(testOptions: bpa.TestOptions, actor: Actor): Promise<bpa.TestResult | null> {
-        const test = await this.selectTestChoice(testOptions);
+    static async test(activityTest: bpa.ActivityTest, actor: Actor): Promise<bpa.TestResult | null> {
+        const test = await this.selectTestChoice(activityTest.options);
         let result: bpa.TestResult | null = null;
         if (test.type === "ability") {
             result = await this._testAbility(actor,test);
@@ -19,12 +19,24 @@ export class TestHandler {
         } else if (test.type === "input") {
             result = await this._testInput(test);
         } else if (test.type === "prompt") {
-            result = await this._testPrompt(test);
+            result = await game[NAMESPACE].socket.executeAsGM(SOCKET_TEST_PROMPT,test,actor.name+": "+activityTest.name);
         }
         return result;
     }
 
-    static async _testAbility(actor:Actor, test: bpa.Test): Promise<bpa.TestResult | null> {
+    /**
+     * should be executed on gm client
+     * @param test
+     */
+    public static async testPrompt(test:bpa.Test,label:string): Promise<bpa.TestResult | null>{
+        const prompt = await this.uiDialogPrompt(test.promptDialog || {label:label})
+        if (prompt == null) {
+            return null;
+        }
+        return {isSuccess: prompt, testId: test.id};
+    }
+
+    private static async _testAbility(actor:Actor, test: bpa.Test): Promise<bpa.TestResult | null> {
         let roll = await beaversSystemInterface.actorRollAbility(actor, test.name);
         if (roll == null) {
             return null
@@ -32,7 +44,7 @@ export class TestHandler {
         return {number: roll.total, testId: test.id};
     }
 
-    static async _testSkill(actor:Actor,test: bpa.Test): Promise<bpa.TestResult | null> {
+    private static async _testSkill(actor:Actor,test: bpa.Test): Promise<bpa.TestResult | null> {
         let roll = await beaversSystemInterface.actorRollSkill(actor, test.name);
         if (roll == null) {
             return null;
@@ -40,7 +52,7 @@ export class TestHandler {
         return {number: roll.total, testId: test.id};
     }
 
-    static async _testChoices(test: bpa.Test): Promise<bpa.TestResult | null> {
+    private static async _testChoices(test: bpa.Test): Promise<bpa.TestResult | null> {
         const choice = await beaversSystemInterface.uiDialogSelect(test.choices);
         if (choice == null) {
             return null;
@@ -48,7 +60,7 @@ export class TestHandler {
         return {text: choice, testId: test.id};
     }
 
-    static async _testInput(test: bpa.Test): Promise<bpa.TestResult | null> {
+    private static async _testInput(test: bpa.Test): Promise<bpa.TestResult | null> {
         const input = await this.uiDialogInput(test.inputDialog || {type:"text",label:""})
         if (input == null) {
             return null;
@@ -59,16 +71,8 @@ export class TestHandler {
         return {text: input, testId: test.id};
     }
 
-    static async _testPrompt(test:bpa.Test): Promise<bpa.TestResult | null>{
-        const prompt = await this.uiDialogPrompt(test.promptDialog || {label:""})
-        if (prompt == null) {
-            return null;
-        }
-        return {isSuccess: prompt, testId: test.id};
-    }
 
-
-    static async uiDialogPrompt({title = "", label = ""}: bpa.PromptDialog): Promise<boolean | null> {
+    private static async uiDialogPrompt({title = "", label = ""}: bpa.PromptDialog): Promise<boolean | null> {
         return new Promise((resolve, reject) => {
             const dialog = Dialog.confirm({
                 title: title,

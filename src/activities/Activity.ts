@@ -99,7 +99,7 @@ export class Activity {
         if (!actor) {
             throw new Error(game["i18n"].localize("beaversProximityAction.error.noActorOnToken"));
         }
-        return await TestHandler.test(this._data.test.options, actor);
+        return await TestHandler.test(this._data.test, actor);
     }
 
     /**
