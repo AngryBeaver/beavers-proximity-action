@@ -189,6 +189,9 @@ export class Activity {
             return testResult.number && testResult.number >= value;
         }
         if(test.type === "input"){
+            if(testResult.number){
+                return testResult.number === value;
+            }
             return testResult.text === value;
         }
         if(test.type === "prompt" || test.type === "hit"){

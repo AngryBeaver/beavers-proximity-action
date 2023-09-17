@@ -24,7 +24,9 @@ export class ActivitySettings {
                     classes: ["beavers-proximity-actions", "activity-setting"]
                 })
             }
-
+            //TODO fix store correctly
+            //TODO add save button
+            //TODO add default value
             async getData(options):Promise<any>{
                 const blankSettings:bpa.ActivitySettings = {
                     enabled: false,

@@ -74,8 +74,9 @@ class SecretDoorAction extends Action{
         for(const wallId of result.hitArea.wallIds) {
             const wall = this._getWall(wallId);
             if (wall) {
-                const value = getProperty(wall,`flags.${this.parentId}.${result.testResult.testId}`);
-                if(this._parent.validateTest(value)){
+                //TODO fix this
+                const value = getProperty(wall,`flags.${this.parentId}`)[result.testResult.testId];
+                if(this._parent.validateTest(result.testResult,value)){
                     await this.success(wall);
                     anySuccess = true;
                 }

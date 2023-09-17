@@ -25,15 +25,15 @@ export class TestHandler {
     }
 
     static async _testAbility(actor:Actor, test: bpa.Test): Promise<bpa.TestResult | null> {
-        let roll = await beaversSystemInterface.actorRollAbility(actor, test.id);
-        if (roll != null) {
+        let roll = await beaversSystemInterface.actorRollAbility(actor, test.name);
+        if (roll == null) {
             return null
         }
         return {number: roll.total, testId: test.id};
     }
 
     static async _testSkill(actor:Actor,test: bpa.Test): Promise<bpa.TestResult | null> {
-        let roll = await beaversSystemInterface.actorRollSkill(actor, test.id);
+        let roll = await beaversSystemInterface.actorRollSkill(actor, test.name);
         if (roll == null) {
             return null;
         }
@@ -104,23 +104,7 @@ export class TestHandler {
     static async selectTestChoice(testOptions: bpa.TestOptions): Promise<bpa.Test> {
         const choices = {};
         for (const [id, test] of Object.entries(testOptions)) {
-            if (test.type === "skill") {
-                beaversSystemInterface.configSkills.forEach(skill => {
-                    if (skill.id === test.id) {
-                        choices[id] = {text: skill.label};
-                        return;
-                    }
-                });
-            }else if (test.type === "ability") {
-                beaversSystemInterface.configAbilities.forEach(ability => {
-                    if (ability.id === test.id) {
-                        choices[id] = {text: ability.label};
-                        return;
-                    }
-                });
-            }else{
-                choices[id] = {text: test.id};
-            }
+            choices[id] = {text: test.id};
         }
         const choice = await beaversSystemInterface.uiDialogSelect({choices: choices});
         return testOptions[choice];

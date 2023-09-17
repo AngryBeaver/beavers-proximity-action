@@ -2,7 +2,6 @@ import {Activity} from "./Activity.js";
 import {BPAEngine} from "./BPAEngine.js";
 import {NAMESPACE} from "../Settings.js";
 import {bpa} from "../types";
-import TestOptions = bpa.TestOptions;
 
 /**
  * Activities are instanciated when active on a Scene
@@ -16,8 +15,6 @@ export class WallActivity extends Activity {
 
         function _addTabs(app, html) {
             if (html.find("nav").length == 0) {
-                const button = html.find("button [type=submit]");
-                button.detach();
                 const old = html.find("form").html();
                 html.find("form").html(`
 <nav class="sheet-tabs tabs aria-role="Form Tab Navigation">
@@ -27,8 +24,9 @@ export class WallActivity extends Activity {
 <div class="tab active" data-tab="basic"></div>
 <div class="tab" data-tab="proximity"></div>
                 `);
-                html.find("form").after(button);
                 html.find(".tab.active").html(old);
+                const button = html.find("button[type=submit]");
+                html.find("form").append(button);
                 app.options.tabs = [{navSelector: ".tabs", contentSelector: "form", initial: "basic"}];
                 app._tabs = app._createTabHandlers();
                 app._tabs.forEach(t => t.bind(html[0]));
@@ -39,17 +37,18 @@ export class WallActivity extends Activity {
             hookId: "renderWallConfig",
             method: (app, html, options) => {
                 _addTabs(app, html);
+                const flags = getProperty(options.document.flags,this.id) || {};
                 const configurations:bpa.TestConfigurations = this._getConfigurations()
                 html.find(".tab[data-tab=proximity]").append(`
                 <fieldset data-id="${this.id}">
-                    <legend>${this.test.name}</legend>
+                    <legend>${this.name}</legend>
                 </fieldset>
             `);
                 for (const [id, configuration] of Object.entries(configurations)) {
                     html.find(`.tab[data-tab=proximity] fieldset`).append(`
 <div class="form-group">
     <label>${configuration.inputData.label}</label>
-    <input placeholder="${configuration.defaultValue}" name="flags.${NAMESPACE}.${id}." type="${configuration.inputData.type}"/>
+    <input placeholder="${configuration.defaultValue}" value="${flags[id]}" name="flags.${this.id}.${id}" type="${configuration.inputData.type}"/>
     <p class="notes">${id}</p>
 </div>
             `);
