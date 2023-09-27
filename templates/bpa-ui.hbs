@@ -1,0 +1,32 @@
+<div class="beavers-proximity-action app flexrow"
+     style="position:absolute; padding:8px 2px; height:50px; width:200px; bottom:80px; left:15px; border: 1px solid var(--color-border-dark);">
+    <img style="flex:0;border:0px" height="32px" src="{{actor.img}}"/>
+    {{#if (not (beavers-isEmpty choices))}}
+        <div class="flexrow">
+            <div class="selection" style="position:relative">
+                <div style="overflow:hidden; height:34px; width: 140px; margin-right:2px;">
+                    <div style="position:relative;height:34px;background-color:#e0e0e0;color:#191813">
+                        <div class="wheel" style="position:relative;top:7px;line-height:20px;height:20px;transition: top 1s;">
+                            {{#each choices}}
+                                <button class="select" type="submit" style="margin:1px 0px;line-height:15px" data-key="{{@key}}">{{this.text}}</button>
+                            {{/each}}
+                            <div style="border-top:1px solid grey"></div>
+                        </div>
+                    </div>
+                    <div style="pointer-events: none;width:140px;top:0px;position:absolute; height:34px; background:linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 20%, rgba(0,0,0,0) 80%, rgba(0,0,0,0.8) 100%);">
+                    </div>
+                </div>
+            </div>
+            <div class="flexcol">
+                <a class="up">
+                    <i class="fas fa-angle-up"></i>
+                </a>
+                <a class="down">
+                    <i class="fas fa-angle-down"></i>
+                </a>
+            </div>
+        </div>
+    {{else}}
+        <button class="scan-proximity">scan</button>
+    {{/if}}
+</div>

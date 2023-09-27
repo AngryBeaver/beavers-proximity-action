@@ -91,7 +91,7 @@ export class Activity {
      * actions are executed in priority order
      * if an action executed with success it will stop execution for all lower priority ordered executions.
      */
-    public async test(actorId: string, hitArea: bpa.HitArea):Promise<bpa.TestResult|null> {
+    public async test(actorId: string, hitArea: bpa.HitArea, options: any):Promise<bpa.TestResult|null> {
         if (!this.isAvailable(actorId, hitArea)) {
             throw new Error(game["i18n"].localize("beaversProximityAction.error.noAvailableActionsFound"));
         }
@@ -99,7 +99,7 @@ export class Activity {
         if (!actor) {
             throw new Error(game["i18n"].localize("beaversProximityAction.error.noActorOnToken"));
         }
-        return await TestHandler.test(this._data.test, actor);
+        return await TestHandler.test(this._data.test, actor,options);
     }
 
     /**

@@ -10,7 +10,8 @@ export class UserInteraction {
     }
 
     public async request() {
-        const token = this._currentToken();
+
+        const token = UserInteraction.currentToken(game["user"].id);
         //TODO load distance and type from Client? World? Settings;
         const proximityRequest: bpa.ProximityRequest = {
             distance: 5,
@@ -37,8 +38,8 @@ export class UserInteraction {
         await this.beaversProximityAction.getBPAEngine().testActivity(activityRequest);
     }
 
-    private _currentToken(): Token {
-        let token = this._getUserCharacterToken();
+    public static currentToken(userId:string): Token {
+        let token = this._getUserCharacterToken(userId);
         if (!token) {
             token = this._getControlledToken();
         }
@@ -48,7 +49,7 @@ export class UserInteraction {
         return token;
     }
 
-    private _getTokenLayer(): TokenLayer {
+    private static _getTokenLayer(): TokenLayer {
         if (!(canvas instanceof Canvas)) {
             throw new Error("canvas not ready");
         }
@@ -60,9 +61,9 @@ export class UserInteraction {
     }
 
 
-    private _getUserCharacterToken(): Token | null {
+    private static _getUserCharacterToken(userId:string): Token | null {
         const tokenLayer = this._getTokenLayer();
-        let actorId = game["user"].character?.uuid;
+        let actorId = game["users"].get(userId).character?.uuid;
         for (const t of tokenLayer.ownedTokens) {
             if (t.actor?.uuid === actorId) {
                 return t;
@@ -71,7 +72,7 @@ export class UserInteraction {
         return null;
     }
 
-    private _getControlledToken(): Token | null {
+    private static _getControlledToken(): Token | null {
         for (const t of canvas?.tokens?.controlled || []) {
             if (t.actor) {
                 return t;

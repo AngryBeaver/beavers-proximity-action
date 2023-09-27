@@ -5,8 +5,8 @@ import {SOCKET_TEST_PROMPT} from "./main.js";
 
 export class TestHandler {
 
-    static async test(activityTest: bpa.ActivityTest, actor: Actor): Promise<bpa.TestResult | null> {
-        const test = await this.selectTestChoice(activityTest.options);
+    static async test(activityTest: bpa.ActivityTest, actor: Actor, options:any): Promise<bpa.TestResult | null> {
+        const test = await this.selectTestChoice(activityTest.options,options);
         let result: bpa.TestResult | null = null;
         if (test.type === "ability") {
             result = await this._testAbility(actor,test);
@@ -105,10 +105,13 @@ export class TestHandler {
     }
 
 
-    static async selectTestChoice(testOptions: bpa.TestOptions): Promise<bpa.Test> {
+    static async selectTestChoice(testOptions: bpa.TestOptions,options:any): Promise<bpa.Test> {
         const choices = {};
         for (const [id, test] of Object.entries(testOptions)) {
             choices[id] = {text: test.id};
+        }
+        if(options.bpaui){
+            options.bpaui.select(choices);
         }
         const choice = await beaversSystemInterface.uiDialogSelect({choices: choices});
         return testOptions[choice];

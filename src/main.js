@@ -3,6 +3,7 @@ import {BeaversProximityAction} from "./BeaversProximityAction.js";
 import {SecretDoorActivity} from "./activities/SecretDoorActivity.js";
 import {UserInteraction} from "./UserInteraction.js";
 import {TestHandler} from "./TestHandler.js";
+import {BPAUI} from "./BPAUI.js";
 
 
 export const HOOK_READY = NAMESPACE+".ready";
@@ -26,6 +27,8 @@ Hooks.once("beavers-system-interface.ready", async function(){
         game[NAMESPACE].socket.register(SOCKET_TEST_PROMPT, TestHandler.testPrompt.bind(TestHandler));
         Hooks.call(HOOK_READY,game[NAMESPACE].BeaversProximityAction);
         activateScene();
+        //TODO make this a setting
+        new BPAUI(game.userId).render(true)
 })
 
 Hooks.on(HOOK_READY,async function(){
@@ -48,4 +51,10 @@ function activateScene(){
 Hooks.once("socketlib.ready", () => {
         game[NAMESPACE]=game[NAMESPACE]||{};
         game[NAMESPACE].socket = socketlib.registerModule(NAMESPACE);
+});
+
+Handlebars.registerHelper('beavers-isEmpty', function (value, options) {
+        return value === undefined ||
+            (value instanceof Object && Object.keys(value).length === 0) ||
+            (value instanceof Array && value.length === 0)
 });

@@ -67,9 +67,9 @@ export class BPAEngine {
     /**
      * users can execute an activity within proximity range.
      */
-    public async testActivity(request: bpa.ActivityRequest) {
+    public async testActivity(request: bpa.ActivityRequest, options?: any) {
         const activity: Activity = this._activities[request.activityId];
-        const testResult: bpa.TestResult|null = await activity.test(request.actorId, request.hitArea);
+        const testResult: bpa.TestResult|null = await activity.test(request.actorId, request.hitArea, options);
         if(testResult!= null){
             const activityResult: bpa.ActivityResult = {
                 testResult: testResult,
