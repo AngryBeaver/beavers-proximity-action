@@ -3,7 +3,6 @@ import {bpa} from "./types.js";
 import {UserInteraction} from "./UserInteraction.js";
 
 /**
- * TODO
  * Will paint a display with your actor and current activities as dropdown
  * needs to be position absolute so we can have multiple instances of that for shared screen.
  * Each user can have one instance it need not be the user of the client.
@@ -54,15 +53,6 @@ export class BPAUI extends Application {
     }
 
     async getData(options = {}) {
-        if (this._data.result) {
-            this._data.choices = {}
-            if (this._data.result.activities) {
-                this._data.choices[""]={text: game["i18n"].localize("beaversProximityAction.userInteraction.noActivity")}
-            }
-            for (const activity of Object.values(this._data.result.activities)) {
-                this._data.choices[activity.id] = {text: activity.name};
-            }
-        }
         return {
             actor: game["users"].get(this._data.userId).character,
             choices: this._data.choices,
@@ -77,8 +67,9 @@ export class BPAUI extends Application {
                 type: "cone"
             }
             const result = await game[NAMESPACE].BeaversProximityAction.getBPAEngine().getProximityActivities(proximityRequest);
+            const empty = {text:game["i18n"].localize("beaversProximityAction.userInteraction.noActivity")};
             var activities = result.activities.reduce(
-                (obj, item) => Object.assign(obj, { [item.id]: {text:item.name} }), {});
+                (obj, item) => Object.assign(obj, { [item.id]: {text:item.name} }), {"":empty});
             const activityId = await this.select(activities);
             if(activityId===undefined || activityId === ""){
                 this._reset();
@@ -89,7 +80,8 @@ export class BPAUI extends Application {
                 actorId: result.actorId,
                 hitArea: result.hitArea,
             }
-            await game[NAMESPACE].beaversProximityAction.getBPAEngine().testActivity(activityRequest,{bpaui:this});
+            await game[NAMESPACE].BeaversProximityAction.getBPAEngine().testActivity(activityRequest,{bpaui:this});
+            this._reset();
         })
         html.find(".selection").on("wheel", (e) => {
             if (e.originalEvent.deltaY > 0) {

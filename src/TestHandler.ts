@@ -5,7 +5,7 @@ import {SOCKET_TEST_PROMPT} from "./main.js";
 
 export class TestHandler {
 
-    static async test(activityTest: bpa.ActivityTest, actor: Actor, options:any): Promise<bpa.TestResult | null> {
+    static async test(activityTest: bpa.ActivityTest, actor: Actor, options:any={}): Promise<bpa.TestResult | null> {
         const test = await this.selectTestChoice(activityTest.options,options);
         let result: bpa.TestResult | null = null;
         if (test.type === "ability") {
@@ -13,7 +13,7 @@ export class TestHandler {
         } else if (test.type === "skill") {
             result = await this._testSkill(actor,test);
         } else if (test.type === "choices") {
-            result = await this._testChoices(test);
+            result = await this._testChoices(test,options);
         } else if (test.type === "hit") {
             result = {testId: test.id, text: test.id, isSuccess:true};
         } else if (test.type === "input") {
@@ -52,8 +52,13 @@ export class TestHandler {
         return {number: roll.total, testId: test.id};
     }
 
-    private static async _testChoices(test: bpa.Test): Promise<bpa.TestResult | null> {
-        const choice = await beaversSystemInterface.uiDialogSelect(test.choices);
+    private static async _testChoices(test: bpa.Test,options): Promise<bpa.TestResult | null> {
+        let choice: string | null = null;
+        if(options.bpaui){
+            choice = await options.bpaui.select(test.choices);
+        }else{
+            choice = await beaversSystemInterface.uiDialogSelect({choices: test.choices});
+        }
         if (choice == null) {
             return null;
         }
@@ -110,10 +115,12 @@ export class TestHandler {
         for (const [id, test] of Object.entries(testOptions)) {
             choices[id] = {text: test.id};
         }
+        let choice = "";
         if(options.bpaui){
-            options.bpaui.select(choices);
+            choice = await options.bpaui.select(choices);
+        }else{
+            choice = await beaversSystemInterface.uiDialogSelect({choices: choices});
         }
-        const choice = await beaversSystemInterface.uiDialogSelect({choices: choices});
         return testOptions[choice];
     }
 
