@@ -13,7 +13,6 @@ export class BPAUI extends Application {
 
     _data: {
         userId: string,
-        result?: bpa.ProximityResult,
         wheel: number,
         choices: {
             [id:string]:{ text: string }
@@ -32,7 +31,6 @@ export class BPAUI extends Application {
         if (this.element.length > 0) {
             this.bringToTop();
         }
-        //todo delete this._data.result on scene change or token movement or user.character change
     }
 
     static get defaultOptions() {
@@ -101,6 +99,12 @@ export class BPAUI extends Application {
             const id = $(e.currentTarget).data().key;
             this._choose(id);
         });
+
+        html.find('.drag-me').on("mousedown", e => {
+                const app = $(e.currentTarget).parent(".app");
+                dragElement(e,app[0]).then(x=>console.log(x));
+        });
+
     }
 
     public async select(choices: { [id: string]: { text: string } }):Promise<string> {
@@ -116,6 +120,7 @@ export class BPAUI extends Application {
             this._data.resolve(id);
         }
     }
+
     async _reset(){
         this._data.choices = {};
         this._data.wheel = 0;
@@ -142,5 +147,44 @@ class Deferred<T> {
             this.reject = reject
             this.resolve = resolve
         })
+    }
+}
+
+function dragElement(event, elmnt) {
+    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0, top = elmnt.offsetTop-3, left = elmnt.offsetLeft;
+    const deferred = new Deferred();
+    dragMouseDown(event);
+    return deferred.promise;
+    function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // get the mouse cursor position at startup:
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        // call a function whenever the cursor moves:
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // calculate the new cursor position:
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        top = elmnt.offsetTop - pos2-3;
+        left = elmnt.offsetLeft - pos1
+        // set the element's new position:
+        elmnt.style.top = (elmnt.offsetTop - pos2-3) + "px";
+        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    }
+
+    function closeDragElement() {
+        // stop moving when mouse button is released:
+        document.onmouseup = null;
+        document.onmousemove = null;
+        deferred.resolve({top:top,left:left});
     }
 }

@@ -9,6 +9,10 @@
       "noAvailableActionsFound": "no available Actions found for your request",
       "noActorFound": "no actor found for your request"
     },
+    "uiSettings": {
+      "label": "tiny UI",
+      "hint": ""
+    },
     "activitySettings": {
       "testOptions": "test options",
       "enabled": {

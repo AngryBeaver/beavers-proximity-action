@@ -5,7 +5,6 @@ export const NAMESPACE = "beavers-proximity-action"
 
 export class Settings {
 
-
     constructor() {
         if (!(game instanceof Game)) {
             throw new Error("Settings called before game has been initialized");
@@ -39,7 +38,6 @@ export class Settings {
             config: false,
             default: mergedData,
             type: Object
-
         });
         game.settings.registerMenu(NAMESPACE, "activity-"+activityClass.defaultData.id + "-button", {
             name: activityClass.defaultData.name,

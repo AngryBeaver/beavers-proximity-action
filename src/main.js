@@ -53,8 +53,6 @@ Hooks.once("socketlib.ready", () => {
         game[NAMESPACE].socket = socketlib.registerModule(NAMESPACE);
 });
 
-Handlebars.registerHelper('beavers-isEmpty', function (value, options) {
-        return value === undefined ||
-            (value instanceof Object && Object.keys(value).length === 0) ||
-            (value instanceof Array && value.length === 0)
+Handlebars.registerHelper("beavers-objectLen", function(json) {
+        return Object.keys(json).length;
 });
