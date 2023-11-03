@@ -11,7 +11,7 @@ export class Settings {
         }
         game.keybindings.register(NAMESPACE, 'current Token', {
             name: 'beaversProximityAction.keybinding.name',
-            editable: [{key: 'KeyF', modifiers: ['Shift']}],
+            editable: [{key: 'KeyH', modifiers: ['Shift']}],
             onDown: () => {
                 game[NAMESPACE].UserInteraction.request();
             }

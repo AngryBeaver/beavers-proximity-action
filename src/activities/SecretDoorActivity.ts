@@ -1,11 +1,9 @@
 import {NAMESPACE} from "../Settings.js";
-import {WallActivity} from "./WallActivity.js";
+import {BaseWallActivity} from "./BaseWallActivity.js";
 import {Action} from "./Action.js";
 import {bpa} from "../types.js";
 export const ID = NAMESPACE + ".secret-door"
-const CONFIGURATION_ID = "search-dc";
-
-export class SecretDoorActivity extends WallActivity{
+export class SecretDoorActivity extends BaseWallActivity{
 
     static getId():string{
         return ID;
@@ -29,7 +27,8 @@ export class SecretDoorActivity extends WallActivity{
                 }
             },
             actionClasses:{
-                "main":SecretDoorAction
+                "main":SecretDoorAction,
+                "fallback":FallbackAction
             },
             actions:{
                 normal: [
@@ -38,7 +37,12 @@ export class SecretDoorActivity extends WallActivity{
                         priority: "normal"
                     }
                 ],
-                fallback: [],
+                fallback: [
+                    {
+                        classId: "fallback",
+                        priority: "normal",
+                    }
+                ],
             },
             results:[]
         };
@@ -97,4 +101,35 @@ class SecretDoorAction extends Action{
         ui.notifications?.info(game["i18n"].localize("beaversProximityAction.secretDoor.fallbackMessage"));
     }
 
+}
+
+class FallbackAction extends Action{
+    /**
+     * defaultData for this Action
+     */
+    static get defaultData(){
+        return {
+            location:{
+                type:"wall",
+                gridIds:[],
+                wallFilter:[
+                ],
+                isGlobal:true
+            },
+            available:{
+                type:"always",
+            },
+            priority: "normal"
+        }
+    }
+
+    async execute(result: bpa.ActivityResult):Promise<boolean>{
+        this.failure();
+        return false;
+    }
+
+    private failure(){
+        //TODO chat message
+        ui.notifications?.info(game["i18n"].localize("beaversProximityAction.secretDoor.fallbackMessage"));
+    }
 }

@@ -1,6 +1,5 @@
 import {Activity} from "./Activity.js";
 import {BPAEngine} from "./BPAEngine.js";
-import {NAMESPACE} from "../Settings.js";
 import {bpa} from "../types";
 
 /**
@@ -8,7 +7,7 @@ import {bpa} from "../types";
  * WallActivities can add a proximity-action-tab on walls
  * specific WallActivities can add a configuration section to a wall
  */
-export class WallActivity extends Activity {
+export class BaseWallActivity extends Activity {
 
     constructor(parent: BPAEngine, sceneId: string) {
         super(parent, sceneId);

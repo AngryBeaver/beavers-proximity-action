@@ -1,7 +1,7 @@
 
-import {bpa} from "./types.js";
-import {NAMESPACE} from "./Settings.js";
-import {SOCKET_TEST_PROMPT} from "./main.js";
+import {bpa} from "../types.js";
+import {NAMESPACE} from "../Settings.js";
+import {SOCKET_TEST_PROMPT} from "../main.js";
 
 export class TestHandler {
 
@@ -116,8 +116,8 @@ export class TestHandler {
             choices[id] = {text: test.id};
         }
         let choice = "";
-        if(options.bpaui){
-            choice = await options.bpaui.select(choices);
+        if(options.ui){
+            choice = await options.ui.select({choices:choices});
         }else{
             choice = await beaversSystemInterface.uiDialogSelect({choices: choices});
         }

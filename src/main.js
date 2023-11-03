@@ -1,14 +1,24 @@
 import {NAMESPACE, Settings} from "./Settings.js";
-import {BeaversProximityAction} from "./BeaversProximityAction.js";
+import {BeaversProximityAction} from "./app/BeaversProximityAction.js";
 import {SecretDoorActivity} from "./activities/SecretDoorActivity.js";
-import {UserInteraction} from "./UserInteraction.js";
-import {TestHandler} from "./TestHandler.js";
-import {BPAUI} from "./BPAUI.js";
+import {UserInteraction} from "./app/UserInteraction.js";
+import {TestHandler} from "./app/TestHandler.js";
+import {InteractionLayer} from "./interactionLayer/InteractionLayer.js";
+import {ProximityActionUI} from "./uis/ProximityActionUI.js";
 
 
 export const HOOK_READY = NAMESPACE+".ready";
 export const SOCKET_EXECUTE_ACTIVITY = "executeActivity";
 export const SOCKET_TEST_PROMPT = "testPrompt";
+
+let layers = Canvas.layers;
+layers.interaction = {
+        group: "interface",
+        layerClass:InteractionLayer
+}
+Object.defineProperty(Canvas, 'layers', {get: function() {
+                return layers
+}})
 
 Hooks.on("beavers-system-interface.init", async function(){
         beaversSystemInterface.addModule(NAMESPACE);
@@ -17,6 +27,10 @@ Hooks.on("beavers-system-interface.init", async function(){
 Hooks.once('init', () => {
         game[NAMESPACE]=game[NAMESPACE]||{};
         game[NAMESPACE].Settings = new Settings();
+        game.socket.on('module.TerrainLayer', async (data) => {
+                console.log(data)
+                canvas.terrain[data.action].apply(canvas.terrain,data.arguments);
+        })
 })
 
 Hooks.once("beavers-system-interface.ready", async function(){
@@ -27,8 +41,6 @@ Hooks.once("beavers-system-interface.ready", async function(){
         game[NAMESPACE].socket.register(SOCKET_TEST_PROMPT, TestHandler.testPrompt.bind(TestHandler));
         Hooks.call(HOOK_READY,game[NAMESPACE].BeaversProximityAction);
         activateScene();
-        //TODO make this a setting
-        new BPAUI(game.userId).render(true)
 })
 
 Hooks.on(HOOK_READY,async function(){
@@ -47,6 +59,11 @@ function activateScene(){
                 }
         }
 }
+
+Hooks.once("beavers-gamepad.ready", () => {
+        const paUI = new ProximityActionUI();
+        game["beavers-gamepad"].TinyUIModuleManager.addModule(paUI.name,paUI);
+});
 
 Hooks.once("socketlib.ready", () => {
         game[NAMESPACE]=game[NAMESPACE]||{};

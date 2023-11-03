@@ -15,9 +15,10 @@
 //- advanced openShop || other module shop ?
 
 
-import {Action} from "./activities/Action";
-import {Activity} from "./activities/Activity";
-import {BPAEngine} from "./activities/BPAEngine";
+import {Action} from "./activities/Action.js";
+import {Activity} from "./activities/Activity.js";
+import {BPAEngine} from "./activities/BPAEngine.js";
+import {BeaversProximityAction} from "./app/BeaversProximityAction.js";
 
 type ProximityType = "close" | "cone"
 type LocationType = "wall" | "grid" ;
@@ -184,6 +185,12 @@ export declare namespace bpa {
     interface PromptDialog {
         title?:string,
         label:string,
+    }
+}
+
+interface Game {
+    "beavers-proximity-action":{
+        BeaversProximityAction:BeaversProximityAction,
     }
 }
 

@@ -37,8 +37,8 @@
           "type": "module",
           "manifest": "https://github.com/AngryBeaver/beavers-system-interface/releases/latest/download/module.json",
           "compatibility": {
-            "minimum" : "2.1.4",
-            "verified": "2.1.4"
+            "minimum" : "2.1.5",
+            "verified": "2.1.5"
           }
         },
         {
@@ -47,6 +47,11 @@
           "compatibility": {
             "verified": "1.0.13"
           }
+        }
+      ],
+      "recommends": [
+        {
+          "id": "beavers-gamepad"
         }
       ]
     },

@@ -1,5 +1,5 @@
 import {ActivityStore} from "./ActivityStore.js";
-import {ProximitySquareGrid} from "../ProximitySquareGrid.js";
+import {ProximitySquareGrid} from "../app/ProximitySquareGrid.js";
 import {Activity} from "./Activity.js";
 import {bpa} from "../types.js";
 import {NAMESPACE} from "../Settings.js";

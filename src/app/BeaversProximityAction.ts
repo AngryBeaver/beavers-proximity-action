@@ -1,6 +1,6 @@
-import {BPAEngine} from "./activities/BPAEngine.js";
-import {bpa} from "./types.js";
-import {NAMESPACE} from "./Settings.js";
+import {BPAEngine} from "../activities/BPAEngine.js";
+import {bpa} from "../types.js";
+import {NAMESPACE} from "../Settings.js";
 
 export class BeaversProximityAction {
 

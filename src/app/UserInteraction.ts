@@ -1,4 +1,4 @@
-import {bpa} from "./types.js";
+import {bpa} from "../types.js";
 import {BeaversProximityAction} from "./BeaversProximityAction.js";
 
 export class UserInteraction {
