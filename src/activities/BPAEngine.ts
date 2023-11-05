@@ -1,7 +1,7 @@
 import {ActivityStore} from "./ActivityStore.js";
 import {ProximitySquareGrid} from "../app/ProximitySquareGrid.js";
 import {Activity} from "./Activity.js";
-import {bpa} from "../types.js";
+import {bpa} from "../bpaTypes.js";
 import {NAMESPACE} from "../Settings.js";
 import {SOCKET_EXECUTE_ACTIVITY} from "../main.js";
 

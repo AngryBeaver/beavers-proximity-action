@@ -1,8 +1,8 @@
 import {BPAEngine} from "../activities/BPAEngine.js";
-import {bpa} from "../types.js";
+import {bpa} from "../bpaTypes.js";
 import {NAMESPACE} from "../Settings.js";
 
-export class BeaversProximityAction {
+export class BeaversProximityAction implements BeaversProximityActionI{
 
     public currentSceneId:string;
     private _data:{

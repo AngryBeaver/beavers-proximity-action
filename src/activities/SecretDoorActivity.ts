@@ -1,7 +1,7 @@
 import {NAMESPACE} from "../Settings.js";
 import {BaseWallActivity} from "./BaseWallActivity.js";
 import {Action} from "./Action.js";
-import {bpa} from "../types.js";
+import {bpa} from "../bpaTypes.js";
 export const ID = NAMESPACE + ".secret-door"
 export class SecretDoorActivity extends BaseWallActivity{
 

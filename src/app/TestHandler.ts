@@ -1,5 +1,5 @@
 
-import {bpa} from "../types.js";
+import {bpa} from "../bpaTypes.js";
 import {NAMESPACE} from "../Settings.js";
 import {SOCKET_TEST_PROMPT} from "../main.js";
 

@@ -1,4 +1,4 @@
-import {bpa} from "../types.js";
+import {bpa} from "../bpaTypes.js";
 import {NAMESPACE} from "../Settings.js";
 
 export class ProximityActionUI implements UIModule {

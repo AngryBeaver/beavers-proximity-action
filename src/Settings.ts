@@ -1,4 +1,4 @@
-import {bpa} from "./types.js";
+import {bpa} from "./bpaTypes.js";
 import {ActivitySettings} from "./ActivitySetting.js";
 
 export const NAMESPACE = "beavers-proximity-action"

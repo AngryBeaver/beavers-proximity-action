@@ -7,10 +7,10 @@
 	"#devDir": "D:\\Vtts\\v11\\Data\\modules",
 	"main": "src/main.js",
 	"files": [
-		"src/types.ts"
+      "src/bpaTypes.ts"
 	],
 	"scripts": {
-		"type": "npx -p typescript tsc src/types.ts --declaration --emitDeclarationOnly --outDir dist/src",
+		"type": "npx -p typescript tsc src/bpaTypes.ts --declaration --emitDeclarationOnly --outDir dist/src",
 		"build": "npx gulp",
 		"watch": "npx gulp watch",
 		"clean": "npx gulp clean",

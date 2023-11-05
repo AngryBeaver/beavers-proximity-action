@@ -1,6 +1,6 @@
 import {Activity} from "./Activity.js";
 import {BPAEngine} from "./BPAEngine.js";
-import {bpa} from "../types";
+import {bpa} from "../bpaTypes";
 
 /**
  * Activities are instanciated when active on a Scene

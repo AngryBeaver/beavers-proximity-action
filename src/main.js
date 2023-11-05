@@ -3,8 +3,9 @@ import {BeaversProximityAction} from "./app/BeaversProximityAction.js";
 import {SecretDoorActivity} from "./activities/SecretDoorActivity.js";
 import {UserInteraction} from "./app/UserInteraction.js";
 import {TestHandler} from "./app/TestHandler.js";
-import {InteractionLayer} from "./interactionLayer/InteractionLayer.js";
+import {InteractionLayer} from "./test/InteractionLayer.js";
 import {ProximityActionUI} from "./uis/ProximityActionUI.js";
+import {Highlighting} from "./test/Highlighting.js";
 
 
 export const HOOK_READY = NAMESPACE+".ready";
@@ -40,6 +41,7 @@ Hooks.once("beavers-system-interface.ready", async function(){
         game[NAMESPACE].socket.register(SOCKET_EXECUTE_ACTIVITY, game[NAMESPACE].BeaversProximityAction.executeActivity.bind(game[NAMESPACE].BeaversProximityAction));
         game[NAMESPACE].socket.register(SOCKET_TEST_PROMPT, TestHandler.testPrompt.bind(TestHandler));
         Hooks.call(HOOK_READY,game[NAMESPACE].BeaversProximityAction);
+        game[NAMESPACE].Highlighting = new Highlighting();
         activateScene();
 })
 

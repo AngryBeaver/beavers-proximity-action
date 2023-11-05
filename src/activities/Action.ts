@@ -1,5 +1,5 @@
 import {Activity} from "./Activity.js";
-import {bpa} from "../types.js";
+import {bpa} from "../bpaTypes.js";
 import HitArea = bpa.HitArea;
 
 

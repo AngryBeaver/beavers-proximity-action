@@ -1,4 +1,4 @@
-import {bpa} from "../types.js";
+import {bpa} from "../bpaTypes.js";
 import {ConeShapedSquareGrid} from "./ConeShapedSquareGrid.js";
 import {CloseSquareGrid} from "./CloseSquareGrid.js";
 

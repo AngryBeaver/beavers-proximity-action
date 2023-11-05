@@ -2,7 +2,7 @@ import {NAMESPACE} from "../Settings.js";
 import {BPAEngine} from "./BPAEngine.js";
 import {Action} from "./Action.js";
 import {TestHandler} from "../app/TestHandler.js";
-import {bpa, PriorityTypeOrder} from "../types.js";
+import {bpa, PriorityTypeOrder} from "../bpaTypes.js";
 
 
 /**
