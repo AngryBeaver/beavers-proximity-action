@@ -16,7 +16,8 @@ export class UserInteraction {
         const proximityRequest: bpa.ProximityRequest = {
             distance: 5,
             token: token,
-            type: "cone"
+            type: "cone",
+            color: game["user"].color
         }
         const result = this.beaversProximityAction.getBPAEngine().getProximityActivities(proximityRequest);
         const choices = {

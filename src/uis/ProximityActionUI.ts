@@ -5,14 +5,16 @@ export class ProximityActionUI implements UIModule {
     name = "beavers-proximity-action"
 
     async process(userId: string, userInput: UserInput) {
-        const actorId = (game as Game).users?.get(userId)?.character?.id;
+        const user = (game as Game).users?.get(userId)
+        const actorId = user?.character?.id;
         const token = (canvas as Canvas).tokens?.ownedTokens.find(t => t.actor?.id === actorId);
         //TODO load distance and type from Client? World? Settings;
         if(token) {
             const proximityRequest: bpa.ProximityRequest = {
                 distance: 5,
                 token: token,
-                type: "cone"
+                type: "cone",
+                color: user?.color
             }
             const result = game[NAMESPACE].BeaversProximityAction.getBPAEngine().getProximityActivities(proximityRequest);
             const choices = {

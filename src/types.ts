@@ -8,13 +8,17 @@ interface Game {
 interface BeaversProximityActionI {
 
 }
-//fix foundry types
+/*********************************** fix foundry types */
 interface ClockwiseSweepPolygon {
     _constrainBoundaryShapes:()=>void
     addPoint:(pt:PolygonVertex)=>void
     _switchEdge:(result:CollisionResult, activeEdges?:any)=>void
     // @ts-ignore
     _isVertexBehindActiveEdges:(vertex:PolygonVertex, activeEdges:EdgeSet)=>{isBehind:boolean, wasLimited:boolean}
+}
+
+interface User {
+    id: string,
 }
 
 interface CollisionResult {

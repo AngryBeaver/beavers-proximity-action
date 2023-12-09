@@ -119,7 +119,8 @@ export declare namespace bpa {
     interface ProximityRequest {
         token: Token,
         distance: number,
-        type: ProximityType
+        type: ProximityType,
+        color?: string,
     }
 
     interface ProximityResult {
