@@ -3,8 +3,9 @@
 	"title": "Beaver's Proximity Action",
 	"version": "1.0.0",
 	"description": "Enable actions available around your token",
-	"devDir": "D:\\Vtts\\v10\\Data\\modules",
+	"#devDir": "D:\\Vtts\\v10\\Data\\modules",
 	"#devDir": "D:\\Vtts\\v11\\Data\\modules",
+	"devDir": "D:\\Vtts\\v11.315\\Data\\modules",
 	"main": "src/main.js",
 	"files": [
       "src/bpaTypes.ts"

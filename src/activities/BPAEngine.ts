@@ -3,7 +3,7 @@ import {Activity} from "./Activity.js";
 import {bpa} from "../bpaTypes.js";
 import {NAMESPACE} from "../Settings.js";
 import {SOCKET_EXECUTE_ACTIVITY} from "../main.js";
-import {ClockwiseSweepShape} from "../canvas/ClockwiseSweepShape";
+import {HitArea} from "../classes/HitArea.js";
 
 export class BPAEngine {
     public readonly _scene:Scene;
@@ -37,17 +37,17 @@ export class BPAEngine {
      * tokens have a center and a rotation
      */
     public getProximityActivities(request: bpa.ProximityRequest): bpa.ProximityResult {
-        const sweepResult = game[NAMESPACE].ActivityLayer.drawActivity(request);
-        const hitArea: bpa.HitArea = this._getHitAreaFromSweep(sweepResult);
+        const hitArea: HitArea = HitArea.from(request);
         const actorId = request.token.actor?.uuid;
         if(!actorId){
             throw new Error(game["i18n"].localize("beaversProximityAction.error.noActorOnToken"));
         }
+        game[NAMESPACE].ActivityLayer.drawActivity(hitArea.polygon,actorId, request.color);
         const result: bpa.ProximityResult = {
             origin: request.token.center,
             actorId: actorId,
             activities: [],
-            hitArea: hitArea
+            hitArea: hitArea.serialize()
         }
         for (const activity of Object.values(this._activities)) {
             if (activity.isAvailable(actorId, hitArea)) {
@@ -107,13 +107,5 @@ export class BPAEngine {
         }
     }
 
-    /**
-     * add wallIds and remove grids behind walls
-     */
-    private _getHitAreaFromSweep(sweep:ClockwiseSweepShape): bpa.HitArea {
-        const hitArea:bpa.HitArea ={gridIds: [], wallIds: []}
-        hitArea.wallIds = sweep.resultWalls.map(w=>w.id);
-        return hitArea;
-    }
 
 }

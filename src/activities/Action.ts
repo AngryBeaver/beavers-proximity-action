@@ -35,13 +35,19 @@ export abstract class Action {
         return this._parent.id;
     }
 
-    private _validateGridId(gridId:string):boolean{
-        return this._data.location.gridIds.includes(gridId);
+    private _validateTileId(tileId:string):boolean{
+        const tile = this._getTile(tileId);
+        for(const filter of this._data.location.filter) {
+            if (beaversSystemInterface.objectAttributeGet(tile, filter.attribute) !== filter.value) {
+                return false;
+            }
+        }
+        return true;
     }
     private _validateWallId(wallId:string):boolean{
         const wall = this._getWall(wallId);
-        for(const wallFilter of this._data.location.wallFilter) {
-            if (beaversSystemInterface.objectAttributeGet(wall, wallFilter.attribute) != wallFilter.value) {
+        for(const filter of this._data.location.filter) {
+            if (beaversSystemInterface.objectAttributeGet(wall, filter.attribute) !== filter.value) {
                 return false;
             }
         }
@@ -52,6 +58,10 @@ export abstract class Action {
         return this._parent._parent._scene.walls.get(wallId)
     }
 
+    protected _getTile(tileId:string):TileDocument|undefined {
+        return this._parent._parent._scene.tiles.get(tileId)
+    }
+
     /**
      * filter the HitArea to match only the action location,
      * when executing a single Action it should have reduced HitArea to this action only.
@@ -59,12 +69,13 @@ export abstract class Action {
      */
     public filterHitArea(hitArea:HitArea):HitArea{
         const result:HitArea = {
-            gridIds:[],
-            wallIds:[]
+            tileIds:[],
+            wallIds:[],
+            polygon: hitArea.polygon
         }
-        for(const gridId of hitArea.gridIds){
-            if(this._validateGridId(gridId)){
-                result.gridIds.push(gridId);
+        for(const tileId of hitArea.tileIds){
+            if(this._validateTileId(tileId)){
+                result.tileIds.push(tileId);
             }
         }
         for(const wallId of hitArea.wallIds){

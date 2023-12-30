@@ -1,9 +1,32 @@
 import {NAMESPACE} from "../Settings";
+import {bpa} from "../bpaTypes";
+
+function gridSize(): number {
+    const size = canvas?.grid?.size;
+    if (!size) {
+        throw new Error(game["i18n"].localize("beaversProximityAction.error.canvasGridError"));
+    }
+    return size;
+}
 
 export class ClockwiseSweepShape extends ClockwiseSweepPolygon {
     walls:Set<Wall> = new Set();
     resultWalls: Wall[] = []
     polygonVertices: PolygonVertex[] = [];
+
+    static from({token,distance,type}:bpa.ProximityRequest){
+        let result:ClockwiseSweepShape|null = null;
+        if (token) {
+            const center = (token as Token).center;
+            result = new ClockwiseSweepShape();
+            const angel = type === "cone" ? 90 : 360;
+            const size = gridSize();
+            // @ts-ignore
+            result.initialize(center, {radius: size * distance, rotation: token.document.rotation, angle: angel, type: "move"});
+            result.compute();
+        }
+        return result;
+    }
 
     /** @inheritdoc */
     _compute() {

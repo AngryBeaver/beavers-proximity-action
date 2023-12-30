@@ -21,9 +21,9 @@ import {BPAEngine} from "./activities/BPAEngine.js";
 import {BeaversProximityAction} from "./app/BeaversProximityAction.js";
 
 type ProximityType = "close" | "cone"
-type LocationType = "wall" | "grid" ;
-//version1 only use "always" until we can clean up the grids again.
-type AvailableType = "always" | "once" | "perGrid" | "perWall" | "perActor" | "each"
+type LocationType = "wall" | "tile" ;
+//version1 only use "always" until we can clean up again.
+type AvailableType = "always" | "once" | "perTile" | "perWall" | "perActor" | "each"
 type PriorityType = "fallback" | "normal"
 
 
@@ -35,10 +35,7 @@ export declare namespace bpa {
 
     interface ActionLocation {
         type: LocationType
-        //or directly actionSpaces
-        gridIds: string[],
-        //or walls
-        wallFilter: {attribute: string, value: any}[],
+        filter: {attribute: string, value: any}[],
         isGlobal: boolean
     }
 
@@ -151,8 +148,9 @@ export declare namespace bpa {
     }
 
     interface HitArea {
-        gridIds: string[],
-        wallIds: string[]
+        tileIds: string[],
+        wallIds: string[],
+        polygon: number[]
     }
 
     interface TestOptions {

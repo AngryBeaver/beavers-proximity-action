@@ -228,9 +228,9 @@ export class Activity {
         if (result) {
             return true;
         }
-        for (const gridId of hitArea.gridIds) {
-            result = (type === "perGrid" && activityResults.filter(a => a.hitArea.gridIds.includes(gridId)).length === 0)
-                || (type === "each" && activityResults.filter(a => (actorId === a.actorId && a.hitArea.gridIds.includes(gridId))).length === 0)
+        for (const tileId of hitArea.tileIds) {
+            result = (type === "perTile" && activityResults.filter(a => a.hitArea.tileIds.includes(tileId)).length === 0)
+                || (type === "each" && activityResults.filter(a => (actorId === a.actorId && a.hitArea.wallIds.includes(tileId))).length === 0)
             if (result) {
                 return true;
             }
@@ -247,7 +247,7 @@ export class Activity {
 
     //TODO MOVE SOMEWHERE HITAREA class ?
     private _isHitAreaEmpty(hitArea: bpa.HitArea): boolean {
-        for (const gridId of hitArea.gridIds) {
+        for (const gridId of hitArea.tileIds) {
             return false;
         }
         for (const wallId of hitArea.wallIds) {

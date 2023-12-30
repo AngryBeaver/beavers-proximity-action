@@ -1,26 +1,16 @@
 import {ClockwiseSweepShape} from "./ClockwiseSweepShape.js";
-import {bpa} from "../bpaTypes.js";
 
 export class ActivityLayer {
 
     activityContainer = {};
 
-    drawActivity({token,distance,type,color}:bpa.ProximityRequest):ClockwiseSweepShape|null {
-        let result:ClockwiseSweepShape|null = null;
-        if (token) {
-            const center = (token as Token).center;
-            result = new ClockwiseSweepShape();
-            const angel = type==="cone"?90:360;
-            const size = this._gridSize();
-            // @ts-ignore
-            result.initialize(center, {radius: size*distance, rotation: token.document.rotation, angle: angel, type: "move"});
-            result.compute();
-            // @ts-ignore
-            const activity = this._drawPolygon(Color.from(color || "#FFFFFF"), result.points);
-            this.fadeOut(activity);
-            this._getContainer(token.id).addChild(activity);
-        }
-        return result;
+    drawActivity(points: number[], id:string, color?:string): void {
+        let result: ClockwiseSweepShape | null = null;
+        // @ts-ignore
+        const activity = this._drawPolygon(Color.from(color || "#FFFFFF"), result.points);
+        this._getContainer(id).removeChildren();
+        this._getContainer(id).addChild(activity);
+        window.setTimeout(() => this.fadeOut(activity), 1000);
     }
 
     _getContainer(userId) {
@@ -35,9 +25,12 @@ export class ActivityLayer {
 
     fadeOut(activity) {
         const fadeOut = () => {
-            activity.alpha -= 0.01;
-            if (activity.alpha <= 0) {
-                activity.parent.removeChild(activity);
+            if (activity.parent) {
+                activity.alpha -= 0.01;
+                if (activity.alpha <= 0) {
+                    activity.parent.removeChild(activity);
+                }
+            } else {
                 // @ts-ignore
                 (canvas as Canvas).app.ticker.remove(fadeOut);
             }
@@ -56,11 +49,4 @@ export class ActivityLayer {
         return g;
     }
 
-    private _gridSize(): number {
-        const size = canvas?.grid?.size;
-        if (!size) {
-            throw new Error(game["i18n"].localize("beaversProximityAction.error.canvasGridError"));
-        }
-        return size;
-    }
 }
