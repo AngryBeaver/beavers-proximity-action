@@ -1,6 +1,6 @@
 import {bpa} from "../bpaTypes.js";
 import {ClockwiseSweepShape} from "../canvas/ClockwiseSweepShape.js";
-import {TileCollision} from "../canvas/TileCollision";
+import {TileCollision} from "../canvas/TileCollision.js";
 
 export class HitArea implements bpa.HitArea {
     tileIds: string[];

@@ -36,6 +36,7 @@ export abstract class Action {
     }
 
     private _validateTileId(tileId:string):boolean{
+        if(this._data.location.type !== "tile") return false;
         const tile = this._getTile(tileId);
         for(const filter of this._data.location.filter) {
             if (beaversSystemInterface.objectAttributeGet(tile, filter.attribute) !== filter.value) {
@@ -45,6 +46,7 @@ export abstract class Action {
         return true;
     }
     private _validateWallId(wallId:string):boolean{
+        if(this._data.location.type !== "wall") return false;
         const wall = this._getWall(wallId);
         for(const filter of this._data.location.filter) {
             if (beaversSystemInterface.objectAttributeGet(wall, filter.attribute) !== filter.value) {

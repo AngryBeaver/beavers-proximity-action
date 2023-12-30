@@ -56,12 +56,11 @@ class SecretDoorAction extends Action{
     /**
      * defaultData for this Action
      */
-    static get defaultData(){
+    static get defaultData():Partial<bpa.ActionStoreData>{
         return {
             location:{
                 type:"wall",
-                gridIds:[],
-                wallFilter:[
+                filter:[
                     {attribute:"door",value:2}
                 ],
                 isGlobal:false
@@ -107,13 +106,11 @@ class FallbackAction extends Action{
     /**
      * defaultData for this Action
      */
-    static get defaultData(){
+    static get defaultData():Partial<bpa.ActionStoreData>{
         return {
             location:{
                 type:"wall",
-                gridIds:[],
-                wallFilter:[
-                ],
+                filter:[],
                 isGlobal:true
             },
             available:{

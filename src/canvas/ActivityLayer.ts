@@ -1,13 +1,10 @@
-import {ClockwiseSweepShape} from "./ClockwiseSweepShape.js";
-
 export class ActivityLayer {
 
     activityContainer = {};
 
     drawActivity(points: number[], id:string, color?:string): void {
-        let result: ClockwiseSweepShape | null = null;
         // @ts-ignore
-        const activity = this._drawPolygon(Color.from(color || "#FFFFFF"), result.points);
+        const activity = this._drawPolygon(Color.from(color || "#FFFFFF"), points);
         this._getContainer(id).removeChildren();
         this._getContainer(id).addChild(activity);
         window.setTimeout(() => this.fadeOut(activity), 1000);
