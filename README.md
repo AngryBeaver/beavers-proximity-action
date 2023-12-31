@@ -40,14 +40,15 @@ This module is intended to be extended, however the documentation about how to d
 The structure might change too much in the early versions to make it stable usable for others.
 
 ## TODO 1.0.0
-- display one activity scan per player
-- hide display after n seconds
-- make display settings
-- add open close door activity
-  - disable door icon display on activity scan
-  - settings for icon and scan icon
+- make Scan Area Settings
+- add activities to tiles / walls
+- rework global/scene Settings set default activities on tiles/walls 
+- allow generic macro test
+- allow generic macro execution
+- allow generic macro isAvailable
 - add gamepad ui module
   - shortcut activity gamepad module
+
 
 ## Feature Plan
 - Locked-Door-Activity

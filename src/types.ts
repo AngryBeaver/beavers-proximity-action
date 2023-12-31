@@ -1,9 +1,21 @@
+type InputType = "text" | "number" | "area" | "selection";
 
-interface Game {
-    "beavers-proximity-action":{
-        BeaversProximityAction:BeaversProximityActionI,
+interface InputField {
+    label: string,
+    type: InputType,
+    note?: string,
+    defaultValue?: any,
+    choices?: {
+        [id:string]:{text:string,img?:string}
     }
 }
+
+interface InputData {
+    inputField: InputField,
+    value: any,
+    name: string
+}
+
 
 interface BeaversProximityActionI {
 
@@ -23,6 +35,12 @@ interface Bounds {
     width: number,
     height: number
 }
+/*********************************** extend foundry types */
+interface Game {
+    "beavers-proximity-action":{
+        BeaversProximityAction:BeaversProximityActionI,
+    }
+}
 
 /*********************************** fix foundry types */
 interface ClockwiseSweepPolygon {
@@ -32,11 +50,13 @@ interface ClockwiseSweepPolygon {
     // @ts-ignore
     _isVertexBehindActiveEdges:(vertex:PolygonVertex, activeEdges:EdgeSet)=>{isBehind:boolean, wasLimited:boolean}
 }
+
+
 interface TileDocument {
     x:number,
     y:number,
     width: number,
-    height: number
+    height: number,
 }
 
 interface User {

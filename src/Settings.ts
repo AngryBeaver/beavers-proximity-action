@@ -18,6 +18,7 @@ export class Settings {
         });
     }
 
+    //registerGlobalSettings for an Activity
     private addActivity(activityClass: bpa.ActivityClass) {
         if (!(game instanceof Game)) {
             throw new Error("Settings called before game has been initialized");

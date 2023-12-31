@@ -33,6 +33,7 @@ export declare namespace bpa {
     //version1 do not use "choices" until ui is build for it.
     type TestType = "skill" | "ability" | "hit" | "choices" | "input" | "prompt";
 
+
     interface ActionLocation {
         type: LocationType
         filter: {attribute: string, value: any}[],
@@ -56,11 +57,6 @@ export declare namespace bpa {
         }
     }
 
-    interface InputData {
-        label: string,
-        type: string,
-    }
-
     interface ActionClass {
         new(activity: Activity, options?: any): Action
         [any: string]: any,
@@ -82,6 +78,7 @@ export declare namespace bpa {
     interface ActivityData extends ActivityStoreData {
         id: string,
         name: string,
+        config: ActivityConfiguration,
         test:{
             name:string,
             options: TestOptions
@@ -168,18 +165,15 @@ export declare namespace bpa {
         promptDialog?: PromptDialog
         defaultValue?:any
     }
-    interface TestConfigurations {
-        [configId: string]: {
-            inputData: InputData,
-            defaultValue: any,
-        }
+    interface ActivityConfiguration {
+        [configId: string]: InputField,
     }
 
 
     interface InputDialog {
         title?:string,
         label:string,
-        type:string
+        type:InputType
     }
     interface PromptDialog {
         title?:string,

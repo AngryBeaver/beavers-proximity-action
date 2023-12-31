@@ -63,6 +63,24 @@
         "actionTypeNotFound": "action not found"
       },
       "fallbackMessage": "Nothing found."
+    },
+    "activity": {
+      "investigate": {
+        "name": "Investigate activity",
+        "note": "Here you can investigate a location and uncover its secrets",
+        "test": {
+          "name": "investigate Area",
+          "prompt": "Has Investigate activity been successful ?"
+        },
+        "secretInfo": {
+          "label": "Secret Information",
+          "defaultValue": "You found something interesting.",
+          "note": "This secret information will get revealed on success"
+        },
+        "error": {
+          "actionTypeNotFound": "action not found"
+        }
+      }
     }
   }
 }

@@ -1,9 +1,9 @@
-import {NAMESPACE} from "../Settings.js";
-import {BaseWallActivity} from "./BaseWallActivity.js";
-import {Action} from "./Action.js";
-import {bpa} from "../bpaTypes.js";
-export const ID = NAMESPACE + ".secret-door"
-export class SecretDoorActivity extends BaseWallActivity{
+import {NAMESPACE} from "../../Settings.js";
+import {Action} from "../Action.js";
+import {bpa} from "../../bpaTypes.js";
+import {BaseTileActivity} from "./BaseTileActivity.js";
+export const ID = NAMESPACE + ".investigate"
+export class InvestigateActivity extends BaseTileActivity{
 
     static getId():string{
         return ID;
@@ -11,24 +11,31 @@ export class SecretDoorActivity extends BaseWallActivity{
 
     static get defaultData():bpa.ActivityData {
         return {
-            id:NAMESPACE + ".secret-door",
-            name: game["i18n"].localize("beaversProximityAction.secretDoor.name"),
+            id:ID,
+            name: game["i18n"].localize("beaversProximityAction.activity.investigate.name"),
+            config:{
+                "secretInfo":{
+                    type:"area",
+                    label: game["i18n"].localize("beaversProximityAction.activity.investigate.secretInfo.label"),
+                    defaultValue: game["i18n"].localize("beaversProximityAction.activity.investigate.secretInfo.defaultValue"),
+                    note: game["i18n"].localize("beaversProximityAction.activity.investigate.secretInfo.note"),
+                }
+            },
             test:{
-                name: game["i18n"].localize("beaversProximityAction.secretDoor.test.name"),
+                name: game["i18n"].localize("beaversProximityAction.activity.investigate.test.name"),
                 options: {
                     "prompt": {
                         id: "prompt",
                         type: "prompt",
                         promptDialog: {
-                            title: game["i18n"].localize("beaversProximityAction.secretDoor.test.name"),
-                            label: game["i18n"].localize("beaversProximityAction.secretDoor.test.prompt")
+                            title: game["i18n"].localize("beaversProximityAction.investigate.test.name"),
+                            label: game["i18n"].localize("beaversProximityAction.investigate.test.prompt")
                         }
                     }
                 }
             },
             actionClasses:{
-                "main":SecretDoorAction,
-                "fallback":FallbackAction
+                "main":InvestigateAction
             },
             actions:{
                 normal: [
@@ -37,12 +44,7 @@ export class SecretDoorActivity extends BaseWallActivity{
                         priority: "normal"
                     }
                 ],
-                fallback: [
-                    {
-                        classId: "fallback",
-                        priority: "normal",
-                    }
-                ],
+                fallback: [],
             },
             results:[]
         };
@@ -52,17 +54,15 @@ export class SecretDoorActivity extends BaseWallActivity{
 
 
 
-class SecretDoorAction extends Action{
+class InvestigateAction extends Action{
     /**
      * defaultData for this Action
      */
     static get defaultData():Partial<bpa.ActionStoreData>{
         return {
             location:{
-                type:"wall",
-                filter:[
-                    {attribute:"door",value:2}
-                ],
+                type:"tile",
+                filter:[],
                 isGlobal:false
             },
             available:{

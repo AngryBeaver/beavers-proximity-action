@@ -1,6 +1,6 @@
 import {Activity} from "./Activity.js";
 import {bpa} from "../bpaTypes.js";
-import HitArea = bpa.HitArea;
+import { HitArea } from "../classes/HitArea.js";
 
 
 export abstract class Action {
@@ -69,12 +69,12 @@ export abstract class Action {
      * when executing a single Action it should have reduced HitArea to this action only.
      * @param hitArea
      */
-    public filterHitArea(hitArea:HitArea):HitArea{
-        const result:HitArea = {
+    public filterHitArea(hitArea:bpa.HitArea):HitArea{
+        const result = HitArea.create({
             tileIds:[],
             wallIds:[],
             polygon: hitArea.polygon
-        }
+        });
         for(const tileId of hitArea.tileIds){
             if(this._validateTileId(tileId)){
                 result.tileIds.push(tileId);

@@ -1,0 +1,9 @@
+<section data-tab="{{id}}">
+    <h2 class="border">{{name}}</h2>
+    {{#each config}}
+        {{>beavers-input-data name="flags.{{../id}}.{{@key}}}" value=(lookup ../data @key)}}
+    {{/each}}
+    {{#each tests}}
+        {{>beavers-input-data name="flags.{{../id}}.{{@key}}}" value=(lookup ../data @key)}}
+    {{/each}}
+</section>

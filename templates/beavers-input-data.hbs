@@ -1,0 +1,29 @@
+<div class="form-group">
+    <label>{{this.label}}</label>
+    <div class="form-fields">
+        {{#if (eq this.type "area")}}
+            <textarea style="resize:vertical" name="{{name}}"
+                      {{#if this.defaultValue}}placeholder="{{this.defaultValue}}"{{/if}}
+            >{{value}}</textarea>
+        {{else if (eq this.type "selection")}}
+            <beavers-selection>
+                <select name="{{name}}">
+                    {{#select value}}
+                        <option selected disabled value=""></option>
+                        {{#each this.choices}}
+                            <option value="{{@key}}" img="{{this.img}}">
+                                {{this.text}}
+                            </option>
+                        {{/each}}
+                    {{/select}}
+                </select>
+            </beavers-selection>
+        {{else}}
+            <input {{#unless this.defaultValue}}placeholder="{{this.defaultValue}}"{{/unless}}
+                   value="{{value}}" name="{{name}}" type="{{this.type}}"/>
+        {{/if}}
+    </div>
+    {{#if this.note}}
+        <p class="notes">{{this.note}}</p>
+    {{/if}}
+</div>
