@@ -1,3 +1,4 @@
+
 type InputType = "text" | "number" | "area" | "selection";
 
 interface InputField {

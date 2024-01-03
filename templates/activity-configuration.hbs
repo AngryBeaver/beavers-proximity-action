@@ -1,9 +1,14 @@
 <section data-tab="{{id}}">
-    <h2 class="border">{{name}}</h2>
+    <h2 class="border flexrow">
+        <span>{{name}}</span>
+        <a style="flex:0" class="item-delete" data-id="{{id}}">
+            <i class="fas fa-trash"></i>
+        </a>
+    </h2>
     {{#each config}}
-        {{>beavers-input-data name="flags.{{../id}}.{{@key}}}" value=(lookup ../data @key)}}
+        {{>beavers-input-data name=(concat ../path "." @key) value=(lookup ../data @key)}}
     {{/each}}
     {{#each tests}}
-        {{>beavers-input-data name="flags.{{../id}}.{{@key}}}" value=(lookup ../data @key)}}
+        {{>beavers-input-data name=(concat ../path "." @key) value=(lookup ../data @key)}}
     {{/each}}
 </section>

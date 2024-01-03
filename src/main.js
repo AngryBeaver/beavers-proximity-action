@@ -6,6 +6,7 @@ import {TestHandler} from "./app/TestHandler.js";
 import {ProximityActionUI} from "./uis/ProximityActionUI.js";
 import {ActivityLayer} from "./canvas/ActivityLayer.js";
 import {InvestigateActivity} from "./activities/tiles/InvestigateActivity.js";
+import {ProximityTileApp} from "./app/ProximityTileApp.js";
 
 
 export const HOOK_READY = NAMESPACE + ".ready";
@@ -31,6 +32,11 @@ Hooks.once("beavers-system-interface.ready", async function () {
     initHandlebars();
     Hooks.call(HOOK_READY, game[NAMESPACE].BeaversProximityAction);
     activateScene();
+
+    Hooks.on("renderTileConfig", (app, html, options) => {
+        new ProximityTileApp(app, html, options);
+    });
+
 })
 
 Hooks.on(HOOK_READY, async function () {
@@ -52,6 +58,8 @@ Hooks.once("socketlib.ready", () => {
     game[NAMESPACE] = game[NAMESPACE] || {};
     game[NAMESPACE].socket = socketlib.registerModule(NAMESPACE);
 });
+
+
 
 function activateScene() {
     if (game[NAMESPACE].BeaversProximityAction) {

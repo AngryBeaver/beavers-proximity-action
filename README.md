@@ -72,3 +72,74 @@ The structure might change too much in the early versions to make it stable usab
 - Extend Documentation.
   - how to build your own Activities.
 
+-------------------
+Activities
+- namedChecks
+  - must define namedChecks.
+  - can configure namedChecks "skill arcana: default 10" global Settings
+- actions
+  - can define actions for those namedChecks
+  - allows actions to be registered for those named checks. (hooks)
+  - can be configured to be enabled by default. (global Setting)
+  - can be configured to have fallback action -> is an Action that triggers when no namedCheck is successfull.
+
+Actions belong to an Activity and can be configured.
+- actions do not know anything about the namedChecks they run upon.
+- actions can define configuration fields needed for its action.
+- actions must define a success execution method.
+- actions can define a fail execution method.
+
+Tiles/walls/token 
+- can add Actions grouped by activities
+  - can configure each configuration field.
+  - can be configured to be an individualSubCheck
+    - name and icon needed
+    - when a user selects a namedCheck he will get all Actions for it found and if there are mutliple subChecks the user will get a choice.
+  - can add a namedCheck from the available
+    - can configure success/failure for that namedCheck.
+
+
+Users select namedChecks not Activities nor Actions
+namedChecks can trigger Actions.
+ForEach namedCheck Actions are triggered in priority order.
+
+Are namedChecks unique to an Activity ? or can different Activities share a namedCheck.
+e.g. "search" -> find traps and loot ?
+kiss: version 1 assumption namedChecks can not be shared.
+
+Examples
+Activity RevealSecretDoors
+"search Secret Door" -> namedCheck. "skill perception"
+"cast detect secretDoor" -> namedCheck. "ask gm or hit"
+Action nothing -> success, fail => nothing
+Action found -> success "make door out of wall".
+
+
+iterate over all tiles ->
+-> get all ConfiguredActions
+-> order them by priority
+when no Action is successful -> trigger Fallback.
+
+Special only one action per wall allowed it does not make sense to add more.
+Special action needs to be found on all Walls.
+Special fallback when no tile has a wall.
+
+
+Examples
+Activity DetectClues
+"Investigate Footprint" -namedCheck "skill perception"
+"Investigate Table" -namedCheck "skill perception"
+
+Special The user selects the activity "investigate"
+Special subchoice search table, search footstep 
+
+
+No order needed
+
+do we need activities
+-> do we need multiple namedChecks per activity ?
+-> do we need multiple actions per activity ?
+
+
+
+

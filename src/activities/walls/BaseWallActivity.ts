@@ -42,15 +42,15 @@ export class BaseWallActivity extends Activity {
             method: (app, html, options) => {
                 _addTabs(app, html);
                 _addProximityTab(app, html);
-                const flags = getProperty(options.document.flags,this.id) || {};
-                const configuration:bpa.ActivityConfiguration = this._getConfiguration();
-                renderTemplate('modules/beavers-proximity-action/templates/activity-configuration.hbs',{
+                const flags = getProperty(options.document.flags, this.id) || {};
+                const configuration: bpa.ActivityConfiguration = this._getConfiguration();
+                renderTemplate('modules/beavers-proximity-action/templates/activity-configuration.hbs', {
                     id: this.id,
                     name: this.name,
                     config: this._data.config,
                     tests: configuration,
-                    data:flags,
-                }).then(content=>{
+                    data: flags,
+                }).then(content => {
                     html.find(`.tab[data-tab=proximity]`).append(content);
                 });
             }

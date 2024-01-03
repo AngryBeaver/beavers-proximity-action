@@ -1,19 +1,40 @@
-import {NAMESPACE} from "../../Settings.js";
-import {Action} from "../Action.js";
-import {bpa} from "../../bpaTypes.js";
-import {TileActivity} from "./TileActivity.js";
-export const ID = NAMESPACE + ".investigate"
-export class InvestigateActivity extends TileActivity{
 
-    static getId():string{
-        return ID;
+import {bp} from "./types.js";
+import {NAMESPACE} from "../Settings.js";
+import {ConfigurationDefinition} from "./types";
+export const ID = NAMESPACE + ".investigate.js"
+
+
+/* class decorator */
+function staticImplements<T>() {
+    return <U extends T>(constructor: U) => {constructor};
+}
+@staticImplements<bp.Action<TileDocument>>()
+export class InvestigateAction implements bp.EntityAction<TileDocument>{
+
+    config: any;
+    entity: TileDocument;
+
+    constructor(entity: TileDocument, config:any){
+        this.entity = entity;
+        this.config = config;
     }
 
-    static get defaultData():bpa.ActivityData {
+    fail(): void {
+    }
+
+    success(): void {
+    }
+
+
+    static get id():string{
+        return ID;
+    }
+    static get data():bp.ActionData {
         return {
             id:ID,
             name: game["i18n"].localize("beaversProximityAction.activity.investigate.name"),
-            config:{
+            configurationDefinition:{
                 "secretInfo":{
                     type:"area",
                     label: game["i18n"].localize("beaversProximityAction.activity.investigate.secretInfo.label"),
@@ -21,40 +42,32 @@ export class InvestigateActivity extends TileActivity{
                     note: game["i18n"].localize("beaversProximityAction.activity.investigate.secretInfo.note"),
                 }
             },
-            test:{
-                name: game["i18n"].localize("beaversProximityAction.activity.investigate.test.name"),
-                options: {
-                    "prompt": {
-                        id: "prompt",
-                        type: "prompt",
-                        promptDialog: {
-                            title: game["i18n"].localize("beaversProximityAction.investigate.test.name"),
-                            label: game["i18n"].localize("beaversProximityAction.investigate.test.prompt")
-                        }
-                    }
+            allowSubOptions:false,
+            defaultTest:{
+                type: "prompt",
+                name: "",
+                inputField: {
+                    type:"area",
+                    label: game["i18n"].localize("beaversProximityAction.activity.investigate.secretInfo.label"),
+                    defaultValue: game["i18n"].localize("beaversProximityAction.activity.investigate.secretInfo.defaultValue"),
+                    note: game["i18n"].localize("beaversProximityAction.activity.investigate.secretInfo.note"),
                 }
             },
-            actionClasses: {
-                "main":InvestigateAction
-            },
-            actions:{
-                normal: [
-                    {
-                        classId: "main",
-                        priority: "normal"
-                    }
-                ],
-                fallback: [],
-            },
-            results:[]
+            fallback:(user:User)=>{
+                userOutput
+            }
         };
     }
+
+
+
+
 
 }
 
 
 
-class InvestigateAction extends Action{
+class InvestigateActions extends Action{
     /**
      * defaultData for this Action
      */
