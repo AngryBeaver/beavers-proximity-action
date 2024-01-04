@@ -1,66 +1,77 @@
+import {TileAction} from "./TileAction.js";
+import {HitArea} from "./HitArea.js";
+import {NAMESPACE} from "../Settings.js";
 export class BeaversProximityAction implements BeaversProximityActionI{
 
-    private actions:{
-        [activityId:string]:{
-            [actionClassId:string]:any
+    game: Game;
+
+    private activities:{
+        [type in  ActivityType]: {
+            [id: string]: Activity
         }
-    }={};
+    }={wall:{},tile:{}};
+
+    constructor(){
+        if(game instanceof Game) {
+            this.game = game;
+        }else{
+            throw Error("game not initialized");
+        }
+    }
 
     /**
      * socket can execute Actions
      */
-    public async executeAction(){
-        await this.initializeBPAEngine(sceneId)
-        await this._data[sceneId].executeActivity(activityId,activityResult);
+    public async executeAction(initiator: Initiator){
+
     }
 
     /**
-     * Modules can add Actions by register additional ActionClasses.
+     * Modules can add Actions by register additional ActionDefinitions
      * They are not stored and needs to be registered each time with a ready hook.
      */
-    public addAction( ){
-        this._actionClasses[activityId] = this.getActionClasses(activityId);
-        this._actionClasses[activityId][actionClassId] = actionClass;
-    }
-
-    /**
-     * Activities can lookUp actionClasses that had been registered from other modules
-     */
-    public getActionClasses(activityId:string){
-        return this._actionClasses[activityId] || {};
-    }
-
-    /**
-     * is called on each client whenever a scene is changing
-     * @param sceneId
-     */
-    public async activateScene(){
-        if(this._data[this.currentSceneId]){
-            this._data[this.currentSceneId].disableHooks();
+    public addActivity(activity: Activity){
+        if(activity.prototype instanceof TileAction){
+            this.activities.tile[activity.id] = activity;
+        }else{
+            return;
         }
-        const currentSceneId = this.defaultSceneId();
-        await this.initializeBPAEngine(currentSceneId);
-        this.currentSceneId = currentSceneId;
-        this._data[this.currentSceneId].enableHooks();
+        this.game[NAMESPACE].Settings.addActivity(activity);
     }
 
-    private async initializeBPAEngine(sceneId:string){
-        if(!this._data[sceneId]) {
-            this.currentSceneId = "";
-            const scene = await fromUuid(sceneId) as Scene;
-            this._data[sceneId] = new BPAEngine(scene);
-            for(const activityClass of Object.values(this._activityClasses)){
-                this._data[sceneId].addActivity(activityClass)
+    public getActivities(type: ActivityType){
+        return this.activities[type];
+    }
+
+    public getActivity(type, actionId: string):Activity{
+        return this.activities[type][actionId];
+    }
+
+
+    /**
+     * users can get scan around a token
+     * tokens have a center and a rotation
+     */
+    public scanProximity(request: ProximityRequest): ProximityResponse {
+        const initiator = new Initiator(request.initiator);
+        const hitArea: HitArea = HitArea.from(initiator.token,request);
+        this.game[NAMESPACE].ActivityLayer.drawActivity(hitArea.polygon,initiator.actorId, initiator.user.color);
+        const result: ProximityResponse = {
+            initiator: request.initiator,
+            origin: initiator.token.center,
+            actions: [],
+            hitArea: hitArea.serialize()
+        }
+        for (const activity of Object.values(this.activities)) {
+            if (activity.isAvailable(actorId, hitArea)) {
+                result.activities.push({
+                    id: activity.id,
+                    name: activity.name,
+                })
             }
         }
+        return result;
     }
 
-    public getActivities(type):bpa.ActivityClass[]{
-        return Object.values(this._activityClasses).filter(a=>a.prototype instanceof type);
-    }
-
-    private defaultSceneId(){
-        return canvas?.scene?.uuid || "";
-    }
 
 }

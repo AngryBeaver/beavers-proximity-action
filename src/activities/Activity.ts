@@ -3,7 +3,7 @@ import {BPAEngine} from "./BPAEngine.js";
 import {Action} from "./Action.js";
 import {TestHandler} from "../app/TestHandler.js";
 import {bpa, PriorityTypeOrder} from "../bpaTypes.js";
-import {HitArea} from "../classes/HitArea.js";
+import {HitArea} from "../new/HitArea.js";
 
 
 /**

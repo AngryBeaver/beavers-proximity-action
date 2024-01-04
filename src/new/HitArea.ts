@@ -1,13 +1,12 @@
-import {bpa} from "../bpaTypes.js";
-import {ClockwiseSweepShape} from "../canvas/ClockwiseSweepShape.js";
-import {TileCollision} from "../canvas/TileCollision.js";
+import {ClockwiseSweepShape} from "./ClockwiseSweepShape.js";
+import {TileCollision} from "./TileCollision.js";
 
-export class HitArea implements bpa.HitArea {
+export class HitArea implements HitAreaData {
     tileIds: string[];
     wallIds: string[];
     polygon: number[];
 
-    static create(hitArea: bpa.HitArea){
+    static create(hitArea: HitAreaData){
         const result = new HitArea();
         hitArea.tileIds = hitArea.tileIds;
         hitArea.wallIds = hitArea.wallIds;
@@ -15,9 +14,9 @@ export class HitArea implements bpa.HitArea {
         return result;
     }
 
-    static from(proximityRequest:bpa.ProximityRequest){
+    static from(token:Token,proximityRequest:ProximityRequest){
         const hitArea = new HitArea();
-        const cwss = ClockwiseSweepShape.from(proximityRequest);
+        const cwss = ClockwiseSweepShape.from(token,proximityRequest.distance,proximityRequest.type);
         if(cwss){
             hitArea.polygon = cwss.points;
             hitArea.wallIds = cwss.resultWalls.map(w=>w.id);
@@ -26,8 +25,8 @@ export class HitArea implements bpa.HitArea {
         return hitArea;
     }
 
-    serialize():bpa.HitArea {
-        return {tileIds:this.tileIds,wallIds:this.wallIds,polygon:this.polygon}
+    serialize():HitAreaData {
+        return {tileIds:[...this.tileIds],wallIds:[...this.wallIds],polygon:[...this.polygon]}
     }
 
     isEmpty(): boolean {

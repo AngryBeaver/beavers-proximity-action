@@ -18,7 +18,6 @@
 import {Action} from "./activities/Action.js";
 import {Activity} from "./activities/Activity.js";
 import {BPAEngine} from "./activities/BPAEngine.js";
-import {BeaversProximityAction} from "./app/BeaversProximityAction.js";
 
 type ProximityType = "close" | "cone"
 type LocationType = "wall" | "tile" ;

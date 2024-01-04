@@ -1,145 +1,56 @@
-
-import {bp} from "./types.js";
 import {NAMESPACE} from "../Settings.js";
-import {ConfigurationDefinition} from "./types";
-export const ID = NAMESPACE + ".investigate.js"
+import {TileAction} from "./TileAction.js";
 
 
 /* class decorator */
 function staticImplements<T>() {
     return <U extends T>(constructor: U) => {constructor};
 }
-@staticImplements<bp.Action<TileDocument>>()
-export class InvestigateAction implements bp.EntityAction<TileDocument>{
+@staticImplements<Activity>()
+export class InvestigateAction extends TileAction {
 
-    config: any;
-    entity: TileDocument;
-
-    constructor(entity: TileDocument, config:any){
-        this.entity = entity;
-        this.config = config;
-    }
-
-    fail(): void {
+    constructor(entityId: string, initiator: Initiator){
+        super(entityId, initiator);
     }
 
     success(): void {
+        // I think it should have the user in here too
     }
 
-
-    static get id():string{
-        return ID;
-    }
-    static get data():bp.ActionData {
+    static get template():ActivityTemplate {
         return {
-            id:ID,
-            name: game["i18n"].localize("beaversProximityAction.activity.investigate.name"),
-            configurationDefinition:{
+            id:`${NAMESPACE}.${this.name}`,
+            name: game["i18n"].localize("beaversProximityAction.action.investigate.name"),
+            desc: game["i18n"].localize("beaversProximityAction.action.investigate.desc"),
+            config:{
                 "secretInfo":{
                     type:"area",
-                    label: game["i18n"].localize("beaversProximityAction.activity.investigate.secretInfo.label"),
-                    defaultValue: game["i18n"].localize("beaversProximityAction.activity.investigate.secretInfo.defaultValue"),
-                    note: game["i18n"].localize("beaversProximityAction.activity.investigate.secretInfo.note"),
+                    label: game["i18n"].localize("beaversProximityAction.action.investigate.secretInfo.label"),
+                    defaultValue: game["i18n"].localize("beaversProximityAction.action.investigate.secretInfo.defaultValue"),
+                    note: game["i18n"].localize("beaversProximityAction.action.investigate.secretInfo.note"),
                 }
             },
             allowSubOptions:false,
-            defaultTest:{
-                type: "prompt",
-                name: "",
-                inputField: {
-                    type:"area",
-                    label: game["i18n"].localize("beaversProximityAction.activity.investigate.secretInfo.label"),
-                    defaultValue: game["i18n"].localize("beaversProximityAction.activity.investigate.secretInfo.defaultValue"),
-                    note: game["i18n"].localize("beaversProximityAction.activity.investigate.secretInfo.note"),
-                }
-            },
-            fallback:(user:User)=>{
-                userOutput
+            fallback:(initiator:Initiator)=>{
+                game[NAMESPACE].userOutput.msg("You did not find anything usefully");
             }
         };
     }
 
-
-
-
-
-}
-
-
-
-class InvestigateActions extends Action{
-    /**
-     * defaultData for this Action
-     */
-    static get defaultData():Partial<bpa.ActionStoreData>{
+    static get defaultData(): ActivityData{
         return {
-            location:{
-                type:"tile",
-                filter:[],
-                isGlobal:false
-            },
-            available:{
-                type:"always",
-            },
-            priority: "normal"
-        }
-    }
-
-    async execute(result: bpa.ActivityResult):Promise<boolean>{
-        let anySuccess = false;
-        for(const wallId of result.hitArea.wallIds) {
-            const wall = this._getWall(wallId);
-            if (wall) {
-                const value = getProperty(wall,`flags.${this.parentId}`)[result.testResult.testId];
-                if(this._parent.validateTest(result.testResult,value)){
-                    //TODO chat message
-                    await this.success(wall);
-                    anySuccess = true;
+            enabled: [],
+            test: {
+                type: "prompt",
+                name: "",
+                inputField: {
+                    type: "boolean",
+                    label: game["i18n"].localize("beaversProximityAction.action.investigate.test.label"),
+                    note: game["i18n"].localize("beaversProximityAction.action.investigate.test.note"),
                 }
             }
         }
-        if(!anySuccess){
-            this.failure();
-        }
-        return false;
-    }
-
-    private async success(wall:WallDocument){
-        return wall.update({door: 1});
-    }
-
-    private failure(){
-        //TODO chat message
-        ui.notifications?.info(game["i18n"].localize("beaversProximityAction.secretDoor.fallbackMessage"));
     }
 
 }
 
-class FallbackAction extends Action{
-    /**
-     * defaultData for this Action
-     */
-    static get defaultData():Partial<bpa.ActionStoreData>{
-        return {
-            location:{
-                type:"wall",
-                filter:[],
-                isGlobal:true
-            },
-            available:{
-                type:"always",
-            },
-            priority: "normal"
-        }
-    }
-
-    async execute(result: bpa.ActivityResult):Promise<boolean>{
-        this.failure();
-        return false;
-    }
-
-    private failure(){
-        //TODO chat message
-        ui.notifications?.info(game["i18n"].localize("beaversProximityAction.secretDoor.fallbackMessage"));
-    }
-}

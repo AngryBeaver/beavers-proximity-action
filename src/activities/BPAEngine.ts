@@ -3,7 +3,7 @@ import {Activity} from "./Activity.js";
 import {bpa} from "../bpaTypes.js";
 import {NAMESPACE} from "../Settings.js";
 import {SOCKET_EXECUTE_ACTIVITY} from "../main.js";
-import {HitArea} from "../classes/HitArea.js";
+import {HitArea} from "../new/HitArea.js";
 
 export class BPAEngine {
     public readonly _scene:Scene;

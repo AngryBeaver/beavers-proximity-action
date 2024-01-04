@@ -64,6 +64,20 @@
       },
       "fallbackMessage": "Nothing found."
     },
+    "action": {
+      "investigate": {
+        "name": "investigate",
+        "desc": "Here you can investigate a location and uncover its secrets",
+        "test": {
+          "label": "investigate",
+          "note": "Has Investigate activity been successful ?"
+        },
+        "secretInfo": {
+          "label": "Secret Information",
+          "defaultValue": "You found something interesting.",
+          "note": "This secret information will get revealed on success"
+        }
+      },
     "activity": {
       "investigate": {
         "name": "Investigate activity",

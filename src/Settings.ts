@@ -1,4 +1,3 @@
-import {bpa} from "./bpaTypes.js";
 import {ActivitySettings} from "./ActivitySetting.js";
 
 export const NAMESPACE = "beavers-proximity-action"
@@ -18,42 +17,33 @@ export class Settings {
         });
     }
 
-    //registerGlobalSettings for an Activity
-    private addActivity(activityClass: bpa.ActivityClass) {
+    //registerGlobalSettings for an Action
+    public addActivity(activity: Activity) {
         if (!(game instanceof Game)) {
             throw new Error("Settings called before game has been initialized");
         }
-        const blankSettings:bpa.ActivitySettings = {
-            enabled: false,
-            test: {options: {}}
-        };
-        const mergedData = foundry.utils.mergeObject(blankSettings,activityClass.defaultData,{
-            insertKeys: false,
-            insertValues: true,
-            overwrite: true,
-            inplace: false
-        });
-        game.settings.register(NAMESPACE, "activity-"+activityClass.defaultData.id, {
-            name: activityClass.defaultData.name,
+
+        game.settings.register(NAMESPACE, "activity-"+activity.id, {
+            name: activity.template.name,
             scope: "world",
             config: false,
-            default: mergedData,
+            default: activity.defaultData,
             type: Object
         });
-        game.settings.registerMenu(NAMESPACE, "activity-"+activityClass.defaultData.id + "-button", {
-            name: activityClass.defaultData.name,
-            label: activityClass.defaultData.name,
+        game.settings.registerMenu(NAMESPACE, "activity-"+activity.id + "-button", {
+            name: activity.template.name,
+            label: activity.template.name,
             // @ts-ignore
             type: ActivitySettings.build(activityClass),
             restricted: true
         });
     }
 
-    public getActivitySetting(activityId){
+    public getActivityData(activityId:string):ActivityData | null{
         try{
-            return this.get("activity-"+activityId);
+            return (this.get("activity-"+activityId) as ActivityData);
         }catch(e){
-            return {}
+            return null
         }
     }
 

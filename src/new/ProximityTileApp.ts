@@ -1,29 +1,16 @@
-import {bpa} from "../bpaTypes.js";
-import {Activity} from "../activities/Activity.js";
 import {NAMESPACE} from "../Settings.js";
-import {TileActivity} from "../activities/tiles/TileActivity.js";
-
-//Proximity Extension for Tiles
-//Renders Activity-Selection on the Tile
-//When a TileActivity is activated it will add itself as Option. ? Why then why always deactivate afterwards ?
-//When an activity-configuration is added to the tile this will store it on the tile;
-//Renders Activity-Configuration on the Tile
-//Can Edit Activity-Configuration and store it on the tile.
-//There is one instance of ProximityTileApp.
 
 export class ProximityTileApp {
     tileApp;
     element;
     document;
     data: {activities: { id: string, data: any }[]};
-    registeredActivities: bpa.ActivityClass[] = [];
 
     constructor(app, html, data) {
         this.tileApp = app;
         this.document = data.document;
         this.element = html;
         this.data =  getProperty(this.document.flags, NAMESPACE) || {activities:[]};
-        this.registeredActivities = game[NAMESPACE].BeaversProximityAction.getActivities(TileActivity);
         this.init();
     }
 
@@ -31,9 +18,7 @@ export class ProximityTileApp {
         if (this.element.find(".tab[data-tab=proximity]").length == 0) {
             this._addProximityTab();
             this._setActivityOptions();
-            this._removeUnregisteredStoredActivities().then(x=>{
-                void this.render();
-            })
+            void this._removeUnregisteredStoredActions();
         }
     }
 
@@ -51,9 +36,9 @@ export class ProximityTileApp {
         })
     }
 
-    async _removeUnregisteredStoredActivities() {
+    async _removeUnregisteredStoredActions() {
         this.data.activities.forEach((config, index) => {
-            const activityData = this.registeredActivities.find(a => a.defaultData.id === config.id)?.defaultData;
+            const activityData = (game as Game)[NAMESPACE].BeaversProximityAction.getActivity("tile", config.id)?.data;
             if(!activityData){
                 this.data.activities.splice(index, 1);
             }
@@ -62,8 +47,7 @@ export class ProximityTileApp {
     }
 
     _setActivityOptions() {
-        this.registeredActivities.forEach(tileActivity => {
-            const activity = tileActivity.defaultData;
+        Object.values((game as Game)[NAMESPACE].BeaversProximityAction.getActivities("tile")).forEach(activity => {
             this.element.find(`select[data-id=activity-select]`).append(`<option value='${activity.id}'>${activity.name}</option>`);
         })
     }
@@ -87,7 +71,7 @@ export class ProximityTileApp {
         let content = "";
         for(const index in this.data.activities){
             const config = this.data.activities[index];
-            const activityData = this.registeredActivities.find(a => a.defaultData.id === config.id)?.defaultData;
+            const activityData = (game as Game)[NAMESPACE].BeaversProximityAction.getActivity("tile", config.id)?.data;
             if (activityData) {
                 content += await renderTemplate('modules/beavers-proximity-action/templates/activity-configuration.hbs', {
                     id: index,

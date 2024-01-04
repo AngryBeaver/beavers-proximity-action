@@ -1,30 +1,42 @@
-import {bp} from "./types.js";
+import {NAMESPACE} from "../Settings.js";
 
-export class Action {
+export abstract class Action implements ActionI {
+    abstract entity: any;
+    abstract config: any;
+    abstract initiator: Initiator;
 
-    /**
-     * Actions can have defaultData merged with data Stored inside Activity
-     * @param parent
-     * @param data
-     */
-    constructor(data = {}) {
-        if (new.target === ActionDefinition) {
-            throw new TypeError("Cannot construct Abstract instances directly");
+    abstract success(): void;
+
+    abstract fail(): void;
+
+    static get data() {
+        return (game as Game)[NAMESPACE].Settings.getActivityData(this.id);
+    }
+
+    static get id():string{
+        return this.template.id;
+    }
+
+    static get template():ActivityTemplate {
+        return {
+            id:this.name,
+            name: this.name,
+            desc: "",
+            config:{},
+            allowSubOptions:false,
+            fallback:(initiator:Initiator)=>{
+
+            }
+        };
+    }
+
+    static get defaultData(): ActivityData {
+        return {
+            enabled: [],
+            test: {
+                type: "hit",
+                name: "",
+            }
         }
-        // @ts-ignore
-        this._data = foundry.utils.mergeObject(this.constructor.data, data, {
-            insertKeys: true,
-            insertValues: true,
-            overwrite: true,
-            inplace: false
-        });
     }
-
-    public get id() {
-        return this._data.id;
-    }
-
-
-
-
 }

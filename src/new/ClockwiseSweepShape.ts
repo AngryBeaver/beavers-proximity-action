@@ -1,6 +1,3 @@
-import {NAMESPACE} from "../Settings";
-import {bpa} from "../bpaTypes";
-
 function gridSize(): number {
     const size = canvas?.grid?.size;
     if (!size) {
@@ -10,21 +7,25 @@ function gridSize(): number {
 }
 
 export class ClockwiseSweepShape extends ClockwiseSweepPolygon {
-    walls:Set<Wall> = new Set();
+    walls: Set<Wall> = new Set();
     resultWalls: Wall[] = []
     polygonVertices: PolygonVertex[] = [];
 
-    static from({token,distance,type}:bpa.ProximityRequest){
-        let result:ClockwiseSweepShape|null = null;
-        if (token) {
-            const center = (token as Token).center;
-            result = new ClockwiseSweepShape();
-            const angel = type === "cone" ? 90 : 360;
-            const size = gridSize();
+    static from(token: Token, distance, type) {
+        let result: ClockwiseSweepShape | null = null;
+        const center = token.center;
+        result = new ClockwiseSweepShape();
+        const angel = type === "cone" ? 90 : 360;
+        const size = gridSize();
+        result.initialize(center, {
+            radius: size * distance,
             // @ts-ignore
-            result.initialize(center, {radius: size * distance, rotation: token.document.rotation, angle: angel, type: "move"});
-            result.compute();
-        }
+            rotation: token.document.rotation,
+            angle: angel,
+            // @ts-ignore
+            type: "move"
+        });
+        result.compute();
         return result;
     }
 
@@ -37,22 +38,22 @@ export class ClockwiseSweepShape extends ClockwiseSweepPolygon {
     }
 
 
-    filterWalls(){
+    filterWalls() {
         this.resultWalls = [];
-        this.walls.forEach(w=>{
-            let aFound,bFound = false;
-            this.polygonVertices.forEach(p=>{
-                if(p.x === w.A.x && p.y === w.A.y){
+        this.walls.forEach(w => {
+            let aFound, bFound = false;
+            this.polygonVertices.forEach(p => {
+                if (p.x === w.A.x && p.y === w.A.y) {
                     aFound = true;
                 }
-                if(p.x === w.B.x && p.y === w.B.y){
+                if (p.x === w.B.x && p.y === w.B.y) {
                     bFound = true;
                 }
             })
-           if(aFound && bFound){
-               if(!w.id.startsWith("BoundOuter")) {
-                   this.resultWalls.push(w);
-               }
+            if (aFound && bFound) {
+                if (!w.id.startsWith("BoundOuter")) {
+                    this.resultWalls.push(w);
+                }
             }
         });
     }
@@ -61,21 +62,21 @@ export class ClockwiseSweepShape extends ClockwiseSweepPolygon {
         this.addPoint(pt);
         this.polygonVertices.push(pt);
         pt.cwEdges.forEach(edge => {
-            if(edge.wall) {
+            if (edge.wall) {
                 this.walls.add(edge.wall);
             }
         });
         pt.ccwEdges.forEach(edge => {
-            if(edge.wall) {
+            if (edge.wall) {
                 this.walls.add(edge.wall);
             }
         });
     }
 
-    _testWallInclusion(wall,bounds){
+    _testWallInclusion(wall, bounds) {
         // @ts-ignore
-        let result = super._testWallInclusion(wall,bounds);
-        if(wall.isOpen){
+        let result = super._testWallInclusion(wall, bounds);
+        if (wall.isOpen) {
             this.walls.add(wall);
         }
         return result;

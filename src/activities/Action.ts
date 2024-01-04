@@ -1,6 +1,6 @@
 import {Activity} from "./Activity.js";
 import {bpa} from "../bpaTypes.js";
-import { HitArea } from "../classes/HitArea.js";
+import { HitArea } from "../new/HitArea.js";
 
 
 export abstract class Action {
