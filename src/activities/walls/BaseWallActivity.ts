@@ -1,7 +1,7 @@
 import {Activity} from "../Activity.js";
 import {BPAEngine} from "../BPAEngine.js";
 import {bpa} from "../../bpaTypes";
-
+//TODO refactore
 function _addTabs(app, html) {
     if (html.find("nav").length == 0) {
         const old = html.find("form").html();

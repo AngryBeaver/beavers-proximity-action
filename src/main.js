@@ -1,12 +1,13 @@
 import {NAMESPACE, Settings} from "./Settings.js";
 import {BeaversProximityAction} from "./new/BeaversProximityAction.js";
 import {SecretDoorActivity} from "./activities/walls/SecretDoorActivity.js";
-import {UserInteraction} from "./app/UserInteraction.js";
-import {TestHandler} from "./app/TestHandler.js";
+import {UserInteraction} from "./new/UserInteraction.ts";
+import {TestHandler} from "./new/TestHandler.ts";
 import {ProximityActionUI} from "./uis/ProximityActionUI.js";
 import {ActivityLayer} from "./canvas/ActivityLayer.js";
 import {InvestigateActivity} from "./activities/tiles/InvestigateActivity.js";
-import {ProximityTileApp} from "./new/ProximityTileApp.ts";
+import {ProximityTileApp} from "./new/ProximityTileApp.js";
+import {DisplayProxy} from "./new/DisplayProxy.js";
 
 
 export const HOOK_READY = NAMESPACE + ".ready";
@@ -25,6 +26,7 @@ Hooks.once('init', () => {
 Hooks.once("beavers-system-interface.ready", async function () {
     game[NAMESPACE] = game[NAMESPACE] || {};
     game[NAMESPACE].BeaversProximityAction = new BeaversProximityAction();
+    game[NAMESPACE].DisplayProxy = new DisplayProxy();
     //game[NAMESPACE].UserInteraction = new UserInteraction(game[NAMESPACE].BeaversProximityAction);
     game[NAMESPACE].ActivityLayer = new ActivityLayer();
     game[NAMESPACE].socket.register(SOCKET_EXECUTE_ACTIVITY, game[NAMESPACE].BeaversProximityAction.executeActivity.bind(game[NAMESPACE].BeaversProximityAction));

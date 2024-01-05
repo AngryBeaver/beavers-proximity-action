@@ -1,9 +1,9 @@
 import {NAMESPACE} from "../Settings.js";
 import {Action} from "./Action";
 
-export abstract class TileAction extends Action{
+export abstract class WallAction extends Action{
 
-    entity: Tile | undefined;
+    entity: Wall | undefined;
     initiator: Initiator;
     config: any
 
@@ -13,20 +13,20 @@ export abstract class TileAction extends Action{
         if(initiator.sceneId !== canvas?.scene?.id){
             console.warn(`${NAMESPACE} | "initiator is not on the same scene`);
         }
-        this.entity = TileAction.getEntity(entityId);
+        this.entity = WallAction.getEntity(entityId);
         if(!this.entity) {
             throw new Error(`${NAMESPACE} | "Entity ${entityId} not found on scene`);
         }
         // @ts-ignore
         const id = this.constructor.template.id;
-        this.config = TileAction.getConfig(this.entity)[id] || {}
+        this.config = WallAction.getConfig(this.entity)[id] || {}
     }
 
-    static getEntity(entityId: string): Tile | undefined{
-        return canvas?.["tiles"]?.get(entityId) || undefined;
+    static getEntity(entityId: string): Wall | undefined{
+        return canvas?.walls?.get(entityId) || undefined;
     }
 
-    static getConfig(entity: Tile){
+    static getConfig(entity: Wall){
         return getProperty(entity || {}, `flags.${NAMESPACE}`) || {};
     }
 }

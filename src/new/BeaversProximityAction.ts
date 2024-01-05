@@ -1,15 +1,21 @@
 import {TileAction} from "./TileAction.js";
 import {HitArea} from "./HitArea.js";
 import {NAMESPACE} from "../Settings.js";
+import {SOCKET_EXECUTE_ACTIVITY} from "../main";
 export class BeaversProximityAction implements BeaversProximityActionI{
 
     game: Game;
 
+    //dual store for better access
     private activities:{
-        [type in  ActivityType]: {
+        byId:{
             [id: string]: Activity
         }
-    }={wall:{},tile:{}};
+        byType: {
+            [type in  ActivityType] : Activity[]
+        }
+    } = {byId:{},byType:{wall:[],tile:[]}}
+
 
     constructor(){
         if(game instanceof Game) {
@@ -20,36 +26,29 @@ export class BeaversProximityAction implements BeaversProximityActionI{
     }
 
     /**
-     * socket can execute Actions
-     */
-    public async executeAction(initiator: Initiator){
-
-    }
-
-    /**
      * Modules can add Actions by register additional ActionDefinitions
      * They are not stored and needs to be registered each time with a ready hook.
      */
     public addActivity(activity: Activity){
         if(activity.prototype instanceof TileAction){
-            this.activities.tile[activity.id] = activity;
+            this.activities.byType.tile.push(activity);
         }else{
             return;
         }
+        this.activities.byId[activity.id] = activity;
         this.game[NAMESPACE].Settings.addActivity(activity);
     }
 
-    public getActivities(type: ActivityType){
-        return this.activities[type];
+    public getActivities(type: ActivityType):Activity[] {
+        return this.activities.byType[type];
     }
 
-    public getActivity(type, actionId: string):Activity{
-        return this.activities[type][actionId];
+    public getActivity(activityId: string):Activity{
+        return this.activities.byId[activityId];
     }
-
 
     /**
-     * users can get scan around a token
+     * users can scan proximity area around a token
      * tokens have a center and a rotation
      */
     public scanProximity(request: ProximityRequest): ProximityResponse {
@@ -59,19 +58,81 @@ export class BeaversProximityAction implements BeaversProximityActionI{
         const result: ProximityResponse = {
             initiator: request.initiator,
             origin: initiator.token.center,
-            actions: [],
-            hitArea: hitArea.serialize()
+            activities: [],
         }
-        for (const activity of Object.values(this.activities)) {
-            if (activity.isAvailable(actorId, hitArea)) {
-                result.activities.push({
-                    id: activity.id,
-                    name: activity.name,
-                })
+        const activityIds:{[id:string]:ActivityHit} = {}
+        //TODO maybe move out
+        hitArea.tileIds.forEach(entityId=>{
+            const entity = TileAction.getEntity(entityId);
+            if(entity){
+                const config = TileAction.getConfig(entity);
+                //each tile configured activity;
+                Object.keys(config).forEach(activityId=> {
+                    const activity = this.getActivity(activityId);
+                    if (activity) {
+                        activityIds[activityId] = activityIds[activityId] || {activityId: activityId, name: activity.template.name,type:"tile", entityIds: []};
+                        activityIds[activityId].entityIds.push(entityId)
+                    }
+                });
+                //each activity default configured tile
+                this.getActivities("tile").forEach(activity=>{
+                    if(activity.data.enabled.find(filter=>getProperty(entity,filter.attribute)===filter.value)){
+                        activityIds[activity.id] = activityIds[activity.id] || {activityId: activity.id, name: activity.template.name,type:"tile", entityIds: []};
+                        activityIds[activity.id].entityIds.push(entityId)
+                    }
+                });
             }
-        }
+        });
+        hitArea.wallIds.forEach(entityId=>{
+            const entity = TileAction.getEntity(entityId);
+            if(entity){
+                const config = TileAction.getConfig(entity);
+                //each tile configured activity;
+                Object.keys(config).forEach(activityId=> {
+                    const activity = this.getActivity(activityId);
+                    if (activity) {
+                        activityIds[activityId] = activityIds[activityId] || {activityId: activityId, name: activity.template.name,type:"wall", entityIds: []};
+                        activityIds[activityId].entityIds.push(entityId)
+                    }
+                });
+                //each activity default configured tile
+                this.getActivities("tile").forEach(activity=>{
+                    if(activity.data.enabled.find(filter=>getProperty(entity,filter.attribute)===filter.value)){
+                        activityIds[activity.id] = activityIds[activity.id] || {activityId: activity.id, name: activity.template.name,type:"wall", entityIds: []};
+                        activityIds[activity.id].entityIds.push(entityId)
+                    }
+                });
+            }
+        });
+        result.activities.push(...Object.values(activityIds));
         return result;
     }
 
+    /**
+     * users can test an activity
+     * TODO ask for SubOptions
+     */
+    public async testActivity(request: ActivityRequest) {
+        const initiator = new Initiator(request.initiatorData);
+        const activity: Activity = this.getActivity(request.activityHit.activityId);
+        const testResult = await game[NAMESPACE].DisplayProxy.test(activity.data.test,initiator)
+        if(testResult!= null){
+            await game[NAMESPACE].socket.executeAsGM(SOCKET_EXECUTE_ACTIVITY,request,testResult);
+        }
+    }
+
+    /**
+     * socket gm can execute Actions
+     */
+    public async executeAction(request: ActivityRequest,testResult:TestResult){
+        const initiator = new Initiator(request.initiatorData);
+        const activity: Activity = this.getActivity(request.activityHit.activityId);
+        const promises:Promise<any>[] = []
+        for(const entityId of request.activityHit.entityIds) {
+            const action = new activity(entityId, initiator);
+            promises.push(action.run(testResult));
+        }
+        await Promise.all(promises);
+    }
 
 }

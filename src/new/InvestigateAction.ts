@@ -13,7 +13,7 @@ export class InvestigateAction extends TileAction {
         super(entityId, initiator);
     }
 
-    success(): void {
+    async run(): Promise<void> {
         // I think it should have the user in here too
     }
 

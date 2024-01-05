@@ -1,7 +1,7 @@
 import {NAMESPACE} from "../Settings.js";
 import {BPAEngine} from "./BPAEngine.js";
 import {Action} from "./Action.js";
-import {TestHandler} from "../app/TestHandler.js";
+import {TestHandler} from "../new/TestHandler.js";
 import {bpa, PriorityTypeOrder} from "../bpaTypes.js";
 import {HitArea} from "../new/HitArea.js";
 
@@ -128,6 +128,7 @@ export class Activity {
     }
 
     /**
+     * TODO refactore somewhere
      * Activities use this to display configuration Settings on the object
      */
     protected _getConfiguration(): bpa.ActivityConfiguration {
@@ -176,6 +177,7 @@ export class Activity {
     }
 
     /**
+     * TODO refactore somewhere
      * Actions can validate tests
      */
     public validateTest(testResult: bpa.TestResult, storedValue?: any) {
@@ -214,7 +216,7 @@ export class Activity {
         return new clazz(this, actionStoreData);
     }
 
-    // TODO move to Action but actionResults are here;
+    // TODO refactor or remove for first version.
     private _isActionAvailable(action: Action, actorId: string, hitArea: HitArea): boolean {
         const actionHitArea = action.filterHitArea(hitArea);
         if (actionHitArea.isEmpty()) {

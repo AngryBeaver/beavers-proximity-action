@@ -1,4 +1,5 @@
 import {NAMESPACE} from "../Settings.js";
+import {TileAction} from "./TileAction.js";
 
 export class ProximityTileApp {
     tileApp;
@@ -10,7 +11,7 @@ export class ProximityTileApp {
         this.tileApp = app;
         this.document = data.document;
         this.element = html;
-        this.data =  getProperty(this.document.flags, NAMESPACE) || {activities:[]};
+        this.data =  TileAction.getConfig(this.document);
         this.init();
     }
 
@@ -71,13 +72,13 @@ export class ProximityTileApp {
         let content = "";
         for(const index in this.data.activities){
             const config = this.data.activities[index];
-            const activityData = (game as Game)[NAMESPACE].BeaversProximityAction.getActivity("tile", config.id)?.data;
-            if (activityData) {
+            const activityTemplate = (game as Game)[NAMESPACE].BeaversProximityAction.getActivity("tile", config.id)?.template;
+            if (activityTemplate) {
                 content += await renderTemplate('modules/beavers-proximity-action/templates/activity-configuration.hbs', {
                     id: index,
                     path: `${NAMESPACE}.activities[${index}].data`,
-                    name: activityData.name,
-                    config: activityData.config,
+                    name: activityTemplate.name,
+                    config: activityTemplate.config,
                     tests: [],
                     data: config.data,
                 });

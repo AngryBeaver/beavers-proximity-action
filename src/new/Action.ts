@@ -5,10 +5,6 @@ export abstract class Action implements ActionI {
     abstract config: any;
     abstract initiator: Initiator;
 
-    abstract success(): void;
-
-    abstract fail(): void;
-
     static get data() {
         return (game as Game)[NAMESPACE].Settings.getActivityData(this.id);
     }
@@ -16,6 +12,8 @@ export abstract class Action implements ActionI {
     static get id():string{
         return this.template.id;
     }
+
+    abstract run()
 
     static get template():ActivityTemplate {
         return {
@@ -35,7 +33,12 @@ export abstract class Action implements ActionI {
             enabled: [],
             test: {
                 type: "hit",
-                name: "",
+                name: this.name,
+                inputField: {
+                    label: this.name,
+                    type: "boolean",
+                    note: this.name
+                }
             }
         }
     }

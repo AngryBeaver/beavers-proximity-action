@@ -30,4 +30,14 @@ class Initiator implements InitiatorData{
         }
         throw new Error("Can not find user");
     }
+
+    get data():InitiatorData{
+        return {
+            actorId: this.actorId,
+            sceneId: this.sceneId,
+            tokenId: this.tokenId,
+            userId: this.userId
+        }
+
+    }
 }

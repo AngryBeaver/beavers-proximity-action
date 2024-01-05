@@ -3,6 +3,9 @@ import {BaseWallActivity} from "./BaseWallActivity.js";
 import {Action} from "../Action.js";
 import {bpa} from "../../bpaTypes.js";
 export const ID = NAMESPACE + ".secret-door"
+
+
+//TODO refactor
 export class SecretDoorActivity extends BaseWallActivity{
 
     static getId():string{

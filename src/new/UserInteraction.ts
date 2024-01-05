@@ -1,5 +1,5 @@
 import {bpa} from "../bpaTypes.js";
-import {BeaversProximityAction} from "./BeaversProximityAction.js";
+import {BeaversProximityAction} from "../app/BeaversProximityAction.js";
 
 export class UserInteraction {
 

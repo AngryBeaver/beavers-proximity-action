@@ -1,20 +1,24 @@
-type TestType = "skill" | "ability" | "hit" | "choices" | "input" | "prompt";
 type ActivityType = "wall" | "tile";
 type ProximityType = "close" | "cone"
 type AvailableType = "always" | "once" | "perTile" | "perWall" | "perActor" | "each"
 
-interface Test {
-    type: TestType
-    name: string
-    inputField?: InputField
-}
 
-//each Activity has ActivityData
+/**
+ * ActivityData is the configuration setting for Activities.
+ * can be configured globally or comes with as default from Activity declaration
+ * holds information on which entity it is enabled per default.
+ * holds information on how the Test needs to look like for this Activity.
+ */
 interface ActivityData {
     enabled: { attribute: string, value: any }[],
     test: Test
 }
-
+/**
+ * ActivityTemplate describes an Activity
+ * it holds configuration fields unique to this Activity that can then be set on the Action.
+ * it describes how it should be used programatically.
+ * e.g. has a global fallback, Actions can be configured to have subOptions etc.
+ */
 interface ActivityTemplate {
     id: string,
     name: string,
@@ -28,6 +32,7 @@ interface ActivityTemplate {
 
 /**
  * An Activity is the class Action the instance of this class.
+ * in your ActivityDeclaration you should overwrite template and defaultData.
  */
 interface Activity {
     new(entityId: string, initiator: Initiator): ActionI
@@ -37,40 +42,39 @@ interface Activity {
     id: string,
 }
 
-interface EntityActionConfig {      //this is stored in entity.flags.
-    [actionId: string]: {
-        subCheck?: string               //allow for additional user choice "search Table, investigate footprint"
-        config: any,
-    }
-}
-
-interface UserOutput {
-    msg: (msg: string, type: "info | warn | error") => Promise<void>
-}
-
-interface InitiatorData {
-    userId: string,
-    actorId: string,
-    tokenId: string,
-    sceneId: string,
-}
-
-
+/**
+ * the request that starts a proximityScan
+ */
 interface ProximityRequest {
     initiator: InitiatorData,
     distance: number,
     type: ProximityType,
 }
-
+/**
+ * the response of a proximityScan
+ */
 interface ProximityResponse {
     origin: Point
     initiator: InitiatorData,
-    actions:
-        {
-            id: string,
-            name: string
-        }[],
-    hitArea: HitAreaData,
+    activities:
+        ActivityHit[],
+}
+/**
+ * an ActivityReqeust followed by a proxmityScan
+ * will lead to a test
+ */
+interface ActivityRequest {
+    activityHit: ActivityHit,
+    initiatorData: InitiatorData,
+}
+/**
+ * an Activity found by a proximityScan including the entities hitted
+ */
+interface ActivityHit {
+    activityId: string,
+    name: string,
+    type: ActivityType,
+    entityIds: string[]
 }
 
 interface HitAreaData {
@@ -80,16 +84,21 @@ interface HitAreaData {
 }
 
 interface BeaversProximityActionI {
-    getActivities: (type: ActivityType) => {[id:string]:Activity},
+    getActivities: (type: ActivityType) => Activity[],
     getActivity: (type: ActivityType, actionId: string) => Activity,
     scanProximity: (request: ProximityRequest) => ProximityResponse;
 }
+
+/**
+ * An ActivityInstance
+ * configured with the entity it is activated on the initiator that activates it and all global and individual configurations.
+ * it has one Run method that is executed with the TestResult given.
+ */
 interface ActionI {
     entity: any;
     config: any;
     initiator: InitiatorData;
-    success(): void;
-    fail(): void;
+    run:(TestResult)=>Promise<void>;
 }
 interface ActivityLayerI {
     drawActivity:(points: number[], id:string, color?:string)=>void
@@ -106,6 +115,8 @@ interface SettingsI {
 
 
 type InputType = "text" | "number" | "area" | "selection" | "boolean" ;
+type TestType = "skill" | "ability" | "hit" | "input" | "prompt" ;
+type MsgType = "info" | "warn" | "error";
 
 interface InputField {
     label: string,
@@ -117,10 +128,29 @@ interface InputField {
     }
 }
 
-interface InputData {
-    inputField: InputField,
-    value: any,
+interface Test {
+    type: TestType
     name: string
+    inputField: InputField
+}
+
+interface TestResult {
+    type: InputType,
+    fails?: number,
+    value?: string | number | boolean,
+}
+
+interface DisplayModule {
+    msg: (msg: string, type: MsgType,initiatorData:InitiatorData ) => Promise<void>
+    prompt: (inputField:InputField,initiatorData:InitiatorData)=>Promise<boolean|null>
+    input: (inputField: InputField,initiatorData:InitiatorData)=>Promise<any>
+}
+
+interface InitiatorData {
+    userId: string,
+    actorId: string,
+    tokenId: string,
+    sceneId: string,
 }
 
 interface Edge {

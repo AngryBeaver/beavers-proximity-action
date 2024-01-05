@@ -1,3 +1,5 @@
-export class UserOutput {
+export class UserInterface {
+
+
 
 }

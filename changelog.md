@@ -8,3 +8,5 @@ initial release
   - InvestigateActivity
     - an Activity to investigate a Location and returning some clues.
 - Display Scan Area
+### TODO
+- add SubOptions
