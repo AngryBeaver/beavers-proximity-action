@@ -1,5 +1,5 @@
 import {NAMESPACE} from "../Settings.js";
-import {Action} from "./Action";
+import {Action} from "./Action.js";
 
 export abstract class TileAction extends Action{
 

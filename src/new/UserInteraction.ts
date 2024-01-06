@@ -1,5 +1,5 @@
-import {bpa} from "../bpaTypes.js";
-import {BeaversProximityAction} from "../app/BeaversProximityAction.js";
+import {BeaversProximityAction} from "./BeaversProximityAction.js";
+import {NAMESPACE} from "../Settings.js";
 
 export class UserInteraction {
 
@@ -11,75 +11,54 @@ export class UserInteraction {
 
     public async request() {
 
-        const token = UserInteraction.currentToken(game["user"].id);
+        const initiatorData = UserInteraction.currentUserInitiator(game["user"].id);
         //TODO load distance and type from Client? World? Settings;
-        const proximityRequest: bpa.ProximityRequest = {
+        const proximityRequest: ProximityRequest = {
+            initiator: initiatorData,
             distance: 5,
-            token: token,
-            type: "cone",
-            color: game["user"].color
+            type: "cone"
         }
-        const result = this.beaversProximityAction.getBPAEngine().getProximityActivities(proximityRequest);
-        const choices = {
-            "": {text:game["i18n"].localize("beaversProximityAction.userInteraction.noActivity")}
-        };
-        for (const activity of Object.values(result.activities)) {
-            choices[activity.id] = {text: activity.name}
+        const proximityResponse:ProximityResponse = game[NAMESPACE].scanProximity(proximityRequest);
+
+        const input = {
+            choices: {"": {text: game["i18n"].localize("beaversProximityAction.userInteraction.noActivity")}},
+            defaultValue: undefined,
+            label: "",
+            note: "",
+            type: "selection"
         }
-        const activityId = await beaversSystemInterface.uiDialogSelect({choices:choices});
-        if(activityId===undefined || activityId === ""){
+        for (const activity of Object.values(proximityResponse.activities)) {
+            input.choices[activity.id] = {text: activity.name}
+        }
+        const activityId = game[NAMESPACE].DisplayProxy.input(input as InputField, initiatorData);
+        const activityHit = proximityResponse.activities.find(a=>a.id===activityId);
+        if(!activityHit){
             return;
         }
         //TODO scene might have changed between actions
-        const activityRequest: bpa.ActivityRequest = {
-            activityId: activityId,
-            actorId: result.actorId,
-            hitArea: result.hitArea,
+        const activityRequest: ActivityRequest = {
+            activityHit: activityHit, initiatorData: initiatorData
+
         }
-        await this.beaversProximityAction.getBPAEngine().testActivity(activityRequest);
+        await this.beaversProximityAction.testActivity(activityRequest);
     }
 
-    public static currentToken(userId:string): Token {
-        let token = this._getUserCharacterToken(userId);
-        if (!token) {
-            token = this._getControlledToken();
+    public static currentUserInitiator(userId):InitiatorData{
+        const user = (game as Game).users?.get(userId);
+        const initiatorData:InitiatorData = {
+            sceneId : canvas?.scene?.id || "",
+            userId: userId,
+            actorId: user?.character?.id || "",
+            tokenId: "",
+        };
+        if(initiatorData.actorId === ""){
+            const token = canvas?.tokens?.controlled?.[0];
+            initiatorData.tokenId = token?.id || "";
+            initiatorData.actorId = token?.actor?.id || "";
+        }else{
+            initiatorData.tokenId = canvas?.tokens?.ownedTokens.find(t=>t.actor?.id)?.id || "";
         }
-        if (!token) {
-            throw new Error(game["i18n"].localize("beaversProximityAction.error.noActorFound"))
-        }
-        return token;
-    }
-
-    private static _getTokenLayer(): TokenLayer {
-        if (!(canvas instanceof Canvas)) {
-            throw new Error("canvas not ready");
-        }
-        const tokenLayer = canvas.tokens;
-        if (!(tokenLayer instanceof TokenLayer)) {
-            throw new Error("No Tokenlayer found");
-        }
-        return tokenLayer;
-    }
-
-
-    private static _getUserCharacterToken(userId:string): Token | null {
-        const tokenLayer = this._getTokenLayer();
-        let actorId = game["users"].get(userId).character?.uuid;
-        for (const t of tokenLayer.ownedTokens) {
-            if (t.actor?.uuid === actorId) {
-                return t;
-            }
-        }
-        return null;
-    }
-
-    private static _getControlledToken(): Token | null {
-        for (const t of canvas?.tokens?.controlled || []) {
-            if (t.actor) {
-                return t;
-            }
-        }
-        return null;
+        return initiatorData;
     }
 
 }

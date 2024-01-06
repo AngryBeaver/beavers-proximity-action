@@ -1,5 +1,5 @@
 import {NAMESPACE} from "../Settings.js";
-import {SOCKET_TEST_PROMPT} from "../main";
+import {SOCKET_TEST_PROMPT} from "../main.js";
 import {StandardDisplayModule} from "./StandardDisplayModule.js";
 
 /**
@@ -26,16 +26,19 @@ export class DisplayProxy implements DisplayModule{
     async test(test: Test, initiator: Initiator ): Promise<TestResult | null> {
         let result: TestResult | null = null;
         if (test.type === "ability") {
-            result = await this.testAbility(initiator,test);
+            result = await this.testAbility(initiator,test.inputField);
         } else if (test.type === "skill") {
-            result = await this.testSkill(initiator,test);
-        } else if (test.type === "hit") {
+            result = await this.testSkill(initiator,test.inputField);
+        } else if (test.type === "none") {
             result = {type:"boolean", value:true};
         } else if (test.type === "input") {
-            result = this.asTestResult(await this.input(test.inputField,initiator.data),test);
-        } else if (test.type === "prompt") { //gmPrompt
+            const r = await this.input(test.inputField,initiator.data);
+            if(!r) return null;
+            result = {type: test.inputField.type, value:r};
+        } else if (test.type === "gm") { //gmPrompt
             const r = await game[NAMESPACE].socket.executeAsGM(SOCKET_TEST_PROMPT,test.inputField,initiator.data);
-            result = this.asTestResult(r,test);
+            if(r === null) return null;
+            result = {type: test.inputField.type, value:r};
         }
         return result;
     }
@@ -51,32 +54,30 @@ export class DisplayProxy implements DisplayModule{
         return result;
     }
 
-    public async testAbility(initiator:Initiator, test: Test): Promise<TestResult | null> {
+    public async testAbility(initiator:Initiator, inputField: InputField): Promise<TestResult | null> {
 
-        let roll = await beaversSystemInterface.actorRollAbility(initiator.actor, test.name);
+        let roll = await beaversSystemInterface.actorRollAbility(initiator.actor, inputField.label);
         if (roll == null) {
             return null
         }
         return {type:"number",value: roll.total};
     }
 
-    public async testSkill(initiator:Initiator, test: Test): Promise<TestResult | null> {
-        let roll = await beaversSystemInterface.actorRollSkill(initiator.actor, test.name);
+    public async testSkill(initiator:Initiator, inputField: InputField): Promise<TestResult | null> {
+        let roll = await beaversSystemInterface.actorRollSkill(initiator.actor, inputField.label);
         if (roll == null) {
             return null
         }
         return {type:"number",value: roll.total};
     }
 
-    public async input(inputField: InputField, initiatorData: InitiatorData): Promise<TestResult | null> {
-        let result:any|null = null;
+    public async input(inputField: InputField, initiatorData: InitiatorData): Promise<any | null> {
         for(const displayModule of Object.values(this.displayModules)){
             if(displayModule.input){
-                result =  await displayModule.input(inputField,initiatorData);
-                break;
+                return await displayModule.input(inputField,initiatorData);
             }
         }
-        return result;
+        return null;
     }
 
     public async msg(msg: string, type: MsgType, initiatorData: InitiatorData): Promise<void> {
@@ -87,11 +88,6 @@ export class DisplayProxy implements DisplayModule{
             }
         }
         return Promise.reject();
-    }
-
-    private asTestResult(result:any,test: Test):TestResult | null{
-        if(result === null) return null;
-        return {type: test.inputField.type, value:result};
     }
 
 }

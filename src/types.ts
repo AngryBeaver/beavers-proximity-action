@@ -1,7 +1,5 @@
 type ActivityType = "wall" | "tile";
 type ProximityType = "close" | "cone"
-type AvailableType = "always" | "once" | "perTile" | "perWall" | "perActor" | "each"
-
 
 /**
  * ActivityData is the configuration setting for Activities.
@@ -71,7 +69,7 @@ interface ActivityRequest {
  * an Activity found by a proximityScan including the entities hitted
  */
 interface ActivityHit {
-    activityId: string,
+    id: string,
     name: string,
     type: ActivityType,
     entityIds: string[]
@@ -98,7 +96,7 @@ interface ActionI {
     entity: any;
     config: any;
     initiator: InitiatorData;
-    run:(TestResult)=>Promise<void>;
+    run:(testResult:TestResult)=>Promise<void>;
 }
 interface ActivityLayerI {
     drawActivity:(points: number[], id:string, color?:string)=>void
@@ -113,26 +111,58 @@ interface SettingsI {
 
 
 
-
-type InputType = "text" | "number" | "area" | "selection" | "boolean" ;
-type TestType = "skill" | "ability" | "hit" | "input" | "prompt" ;
+type InputType =  "selection" | "number" | "text" | "area" | "boolean";
 type MsgType = "info" | "warn" | "error";
+type InputField = TextField | SelectionField | BooleanField | NumberField;
+type Test = NoneTest | RollTest | InputTest | GMTest
 
-interface InputField {
+interface GenericField {
     label: string,
-    type: InputType,
     note?: string,
     defaultValue?: any,
-    choices?: {
+}
+
+interface NumberField extends GenericField{
+    type: "number",
+    defaultValue?: number,
+}
+
+interface BooleanField extends GenericField{
+    type: "boolean",
+    defaultValue?: boolean,
+}
+
+interface TextField extends GenericField{
+    type: "text"|"area",
+    defaultValue?: string,
+}
+
+interface SelectionField extends GenericField{
+    type: "selection",
+    defaultValue?: string,
+    choices: {
         [id:string]:{text:string,img?:string}
     }
 }
 
-interface Test {
-    type: TestType
-    name: string
-    inputField: InputField
+
+interface NoneTest {
+    type: "none"
 }
+
+interface RollTest {
+    type: "skill" | "ability"
+    inputField: NumberField,
+}
+interface InputTest {
+    type: "input"
+    inputField: InputField,
+}
+interface GMTest {
+    type: "gm"
+    inputField: BooleanField,
+}
+
 
 interface TestResult {
     type: InputType,

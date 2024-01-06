@@ -47,7 +47,7 @@ export class StandardDisplayModule implements DisplayModule {
         });
     }
 
-    private async choices(inputField:InputField): Promise<string | null>{
+    private async choices(inputField:SelectionField): Promise<string | null>{
         return beaversSystemInterface.uiDialogSelect({choices: inputField.choices})
     }
 

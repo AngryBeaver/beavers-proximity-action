@@ -1,39 +1,37 @@
-import {bpa} from "../bpaTypes.js";
 import {NAMESPACE} from "../Settings.js";
+import {UserInteraction} from "../new/UserInteraction.js";
 
+//TODO rework work with DisplayProxy !
 export class ProximityActionUI implements UIModule {
     name = "beavers-proximity-action"
 
     async process(userId: string, userInput: UserInput) {
-        const user = (game as Game).users?.get(userId)
-        const actorId = user?.character?.id;
-        const token = (canvas as Canvas).tokens?.ownedTokens.find(t => t.actor?.id === actorId);
+        const initiatorData = UserInteraction.currentUserInitiator(userId);
         //TODO load distance and type from Client? World? Settings;
-        if(token) {
-            const proximityRequest: bpa.ProximityRequest = {
+        if(initiatorData.tokenId) {
+            const proximityRequest: ProximityRequest = {
                 distance: 5,
-                token: token,
                 type: "cone",
-                color: user?.color
+                initiator: initiatorData
             }
-            const result = game[NAMESPACE].BeaversProximityAction.getBPAEngine().getProximityActivities(proximityRequest);
+            const proximityResponse = game[NAMESPACE].BeaversProximityAction.scanProximity(proximityRequest);
             const choices = {
                 "": {text: game["i18n"].localize("beaversProximityAction.userInteraction.noActivity")}
             };
-            for (const activity of result.activities) {
+            for (const activity of proximityResponse.activities) {
                 choices[activity.id] = {text: activity.name}
             }
+            //TODO rework work with DisplayProxy !
             const activityId = await userInput.select({choices: choices});
-            if (activityId === undefined || activityId === "") {
+            const activityHit = proximityResponse.activities.find(a=>a.id===activityId);
+            if (!activityHit) {
                 return;
             }
-            //TODO scene might have changed between actions
-            const activityRequest: bpa.ActivityRequest = {
-                activityId: activityId,
-                actorId: result.actorId,
-                hitArea: result.hitArea,
+            const activityRequest: ActivityRequest = {
+                activityHit: activityHit,
+                initiatorData:initiatorData
             }
-            await game[NAMESPACE].BeaversProximityAction.getBPAEngine().testActivity(activityRequest,{ui:userInput});
+            await game[NAMESPACE].BeaversProximityAction.testActivity(activityRequest);
         }
     }
 

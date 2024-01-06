@@ -1,13 +1,12 @@
 import {NAMESPACE, Settings} from "./Settings.js";
 import {BeaversProximityAction} from "./new/BeaversProximityAction.js";
-import {SecretDoorActivity} from "./activities/walls/SecretDoorActivity.js";
-import {UserInteraction} from "./new/UserInteraction.ts";
-import {TestHandler} from "./new/TestHandler.ts";
+import {UserInteraction} from "./new/UserInteraction.js";
 import {ProximityActionUI} from "./uis/ProximityActionUI.js";
 import {ActivityLayer} from "./canvas/ActivityLayer.js";
-import {InvestigateActivity} from "./activities/tiles/InvestigateActivity.js";
 import {ProximityTileApp} from "./new/ProximityTileApp.js";
 import {DisplayProxy} from "./new/DisplayProxy.js";
+import {BeaversButton} from "./elements/Button.js";
+import {InvestigateAction} from "./new/InvestigateAction.js";
 
 
 export const HOOK_READY = NAMESPACE + ".ready";
@@ -27,10 +26,10 @@ Hooks.once("beavers-system-interface.ready", async function () {
     game[NAMESPACE] = game[NAMESPACE] || {};
     game[NAMESPACE].BeaversProximityAction = new BeaversProximityAction();
     game[NAMESPACE].DisplayProxy = new DisplayProxy();
-    //game[NAMESPACE].UserInteraction = new UserInteraction(game[NAMESPACE].BeaversProximityAction);
+    game[NAMESPACE].UserInteraction = new UserInteraction(game[NAMESPACE].BeaversProximityAction);
     game[NAMESPACE].ActivityLayer = new ActivityLayer();
-    game[NAMESPACE].socket.register(SOCKET_EXECUTE_ACTIVITY, game[NAMESPACE].BeaversProximityAction.executeActivity.bind(game[NAMESPACE].BeaversProximityAction));
-    game[NAMESPACE].socket.register(SOCKET_TEST_PROMPT, TestHandler.testPrompt.bind(TestHandler));
+    game[NAMESPACE].socket.register(SOCKET_EXECUTE_ACTIVITY, game[NAMESPACE].BeaversProximityAction.executeAction.bind(game[NAMESPACE].BeaversProximityAction));
+    game[NAMESPACE].socket.register(SOCKET_TEST_PROMPT, game[NAMESPACE].DisplayProxy.prompt.bind(game[NAMESPACE].DisplayProxy));
     initHandlebars();
     Hooks.call(HOOK_READY, game[NAMESPACE].BeaversProximityAction);
 
@@ -42,7 +41,7 @@ Hooks.once("beavers-system-interface.ready", async function () {
 
 Hooks.on(HOOK_READY, async function () {
     if(game instanceof Game){
-        //game[NAMESPACE].BeaversProximityAction.addActivityClass(SecretDoorActivity);
+        game[NAMESPACE].BeaversProximityAction.addActivity(InvestigateAction);
         //game[NAMESPACE].BeaversProximityAction.addActivityClass(InvestigateActivity);
     }
 });
@@ -57,6 +56,14 @@ Hooks.once("socketlib.ready", () => {
     game[NAMESPACE].socket = socketlib.registerModule(NAMESPACE);
 });
 
+
+Hooks.on("ready", ()=>{
+
+});
+
+function initializeCustomElements(){
+    customElements.define('beavers-button',BeaversButton);
+}
 
 
 function initHandlebars(){

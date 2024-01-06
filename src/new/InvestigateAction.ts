@@ -1,20 +1,17 @@
 import {NAMESPACE} from "../Settings.js";
 import {TileAction} from "./TileAction.js";
-
-
 /* class decorator */
 function staticImplements<T>() {
     return <U extends T>(constructor: U) => {constructor};
 }
 @staticImplements<Activity>()
 export class InvestigateAction extends TileAction {
-
     constructor(entityId: string, initiator: Initiator){
         super(entityId, initiator);
     }
 
-    async run(): Promise<void> {
-        // I think it should have the user in here too
+    run(testResult: TestResult): Promise<void> {
+        return Promise.resolve(undefined);
     }
 
     static get template():ActivityTemplate {
@@ -41,8 +38,7 @@ export class InvestigateAction extends TileAction {
         return {
             enabled: [],
             test: {
-                type: "prompt",
-                name: "",
+                type: "gm",
                 inputField: {
                     type: "boolean",
                     label: game["i18n"].localize("beaversProximityAction.action.investigate.test.label"),

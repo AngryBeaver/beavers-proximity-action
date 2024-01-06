@@ -13,7 +13,7 @@ export abstract class Action implements ActionI {
         return this.template.id;
     }
 
-    abstract run()
+    abstract run(testResult:TestResult):Promise<void>;
 
     static get template():ActivityTemplate {
         return {
@@ -32,14 +32,38 @@ export abstract class Action implements ActionI {
         return {
             enabled: [],
             test: {
-                type: "hit",
-                name: this.name,
-                inputField: {
-                    label: this.name,
-                    type: "boolean",
-                    note: this.name
-                }
+                type: "none",
             }
         }
     }
+
+    validateTest(testResult: TestResult, storedValue?: any) {
+        //TODO
+        /**const test = this.config.test.
+
+            const test = this._data.test.options[testResult.testId];
+            let value = storedValue || test.defaultValue;
+            if (!test) {
+                throw new Error("testId not available");
+            }
+            if (test.type === "skill" || test.type === "ability") {
+                value = value || 20;
+                return testResult.number && testResult.number >= value;
+            }
+            if (test.type === "input") {
+                if (testResult.number) {
+                    value = value || 42;
+                    return testResult.number == value;
+                }
+                value = value || "password";
+                return testResult.text == value;
+            }
+            if (test.type === "prompt" || test.type === "hit") {
+                return testResult.isSuccess;
+            }
+            throw new Error(test.type + "is not yet implemented");
+        }
+         **/
+    }
+
 }

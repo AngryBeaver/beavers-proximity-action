@@ -1,4 +1,4 @@
-import {ActivitySettings} from "./ActivitySetting.js";
+import {createActivitySettings} from "./new/ActivitySetting.js";
 
 export const NAMESPACE = "beavers-proximity-action"
 
@@ -30,11 +30,12 @@ export class Settings {
             default: activity.defaultData,
             type: Object
         });
+
         game.settings.registerMenu(NAMESPACE, "activity-"+activity.id + "-button", {
             name: activity.template.name,
             label: activity.template.name,
             // @ts-ignore
-            type: ActivitySettings.build(activityClass),
+            type: createActivitySettings(activity),
             restricted: true
         });
     }
