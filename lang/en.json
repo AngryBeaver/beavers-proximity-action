@@ -14,29 +14,53 @@
       "hint": ""
     },
     "activitySettings": {
-      "testOptions": "test options",
+      "configuration": "Configuration",
+      "submit": "Save changes",
+      "warning": "Warning when you change TestOptions you will loose individual configured values e.g. on tiles,walls,tokens",
+      "defaultValue": {
+        "label": "Default value",
+        "hint": ""
+      },
+      "acceptedResponse": {
+        "label": "Accept Response",
+        "hint": "The Response the user needs to give in order to pass the Test"
+      },
+      "difficulty": {
+        "label": "Difficulty",
+        "hint": "The Result the user needs to hit in order to pass the Test"
+      },
       "enabled": {
         "label": "enable activity",
         "hint": "enable {name}"
       },
-      "submit": "Save changes",
-      "warning": "This will change the activity behaviour over all ! E.g. when you delete TestOptions you might end up loosing all individual configured values of any scene.",
-      "defaultValue": "Default value",
-      "prompt": {
-        "label": "Prompt",
+      "test": {
+        "label": "Test",
+        "hint": "set a Test the user has to pass in order to activate the activity action"
+      },
+      "gm": {
+        "label": "GM Request",
         "hint": "Question to answer with yes (success) or no (fail)"
       },
       "input": {
         "label": "UserInput",
-        "hint": "Add a label and a type for the user input field"
+        "hint": "A user input field the user has to fill",
+        "field": {
+          "label": {
+            "label": "The label of the inputField",
+            "hint": "This describes the inputField the user needs to fill"
+          },
+          "type": {
+            "label": "The type of the inputField",
+            "hint": "This describes the type and form of the input the user needs to fill"
+          },
+          "selection": {
+            "add": "add choice"
+          }
+        }
       },
-      "hit": {
-        "label": "Success",
+      "none": {
+        "label": "None",
         "hint": "No user input needed. It just succeeds"
-      },
-      "choices": {
-        "label": "Choices",
-        "hint": "User can select on of your choices"
       },
       "ability": {
         "label": "Ability",
@@ -45,9 +69,6 @@
       "skill": {
         "label": "Skill",
         "hint": "Skill check of the current actor"
-      },
-      "add": {
-        "placeholder": "enter id"
       }
     },
     "userInteraction": {
@@ -66,8 +87,8 @@
     },
     "action": {
       "investigate": {
-        "name": "investigate",
-        "desc": "Here you can investigate a location and uncover its secrets",
+        "name": "Investigate Activity",
+        "desc": "With this Activity you can investigate a location and uncover its secrets",
         "test": {
           "label": "investigate",
           "note": "Has Investigate activity been successful ?"
@@ -77,7 +98,8 @@
           "defaultValue": "You found something interesting.",
           "note": "This secret information will get revealed on success"
         }
-      },
+      }
+    },
     "activity": {
       "investigate": {
         "name": "Investigate activity",

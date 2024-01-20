@@ -5,13 +5,15 @@ export class ProximityTileApp {
     tileApp;
     element;
     document;
-    data: {activities: { id: string, data: any }[]};
+    data: {activities: { [key:string]:{ activityId: string, data: any }}};
+    dump: {}={};
 
     constructor(app, html, data) {
         this.tileApp = app;
         this.document = data.document;
         this.element = html;
         this.data =  TileAction.getConfig(this.document);
+        this.tileApp.setPosition({width:500});
         this.init();
     }
 
@@ -21,16 +23,27 @@ export class ProximityTileApp {
             this._setActivityOptions();
             void this._removeUnregisteredStoredActions();
         }
+        this._activateTab();
+        this.render();
+    }
+
+    _activateTab(){
+        if(this.tileApp.activeTab !== undefined){
+            this.tileApp._tabs[0].activate(this.tileApp.activeTab);
+        }
     }
 
     _addProximityTab() {
-        this.element.find("form>nav.tabs").append('<a class="item" data-tab="proximity"><i class="fas fa-street-view"></i> Proximity</a>');
+        this.element.find("nav.sheet-tabs:not(.trigger-tabs)").append('<a class="item" data-tab="proximity"><i class="fas fa-street-view"></i> Proximity</a>');
         this.element.find(".tab[data-tab=basic]").after('<div class="tab" data-tab="proximity"><div style="margin-bottom:20px" class="form-group">' +
             '<label>Activity </label><div class="form-fields">' +
             '<select data-id="activity-select"></select>' +
             '<button type="button" style="display:flex;padding:0px;line-height:25px;border-radius:5px;"><span style="width:25px; background-color: rgba(0,0,0,0.1)"><i class="fas fa-plus"></i></span>' +
             '<span style="padding: 0px 20px;">Add</span></button>' +
             '</div></div><div data-id="activity-content"></div></div>');
+        this.element.find("nav.sheet-tabs:not(.trigger-tabs) a.item").on("click",(e)=>{
+            this.tileApp.activeTab = e.currentTarget.dataset.tab;
+        });
         this.element.find(".tab[data-tab=proximity] button").on("click", (event) => {
             const activityId = this.element.find(".tab[data-tab=proximity] select").val();
             this.addActivityConfig(activityId)
@@ -38,13 +51,17 @@ export class ProximityTileApp {
     }
 
     async _removeUnregisteredStoredActions() {
-        this.data.activities.forEach((config, index) => {
-            const activityData = (game as Game)[NAMESPACE].BeaversProximityAction.getActivity("tile", config.id)?.data;
+        let hasChanged = false;
+        Object.entries(this.data.activities).forEach(([key,config]) => {
+            const activityData = (game as Game)[NAMESPACE].BeaversProximityAction.getActivity(config.activityId)?.data;
             if(!activityData){
-                this.data.activities.splice(index, 1);
-            }
-        });
-        await this.update();
+                hasChanged = true;
+                delete this.data.activities[key];
+                this.dump["-="+key]=null;
+            }});
+        if(hasChanged) {
+            await this.update();
+        }
     }
 
     _setActivityOptions() {
@@ -54,32 +71,40 @@ export class ProximityTileApp {
     }
 
     addActivityConfig(activityId) {
-        this.data.activities.push({id: activityId, data: {}});
+        this.data.activities[foundry.utils.randomID()] = { activityId: activityId, data: {}};
         void this.update();
     }
 
-    removeActivityConfig(index: number) {
-        this.data.activities.splice(index, 1);
+    removeActivityConfig(key: string) {
+        delete this.data.activities[key];
+        this.dump["-="+key]=null;
         void this.update();
     }
 
     async update() {
-        this.document.update({flags: {[NAMESPACE]: this.data}})
+        var flags = {};
+        flags[NAMESPACE]= this.data
+        Object.keys(this.dump).forEach(key=>{
+            flags[NAMESPACE].activities[key]=null;
+        });
+        this.dump={};
+        this.document.update({flags:flags})
     }
 
     async render() {
-        //const configuration:bpa.ActivityConfiguration = this._getConfiguration();
         let content = "";
-        for(const index in this.data.activities){
-            const config = this.data.activities[index];
-            const activityTemplate = (game as Game)[NAMESPACE].BeaversProximityAction.getActivity("tile", config.id)?.template;
+        for(const key in this.data.activities){
+            const config = this.data.activities[key];
+            const activityTemplate = (game as Game)[NAMESPACE].BeaversProximityAction.getActivity(config.activityId)?.template;
+            const setting = (game as Game)[NAMESPACE].Settings.getActivityData(config.activityId);
             if (activityTemplate) {
                 content += await renderTemplate('modules/beavers-proximity-action/templates/activity-configuration.hbs', {
-                    id: index,
-                    path: `${NAMESPACE}.activities[${index}].data`,
+                    key: key,
+                    activityId: config.activityId,
+                    path: `flags.${NAMESPACE}.activities.${key}`,
                     name: activityTemplate.name,
                     config: activityTemplate.config,
-                    tests: [],
+                    test: setting.test,
                     data: config.data,
                 });
             }

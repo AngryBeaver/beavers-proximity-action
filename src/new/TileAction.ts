@@ -27,6 +27,6 @@ export abstract class TileAction extends Action{
     }
 
     static getConfig(entity: Tile){
-        return getProperty(entity || {}, `flags.${NAMESPACE}`) || {};
+        return getProperty(entity || {}, `flags.${NAMESPACE}`) || {activities: {}};
     }
 }

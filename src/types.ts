@@ -83,7 +83,7 @@ interface HitAreaData {
 
 interface BeaversProximityActionI {
     getActivities: (type: ActivityType) => Activity[],
-    getActivity: (type: ActivityType, actionId: string) => Activity,
+    getActivity: (actionId: string) => Activity,
     scanProximity: (request: ProximityRequest) => ProximityResponse;
 }
 
@@ -153,10 +153,12 @@ interface NoneTest {
 interface RollTest {
     type: "skill" | "ability"
     inputField: NumberField,
+    acceptedResponse: number,
 }
 interface InputTest {
     type: "input"
     inputField: InputField,
+    acceptedResponse: string,
 }
 interface GMTest {
     type: "gm"

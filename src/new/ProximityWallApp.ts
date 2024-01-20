@@ -60,7 +60,7 @@ export class ProximityWallApp {
 
     async _removeUnregisteredStoredActions() {
         this.data.activities.forEach((config, index) => {
-            const activityData = (game as Game)[NAMESPACE].BeaversProximityAction.getActivity("wall", config.id)?.data;
+            const activityData = (game as Game)[NAMESPACE].BeaversProximityAction.getActivity(config.id)?.data;
             if(!activityData){
                 this.data.activities.splice(index, 1);
             }
@@ -92,7 +92,7 @@ export class ProximityWallApp {
         let content = "";
         for(const index in this.data.activities){
             const config = this.data.activities[index];
-            const activityTemplate = (game as Game)[NAMESPACE].BeaversProximityAction.getActivity("tile", config.id)?.template;
+            const activityTemplate = (game as Game)[NAMESPACE].BeaversProximityAction.getActivity( config.id)?.template;
             if (activityTemplate) {
                 content += await renderTemplate('modules/beavers-proximity-action/templates/activity-configuration.hbs', {
                     id: index,

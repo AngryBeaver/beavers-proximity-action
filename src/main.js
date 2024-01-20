@@ -6,7 +6,7 @@ import {ActivityLayer} from "./canvas/ActivityLayer.js";
 import {ProximityTileApp} from "./new/ProximityTileApp.js";
 import {DisplayProxy} from "./new/DisplayProxy.js";
 import {BeaversButton} from "./elements/Button.js";
-import {InvestigateAction} from "./new/InvestigateAction.js";
+import {InvestigateActivity} from "./new/InvestigateActivity.js";
 
 
 export const HOOK_READY = NAMESPACE + ".ready";
@@ -30,9 +30,9 @@ Hooks.once("beavers-system-interface.ready", async function () {
     game[NAMESPACE].ActivityLayer = new ActivityLayer();
     game[NAMESPACE].socket.register(SOCKET_EXECUTE_ACTIVITY, game[NAMESPACE].BeaversProximityAction.executeAction.bind(game[NAMESPACE].BeaversProximityAction));
     game[NAMESPACE].socket.register(SOCKET_TEST_PROMPT, game[NAMESPACE].DisplayProxy.prompt.bind(game[NAMESPACE].DisplayProxy));
-    initHandlebars();
     Hooks.call(HOOK_READY, game[NAMESPACE].BeaversProximityAction);
-
+    initHandlebars();
+    initializeCustomElements();
     Hooks.on("renderTileConfig", (app, html, options) => {
         new ProximityTileApp(app, html, options);
     });
@@ -41,7 +41,7 @@ Hooks.once("beavers-system-interface.ready", async function () {
 
 Hooks.on(HOOK_READY, async function () {
     if(game instanceof Game){
-        game[NAMESPACE].BeaversProximityAction.addActivity(InvestigateAction);
+        game[NAMESPACE].BeaversProximityAction.addActivity(InvestigateActivity);
         //game[NAMESPACE].BeaversProximityAction.addActivityClass(InvestigateActivity);
     }
 });

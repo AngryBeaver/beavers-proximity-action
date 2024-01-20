@@ -14,9 +14,10 @@ export function createActivitySettings(activity: Activity) {
                 title: title,
                 template: `modules/${NAMESPACE}/templates/activity-setting.hbs`,
                 id: "activity-setting",
-                width: 500,
+                width: 700,
                 height: 600,
-                closeOnSubmit: true,
+                submitOnChange: true,
+                closeOnSubmit: false,
                 submitOnClose: true,
                 resizable: true,
                 classes: ["beavers-proximity-actions", "activity-setting"]
@@ -30,7 +31,8 @@ export function createActivitySettings(activity: Activity) {
                 abilities: beaversSystemInterface.configCanRollAbility ? beaversSystemInterface.configAbilities : [],
                 canRollAbility: beaversSystemInterface.configCanRollAbility,
                 data: this.data,
-                localizeData: {hash: activity.defaultData}
+                activity: activity.template,
+                localizeData: {hash: activity.template}
             }
         }
 
@@ -55,7 +57,7 @@ export function createActivitySettings(activity: Activity) {
 
         activateListeners(html) {
             super.activateListeners(html);
-            html.find("select[name=test.type]").on("change", (e) => {
+            html.find('select[name="test.type"]').on("change", (e) => {
                 const selection = $(e.currentTarget).val();
                 if(selection === "none"){
                     this.data.test = {
@@ -68,8 +70,8 @@ export function createActivitySettings(activity: Activity) {
                         inputField: {
                             label: "",
                             type: "number",
-                            defaultValue: 8
                         },
+                        acceptedResponse:8
                     };
                 }
                 if(selection === "input"){
@@ -78,8 +80,8 @@ export function createActivitySettings(activity: Activity) {
                         inputField: {
                             label: "",
                             type: "text",
-                            defaultValue: ""
                         },
+                        acceptedResponse:""
                     };
                 }
                 if (selection === "gm") {
@@ -88,43 +90,42 @@ export function createActivitySettings(activity: Activity) {
                         inputField: {
                             label: "",
                             type: "boolean",
-                            defaultValue: true
                         },
                     };
                 }
                 this._updateData();
             });
-            html.find("select[name=test.inputField.type]").on("change", (e) => {
-                const selection = $(e.currentTarget).val();
+            html.find('select[name="test.inputField.type"]').on("change", (e) => {
+                const type = $(e.currentTarget).val();
                 if(this.data.test.type === "input") {
-                    if(selection === "text" || selection === "area" || selection === "number" || selection === "boolean"){
+                    if(type === "text" || type === "area" || type === "number" || type === "boolean"){
                         this.data.test.inputField = {
                             label: "",
                             note: "",
-                            type: selection
+                            type: type
                         }
                     }
-                    if(selection === "selection"){
+                    if(type === "selection"){
                         this.data.test.inputField = {
                             choices: {},
                             label: "",
                             note: "",
-                            type: selection
+                            type: type
                         }
                     }
                 }
                 this._updateData();
             });
-            html.find("button[name=addChoice]").on("click", (e) => {
-                const keyName = $(e.currentTartet).parent("div.form-group").find("input")[0].value;
-                if(this.data.test.type === "input" && this.data.test.inputField.type === "selection") {
+            html.find('button[name="addChoice"]').on("click", (e) => {
+                const keyName = $(e.currentTarget).parents("div.form-group").find("input").val() as string;
+                if(keyName && this.data.test.type === "input" && this.data.test.inputField.type === "selection") {
                     this.data.test.inputField.choices = this.data.test.inputField.choices || {};
                     this.data.test.inputField.choices[keyName] = {text: keyName, img: ""}
                 }
                 this._updateData();
             });
-            html.find("button[name=deleteChoice]").on("click", (e) => {
-                const key = $(e.currentTarget).parent("div.form-group").data("key");
+            html.find('button[name="removeChoice"]').on("click", (e) => {
+                const key = $(e.currentTarget).parents("div.form-group").data("key");
                 if(this.data.test.type === "input" && this.data.test.inputField.type === "selection") {
                     delete this.data.test.inputField.choices[key]
                 }

@@ -5,7 +5,7 @@ function staticImplements<T>() {
     return <U extends T>(constructor: U) => {constructor};
 }
 @staticImplements<Activity>()
-export class InvestigateAction extends TileAction {
+export class InvestigateActivity extends TileAction {
     constructor(entityId: string, initiator: Initiator){
         super(entityId, initiator);
     }

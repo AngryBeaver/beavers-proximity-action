@@ -33,7 +33,7 @@ export class Settings {
 
         game.settings.registerMenu(NAMESPACE, "activity-"+activity.id + "-button", {
             name: activity.template.name,
-            label: activity.template.name,
+            label: game["i18n"].localize("beaversProximityAction.activitySettings.configuration"),
             // @ts-ignore
             type: createActivitySettings(activity),
             restricted: true

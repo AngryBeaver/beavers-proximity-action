@@ -1,14 +1,15 @@
-<section data-tab="{{id}}">
+<section data-tab="{{key}}">
     <h2 class="border flexrow">
         <span>{{name}}</span>
-        <a style="flex:0" class="item-delete" data-id="{{id}}">
+        <a style="flex:0" class="item-delete" data-id="{{key}}">
             <i class="fas fa-trash"></i>
         </a>
     </h2>
+    {{>beavers-input-data type="text" label="Test" disabled=true value=test.type }}
+    <input hidden name="{{concat path ".activityId"}}" value="{{activityId}}">
+
     {{#each config}}
-        {{>beavers-input-data name=(concat ../path "." @key) value=(lookup ../data @key)}}
+        {{>beavers-input-data name=(concat ../path ".data." @key) value=(lookup ../data @key)}}
     {{/each}}
-    {{#each tests}}
-        {{>beavers-input-data name=(concat ../path "." @key) value=(lookup ../data @key)}}
-    {{/each}}
+
 </section>

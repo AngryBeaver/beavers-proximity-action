@@ -19,7 +19,7 @@
                 </select>
             </beavers-selection>
         {{else}}
-            <input {{#unless this.defaultValue}}placeholder="{{this.defaultValue}}"{{/unless}}
+            <input {{#unless disabled}}disabled{{/unless}} {{#unless this.defaultValue}}placeholder="{{this.defaultValue}}"{{/unless}}
                    value="{{value}}" name="{{name}}" type="{{this.type}}"/>
         {{/if}}
     </div>

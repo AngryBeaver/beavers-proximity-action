@@ -1,20 +1,25 @@
 <form autocomplete="off">
+    <h2>{{activity.name}}</h2>
+    <div class="form-group">
+        <p class="notes">
+            {{activity.desc}}
+        </p>
+    </div>
+    <h3> {{localize "beaversProximityAction.activitySettings.configuration"}}</h3>
     <div style="box-shadow:0 0 0 1px #c9ba9b inset, 0 0 0 0 transparent;background-color: #fffaf3;
     color: #573a08;padding:10px;border-radius:5px;margin:2px;">
         <i class="fas fa-exclamation-triangle"></i>
         {{localize "beaversProximityAction.activitySettings.warning"}}
     </div>
-    <fieldset>
-        <div class="form-group">
-            <label>{{localize "beaversProximityAction.activitySettings.enabled.label"}}</label>
-            <div class="form-fields">
-                TODO
-            </div>
-            <p class="notes">
-                {{localize "beaversProximityAction.activitySettings.enabled.hint" localizeData}}
-            </p>
+    <div class="form-group">
+        <label>{{localize "beaversProximityAction.activitySettings.enabled.label"}}</label>
+        <div class="form-fields">
+            TODO
         </div>
-    </fieldset>
+        <p class="notes">
+            {{localize "beaversProximityAction.activitySettings.enabled.hint" localizeData}}
+        </p>
+    </div>
     <div class="form-group">
         <label>{{localize "beaversProximityAction.activitySettings.test.label"}}</label>
         <div class="form-fields">
@@ -38,122 +43,173 @@
             {{localize "beaversProximityAction.activitySettings.test.hint"}}
         </p>
     </div>
-    {{#if (eq data.test.type "skill")}}
-        <div class="form-group">
-            <label>{{localize "beaversProximityAction.activitySettings.skill.label"}}</label>
-            <div class="form-fields">
-                <select name="test.inputField.label">
-                    {{#select data.test.inputField.label}}
-                        <option selected disabled value=""></option>
-                        {{#each ../skills}}
-                            <option value="{{this.id}}">{{this.label}}</option>
-                        {{/each}}
-                    {{/select}}
-                </select>
+    <div style="margin:10px;padding:10px;border-radius:5px;border:1px solid grey">
+        {{#if (eq data.test.type "none")}}
+            <div class="form-group">
+                <label>{{localize "beaversProximityAction.activitySettings.none.label"}}</label>
+                <p class="notes">
+                    {{localize "beaversProximityAction.activitySettings.none.hint" }}
+                </p>
             </div>
-            <p class="notes">
-                {{localize "beaversProximityAction.activitySettings.skill.hint" }}
-            </p>
-        </div>
-        <div class="form-group">
-            <label>{{localize "beaversProximityAction.activitySettings.defaultValue"}}</label>
-            <div class="form-fields">
-                <input type="number" name="test.defaultValue"
-                       value="{{data.test.inputField.defaultValue}}"/>
+        {{/if}}
+        {{#if (eq data.test.type "skill")}}
+            <div class="form-group">
+                <label>{{localize "beaversProximityAction.activitySettings.skill.label"}}</label>
+                <div class="form-fields">
+                    <select name="test.inputField.label">
+                        {{#select data.test.inputField.label}}
+                            <option selected disabled value=""></option>
+                            {{#each skills}}
+                                <option value="{{this.id}}">{{this.label}}</option>
+                            {{/each}}
+                        {{/select}}
+                    </select>
+                </div>
+                <p class="notes">
+                    {{localize "beaversProximityAction.activitySettings.skill.hint" }}
+                </p>
             </div>
-        </div>
-    {{/if}}
-    {{#if (eq test.type "ability")}}
-        <div class="form-group">
-            <label>{{localize "beaversProximityAction.activitySettings.ability.label"}}</label>
-            <div class="form-fields">
-                <select name="test.name">
-                    {{#select data.test.inputField.label}}
-                        <option selected disabled value=""></option>
-                        {{#each ../abilities}}
-                            <option value="{{this.id}}">{{this.label}}</option>
-                        {{/each}}
-                    {{/select}}
-                </select>
+            <div class="form-group">
+                <label>{{localize "beaversProximityAction.activitySettings.difficulty.label"}}</label>
+                <div class="form-fields">
+                    <input type="number" name="test.acceptedResponse"
+                           value="{{data.test.acceptedResponse}}"/>
+                </div>
+                <p class="notes">
+                    {{localize "beaversProximityAction.activitySettings.difficulty.hint" }}
+                </p>
             </div>
-            <p class="notes">
-                {{localize "beaversProximityAction.activitySettings.ability.hint"}}
-            </p>
-        </div>
-        <div class="form-group">
-            <label>{{localize "beaversProximityAction.activitySettings.defaultValue"}}</label>
-            <div class="form-fields">
-                <input type="number" name="test.defaultValue"
-                       value="{{data.test.inputField.defaultValue}}"/>
+        {{/if}}
+        {{#if (eq data.test.type "ability")}}
+            <div class="form-group">
+                <label>{{localize "beaversProximityAction.activitySettings.ability.label"}}</label>
+                <div class="form-fields">
+                    <select name="test.name">
+                        {{#select data.test.inputField.label}}
+                            <option selected disabled value=""></option>
+                            {{#each abilities}}
+                                <option value="{{this.id}}">{{this.label}}</option>
+                            {{/each}}
+                        {{/select}}
+                    </select>
+                </div>
+                <p class="notes">
+                    {{localize "beaversProximityAction.activitySettings.ability.hint"}}
+                </p>
             </div>
-        </div>
-    {{/if}}
-    {{#if (eq this.type "input")}}
-        <div class="form-group">
+            <div class="form-group">
+                <label>{{localize "beaversProximityAction.activitySettings.difficulty.label"}}</label>
+                <div class="form-fields">
+                    <input type="number" name="test.acceptedResponse"
+                           value="{{data.test.acceptedResponse}}"/>
+                </div>
+                <p class="notes">
+                    {{localize "beaversProximityAction.activitySettings.difficulty.hint" }}
+                </p>
+            </div>
+        {{/if}}
+        {{#if (eq data.test.type "input")}}
             <label>{{localize "beaversProximityAction.activitySettings.input.label"}}</label>
-            <div class="form-fields">
-                <input type="text" name="data.test.inputField.label" value="{{data.test.inputField.label}}"/>
-                <select name="test.inputField.type"/>
-                {{#select data.test.inputField.type}}
-                    <option value="number">number</option>
-                    <option value="text">text</option>
-                    <option value="area">area</option>
-                    <option value="selection">selection</option>
-                    <option value="boolean">boolean</option>
-                {{/select}}
-                </select>
-            </div>
             <p class="notes">
                 {{localize "beaversProximityAction.activitySettings.input.hint"}}
             </p>
-        </div>
-        {{#if (eq this.type "selection")}}
             <div class="form-group">
-                <label>{{localize "beaversProximityAction.activitySettings.selection.label"}}</label>
+                <label>{{localize "beaversProximityAction.activitySettings.input.field.label.label"}}</label>
                 <div class="form-fields">
-                    <input/>
+                    <input type="text" name="test.inputField.label" value="{{data.test.inputField.label}}"/>
                 </div>
-                <div class="form-fields">
-                    title="{{localize "beaversProximityAction.activitySettings.selection.add"}}">
-                    <BeaversButton name="addChoice" icon="plus"/>
-                </div>
+                <p class="notes">
+                    {{localize "beaversProximityAction.activitySettings.input.field.label.hint"}}
+                </p>
             </div>
-            {{#each this.choices}}
-                <div class="form-group" data-key="@key">
-                    <label>{{@key}}</label>
-                    <div class="form-fields">
-                        <input value="{{this.text}}" name="{{path}}.choices[{{@key}}].text"/>
+            <div class="form-group">
+                <label>{{localize "beaversProximityAction.activitySettings.input.field.type.label"}}</label>
+                <div class="form-fields">
+                    <select name="test.inputField.type"/>
+                    {{#select data.test.inputField.type}}
+                        <option value="number">number</option>
+                        <option value="text">text</option>
+                        <option value="area">area</option>
+                        <option value="selection">selection</option>
+                        <option value="boolean">boolean</option>
+                    {{/select}}
+                    </select>
+                </div>
+                <p class="notes">
+                    {{localize "beaversProximityAction.activitySettings.input.field.type.hint"}}
+                </p>
+            </div>
+            {{#if (eq data.test.inputField.type "selection")}}
+                <div style="margin:10px;padding:10px;border-radius:5px;border:1px solid grey">
+                    {{#each data.test.inputField.choices}}
+                        <div class="form-group" data-key="{{@key}}">
+                            <label>{{@key}}</label>
+                            <div class="form-fields">
+                                <input type="text" value="{{this.text}}" name="test.inputField.choices.{{@key}}.text"/>
+                                <input type="text" value="{{this.img}}" name="test.inputField.choices.{{@key}}.img"/>
+                                <beavers-button style="flex:0" name="removeChoice" icon="trash"/>
+                            </div>
+                        </div>
+                    {{/each}}
+                    <div class="form-group">
+                        <label>{{localize 'beaversProximityAction.activitySettings.input.field.selection.add'}}</label>
+                        <div class="form-fields">
+                            <input onchange="event.stopPropagation()" type="text"/>
+                            <beavers-button style="flex:0" name="addChoice" icon="plus"/>
+                        </div>
                     </div>
-                    <div class="form-fields">
-                        <input value="{{this.img}}" name="{{path}}.choices[{{@key}}].img"/>
-                    </div>
-                    <div class="form-fields"
-                         title="{{localize "beaversProximityAction.activitySettings.selection.remove"}}">
-                        <BeaversButton name="removeChoice" icon="trash"/>
+                    <div class="form-group">
+                        <label>{{localize "beaversProximityAction.activitySettings.defaultValue.label"}}</label>
+                        <div class="form-fields">
+                            <input type="text" name="test.inputField.defaultValue"
+                                   value="{{data.test.inputField.defaultValue}}"/>
+                        </div>
+                        <p class="notes">
+                            {{localize "beaversProximityAction.activitySettings.defaultValuehint"}}
+                        </p>
                     </div>
                 </div>
-            {{/each}}
+                <div class="form-group">
+                    <label>{{localize "beaversProximityAction.activitySettings.acceptedResponse.label"}}</label>
+                    <div class="form-fields">
+                        <beavers-selection>
+                            <select name="test.acceptedResponse">
+                                {{#select data.test.acceptedResponse}}
+                                    {{#each data.test.inputField.choices}}
+                                        <option img="{{this.img}}" value="{{@key}}">{{this.text}}</option>
+                                    {{/each}}
+                                {{/select}}
+                            </select>
+                        </beavers-selection>
+                    </div>
+                    <p class="notes">
+                        {{localize "beaversProximityAction.activitySettings.acceptedResponse.hint" }}
+                    </p>
+                </div>
+            {{else}}
+                <div class="form-group">
+                    <label>{{localize "beaversProximityAction.activitySettings.acceptedResponse.label"}}</label>
+                    <div class="form-fields">
+                        <input type="text" name="test.acceptedResponse"
+                               value="{{data.test.acceptedResponse}}"/>
+                    </div>
+                    <p class="notes">
+                        {{localize "beaversProximityAction.activitySettings.acceptedResponse.hint" }}
+                    </p>
+                </div>
+            {{/if}}
         {{/if}}
-        <div class="form-group">
-            <label>{{localize "beaversProximityAction.activitySettings.defaultValue"}}</label>
-            <div class="form-fields">
-                <input type="text" name="{{path}}.defaultValue"
-                       value="{{this.defaultValue}}"/>
+        {{#if (eq data.test.type "gm")}}
+            <div class="form-group">
+                <label>{{localize "beaversProximityAction.activitySettings.gm.label"}}</label>
+                <div class="form-fields">
+                    <input type="text" name="test.inputField.note"
+                           value="{{this.inputField.note}}"/>
+                </div>
+                <p class="notes">
+                    {{localize "beaversProximityAction.activitySettings.gm.hint"}}
+                </p>
             </div>
-        </div>
-    {{/if}}
-    {{#if (eq this.type "gm")}}
-        <div class="form-group">
-            <label>{{localize "beaversProximityAction.activitySettings.gm.label"}}</label>
-            <div class="form-fields">
-                <input type="text" name="test.inputField.note"
-                       value="{{this.inputField.note}}"/>
-            </div>
-            <p class="notes">
-                {{localize "beaversProximityAction.activitySettings.gm.hint"}}
-            </p>
-        </div>
-    {{/if}}
-    <button type="submit"><i class="fas fa-save"></i> {{localize "beaversProximityAction.activitySettings.submit"}}
-    </button>
+        {{/if}}
+    </div>
 </form>
