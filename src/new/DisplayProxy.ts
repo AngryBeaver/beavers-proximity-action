@@ -1,6 +1,7 @@
 import {NAMESPACE} from "../Settings.js";
 import {SOCKET_TEST_PROMPT} from "../main.js";
 import {StandardDisplayModule} from "./StandardDisplayModule.js";
+import {Initiator} from "./Initiator.js";
 
 /**
  * holds displayModules that will choose how interaction with users are rendered.

@@ -1,5 +1,6 @@
 import {NAMESPACE} from "../Settings.js";
 import {Action} from "./Action.js";
+import {Initiator} from "./Initiator.js";
 
 export abstract class WallAction extends Action{
 

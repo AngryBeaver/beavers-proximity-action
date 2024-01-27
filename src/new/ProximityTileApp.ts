@@ -5,14 +5,14 @@ export class ProximityTileApp {
     tileApp;
     element;
     document;
-    data: {activities: { [key:string]:{ activityId: string, data: any }}};
+    configs: ActivityConfigs;
     dump: {}={};
 
-    constructor(app, html, data) {
+    constructor(app, html, tile:Tile) {
         this.tileApp = app;
-        this.document = data.document;
+        this.document = tile.document;
         this.element = html;
-        this.data =  TileAction.getConfig(this.document);
+        this.configs =  TileAction.getConfigs(tile);
         this.tileApp.setPosition({width:500});
         this.init();
     }
@@ -52,11 +52,11 @@ export class ProximityTileApp {
 
     async _removeUnregisteredStoredActions() {
         let hasChanged = false;
-        Object.entries(this.data.activities).forEach(([key,config]) => {
+        Object.entries(this.configs.activities).forEach(([key,config]) => {
             const activityData = (game as Game)[NAMESPACE].BeaversProximityAction.getActivity(config.activityId)?.data;
             if(!activityData){
                 hasChanged = true;
-                delete this.data.activities[key];
+                delete this.configs.activities[key];
                 this.dump["-="+key]=null;
             }});
         if(hasChanged) {
@@ -71,19 +71,19 @@ export class ProximityTileApp {
     }
 
     addActivityConfig(activityId) {
-        this.data.activities[foundry.utils.randomID()] = { activityId: activityId, data: {}};
+        this.configs.activities[foundry.utils.randomID()] = { activityId: activityId, data: {}};
         void this.update();
     }
 
     removeActivityConfig(key: string) {
-        delete this.data.activities[key];
+        delete this.configs.activities[key];
         this.dump["-="+key]=null;
         void this.update();
     }
 
     async update() {
         var flags = {};
-        flags[NAMESPACE]= this.data
+        flags[NAMESPACE]= this.configs
         Object.keys(this.dump).forEach(key=>{
             flags[NAMESPACE].activities[key]=null;
         });
@@ -93,8 +93,8 @@ export class ProximityTileApp {
 
     async render() {
         let content = "";
-        for(const key in this.data.activities){
-            const config = this.data.activities[key];
+        for(const key in this.configs.activities){
+            const config = this.configs.activities[key];
             const activityTemplate = (game as Game)[NAMESPACE].BeaversProximityAction.getActivity(config.activityId)?.template;
             const setting = (game as Game)[NAMESPACE].Settings.getActivityData(config.activityId);
             if (activityTemplate) {

@@ -2,6 +2,17 @@ type ActivityType = "wall" | "tile";
 type ProximityType = "close" | "cone"
 
 /**
+ * ActivityConfigs is the configuration for individual Entities.
+ * holds information on which activities are active on Entity and individual data stored to those activities.
+ */
+interface ActivityConfigs {
+    activities:{
+        [uid:string]:{activityId:string, data: {[property:string]:any}}
+    }
+}
+
+//TODO Rename to ActivitySetting
+/**
  * ActivityData is the configuration setting for Activities.
  * can be configured globally or comes with as default from Activity declaration
  * holds information on which entity it is enabled per default.
@@ -25,7 +36,7 @@ interface ActivityTemplate {
         [configId: string]: InputField,
     },
     allowSubOptions?: boolean,
-    fallback?: (initiator: Initiator) => void,//fallback when no tile is successfull.
+    fallback?: (initiator: InitiatorData) => void,//fallback when no tile is successfull.
 }
 
 /**
@@ -33,7 +44,7 @@ interface ActivityTemplate {
  * in your ActivityDeclaration you should overwrite template and defaultData.
  */
 interface Activity {
-    new(entityId: string, initiator: Initiator): ActionI
+    new(entityId: string, initiator: InitiatorData): ActionI
     template: ActivityTemplate,
     data: ActivityData,
     defaultData: ActivityData,

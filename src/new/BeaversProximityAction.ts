@@ -2,6 +2,7 @@ import {TileAction} from "./TileAction.js";
 import {HitArea} from "./HitArea.js";
 import {NAMESPACE} from "../Settings.js";
 import {SOCKET_EXECUTE_ACTIVITY} from "../main.js";
+import {Initiator} from "./Initiator.js";
 
 export class BeaversProximityAction implements BeaversProximityActionI{
 
@@ -62,14 +63,14 @@ export class BeaversProximityAction implements BeaversProximityActionI{
             activities: [],
         }
         const activityIds:{[id:string]:ActivityHit} = {}
-        //TODO maybe move out
         hitArea.tileIds.forEach(entityId=>{
             const entity = TileAction.getEntity(entityId);
             if(entity){
-                const config = TileAction.getConfig(entity);
+                const configs = TileAction.getConfigs(entity);
                 //each tile configured activity;
-                Object.keys(config).forEach(activityId=> {
-                    const activity = this.getActivity(activityId);
+                Object.values(configs.activities).forEach(config=> {
+                    const activityId = config.activityId;
+                    const activity = this.getActivity(config.activityId);
                     if (activity) {
                         activityIds[activityId] = activityIds[activityId] || {activityId: activityId, name: activity.template.name,type:"tile", entityIds: []};
                         activityIds[activityId].entityIds.push(entityId)
@@ -87,9 +88,9 @@ export class BeaversProximityAction implements BeaversProximityActionI{
         hitArea.wallIds.forEach(entityId=>{
             const entity = TileAction.getEntity(entityId);
             if(entity){
-                const config = TileAction.getConfig(entity);
+                const config = TileAction.getConfigs(entity);
                 //each tile configured activity;
-                Object.keys(config).forEach(activityId=> {
+                Object.keys(config.activities).forEach(activityId=> {
                     const activity = this.getActivity(activityId);
                     if (activity) {
                         activityIds[activityId] = activityIds[activityId] || {activityId: activityId, name: activity.template.name,type:"wall", entityIds: []};

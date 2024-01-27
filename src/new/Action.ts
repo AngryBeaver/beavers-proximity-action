@@ -1,4 +1,5 @@
 import {NAMESPACE} from "../Settings.js";
+import {Initiator} from "./Initiator.js";
 
 export abstract class Action implements ActionI {
     abstract entity: any;

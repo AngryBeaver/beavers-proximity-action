@@ -1,6 +1,7 @@
 /* class decorator */
 import {WallAction} from "./WallAction.js";
 import {NAMESPACE} from "../Settings.js";
+import {Initiator} from "./Initiator.js";
 
 function staticImplements<T>() {
     return <U extends T>(constructor: U) => {constructor};

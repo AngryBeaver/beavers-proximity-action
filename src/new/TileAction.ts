@@ -1,5 +1,6 @@
 import {NAMESPACE} from "../Settings.js";
 import {Action} from "./Action.js";
+import {Initiator} from "./Initiator.js";
 
 export abstract class TileAction extends Action{
 
@@ -19,14 +20,15 @@ export abstract class TileAction extends Action{
         }
         // @ts-ignore
         const id = this.constructor.template.id;
-        this.config = TileAction.getConfig(this.entity)[id] || {}
+        //TODO fix me one Tile can have multiple configurations
+        this.config = TileAction.getConfigs(this.entity).activities[id] || {}
     }
 
     static getEntity(entityId: string): Tile | undefined{
         return canvas?.["tiles"]?.get(entityId) || undefined;
     }
 
-    static getConfig(entity: Tile){
-        return getProperty(entity || {}, `flags.${NAMESPACE}`) || {activities: {}};
+    static getConfigs(entity: Tile):ActivityConfigs{
+        return getProperty(entity.document || {}, `flags.${NAMESPACE}`) || {activities: {}};
     }
 }

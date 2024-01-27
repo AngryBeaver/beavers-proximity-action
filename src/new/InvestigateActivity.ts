@@ -1,5 +1,6 @@
 import {NAMESPACE} from "../Settings.js";
 import {TileAction} from "./TileAction.js";
+import {Initiator} from "./Initiator.js";
 /* class decorator */
 function staticImplements<T>() {
     return <U extends T>(constructor: U) => {constructor};

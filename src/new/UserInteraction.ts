@@ -18,7 +18,7 @@ export class UserInteraction {
             distance: 5,
             type: "cone"
         }
-        const proximityResponse:ProximityResponse = game[NAMESPACE].scanProximity(proximityRequest);
+        const proximityResponse:ProximityResponse = (game as Game)[NAMESPACE].BeaversProximityAction.scanProximity(proximityRequest);
 
         const input = {
             choices: {"": {text: game["i18n"].localize("beaversProximityAction.userInteraction.noActivity")}},
