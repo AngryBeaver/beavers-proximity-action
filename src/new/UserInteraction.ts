@@ -28,10 +28,10 @@ export class UserInteraction {
             type: "selection"
         }
         for (const activity of Object.values(proximityResponse.activities)) {
-            input.choices[activity.id] = {text: activity.name}
+            input.choices[activity.activityId] = {text: activity.name}
         }
-        const activityId = game[NAMESPACE].DisplayProxy.input(input as InputField, initiatorData);
-        const activityHit = proximityResponse.activities.find(a=>a.id===activityId);
+        const activityId =  await (game as Game)[NAMESPACE].DisplayProxy.input(input as InputField, initiatorData);
+        const activityHit = proximityResponse.activities.find(a=>a.activityId===activityId);
         if(!activityHit){
             return;
         }

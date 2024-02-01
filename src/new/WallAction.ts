@@ -6,7 +6,7 @@ export abstract class WallAction extends Action{
 
     entity: Wall | undefined;
     initiator: Initiator;
-    config: any
+    configs: ActivityConfig[]
 
     protected constructor(entityId: string, initiator: Initiator){
         super();
@@ -20,14 +20,14 @@ export abstract class WallAction extends Action{
         }
         // @ts-ignore
         const id = this.constructor.template.id;
-        this.config = WallAction.getConfig(this.entity)[id] || {}
+        this.configs = Object.values(WallAction.getConfigs(this.entity).activities).filter(a=>a.activityId === id);
     }
 
     static getEntity(entityId: string): Wall | undefined{
         return canvas?.walls?.get(entityId) || undefined;
     }
 
-    static getConfig(entity: Wall){
+    static getConfigs(entity: Wall):ActivityConfigs{
         return getProperty(entity || {}, `flags.${NAMESPACE}`) || {};
     }
 }

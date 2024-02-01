@@ -6,7 +6,7 @@ export abstract class TileAction extends Action{
 
     entity: Tile | undefined;
     initiator: Initiator;
-    config: any
+    configs: ActivityConfig[]
 
     protected constructor(entityId: string, initiator: Initiator){
         super();
@@ -20,8 +20,7 @@ export abstract class TileAction extends Action{
         }
         // @ts-ignore
         const id = this.constructor.template.id;
-        //TODO fix me one Tile can have multiple configurations
-        this.config = TileAction.getConfigs(this.entity).activities[id] || {}
+        this.configs = Object.values(TileAction.getConfigs(this.entity).activities).filter(a=>a.activityId === id);
     }
 
     static getEntity(entityId: string): Tile | undefined{

@@ -116,7 +116,7 @@ export class BeaversProximityAction implements BeaversProximityActionI{
      */
     public async testActivity(request: ActivityRequest) {
         const initiator = new Initiator(request.initiatorData);
-        const activity: Activity = this.getActivity(request.activityHit.id);
+        const activity: Activity = this.getActivity(request.activityHit.activityId);
         const testResult = await game[NAMESPACE].DisplayProxy.test(activity.data.test,initiator)
         if(testResult!= null){
             await game[NAMESPACE].socket.executeAsGM(SOCKET_EXECUTE_ACTIVITY,request,testResult);
@@ -128,7 +128,7 @@ export class BeaversProximityAction implements BeaversProximityActionI{
      */
     public async executeAction(request: ActivityRequest,testResult:TestResult){
         const initiator = new Initiator(request.initiatorData);
-        const activity: Activity = this.getActivity(request.activityHit.id);
+        const activity: Activity = this.getActivity(request.activityHit.activityId);
         const promises:Promise<any>[] = []
         for(const entityId of request.activityHit.entityIds) {
             const action = new activity(entityId, initiator);

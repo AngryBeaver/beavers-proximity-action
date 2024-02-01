@@ -3,7 +3,7 @@ import {Initiator} from "./Initiator.js";
 
 export abstract class Action implements ActionI {
     abstract entity: any;
-    abstract config: any;
+    abstract configs: ActivityConfig[];
     abstract initiator: Initiator;
 
     static get data() {

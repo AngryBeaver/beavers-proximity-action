@@ -20,6 +20,7 @@
     "esmodules": [
       "src/main.js"
     ],
+    "scripts": ["lib/pixi-filters.js"],
     "styles": [
 
     ],

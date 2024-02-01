@@ -7,8 +7,16 @@ type ProximityType = "close" | "cone"
  */
 interface ActivityConfigs {
     activities:{
-        [uid:string]:{activityId:string, data: {[property:string]:any}}
+        [uid:string]:ActivityConfig
     }
+}
+
+/**
+ * ActivityConfig is the configuration for one activity on individual Entities.
+ * holds information on which activities are active on Entity and individual data stored to those activities.
+ */
+interface ActivityConfig {
+   activityId:string, data: {[property:string]:any}
 }
 
 //TODO Rename to ActivitySetting
@@ -80,7 +88,7 @@ interface ActivityRequest {
  * an Activity found by a proximityScan including the entities hitted
  */
 interface ActivityHit {
-    id: string,
+    activityId: string,
     name: string,
     type: ActivityType,
     entityIds: string[]
@@ -105,7 +113,7 @@ interface BeaversProximityActionI {
  */
 interface ActionI {
     entity: any;
-    config: any;
+    configs: ActivityConfig[];
     initiator: InitiatorData;
     run:(testResult:TestResult)=>Promise<void>;
 }
@@ -215,7 +223,8 @@ interface Game {
     "beavers-proximity-action":{
         BeaversProximityAction:BeaversProximityActionI,
         ActivityLayer: ActivityLayerI,
-        Settings: SettingsI
+        Settings: SettingsI,
+        DisplayProxy: DisplayModule
     }
 }
 

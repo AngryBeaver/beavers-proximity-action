@@ -21,6 +21,7 @@ const ICON = "icons/";
 const PACK = "packs/";
 const CONFIG = "sample-config/";
 const SOUND = "sounds/";
+const LIB = "lib/";
 
 var PACKAGE = JSON.parse(fs.readFileSync("package.json"));
 
@@ -110,6 +111,10 @@ function buildManifest(output = null) {
 
 exports.step_buildManifest = buildManifest();
 
+function outputPixiFilters(output = null) {
+  return () => gulp.src("node_modules/pixi-filters/dist/browser/pixi-filters.js").pipe(gulp.dest((output || DIST) + LIB));
+}
+
 function outputLanguages(output = null) {
   return () => gulp.src(LANG + GLOB).pipe(gulp.dest((output || DIST) + LANG));
 }
@@ -177,6 +182,7 @@ exports.default = gulp.series(
   gulp.parallel(
     buildSource(true, false),
     buildManifest(),
+    outputPixiFilters(),
     outputLanguages(),
     outputTemplates(),
     outputStylesCSS(),
@@ -195,6 +201,7 @@ exports.dev = gulp.series(
   gulp.parallel(
     buildSource(true, false, DEV_DIST()),
     buildManifest(DEV_DIST()),
+    outputPixiFilters(DEV_DIST()),
     outputLanguages(DEV_DIST()),
     outputTemplates(DEV_DIST()),
     outputStylesCSS(DEV_DIST()),
@@ -213,6 +220,7 @@ exports.zip = gulp.series(
   gulp.parallel(
     buildSource(false, false),
     buildManifest(),
+    outputPixiFilters(),
     outputLanguages(),
     outputTemplates(),
     outputStylesCSS(),

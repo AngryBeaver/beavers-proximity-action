@@ -12,6 +12,9 @@ export class InvestigateActivity extends TileAction {
     }
 
     run(testResult: TestResult): Promise<void> {
+        let msg = "";
+        this.configs.forEach(c=>msg+=c.data.secretInfo);
+        ui.notifications?.info?.(msg);
         return Promise.resolve(undefined);
     }
 
