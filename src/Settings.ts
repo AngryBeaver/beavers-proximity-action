@@ -2,7 +2,7 @@ import {createActivitySettings} from "./new/ActivitySetting.js";
 
 export const NAMESPACE = "beavers-proximity-action"
 
-export class Settings {
+export class Settings implements SettingsI {
 
     constructor() {
         if (!(game instanceof Game)) {
@@ -40,11 +40,45 @@ export class Settings {
         });
     }
 
-    public getActivityData(activityId:string):ActivityData | null{
-        try{
-            return (this.get("activity-"+activityId) as ActivityData);
-        }catch(e){
-            return null
+    public getActivityData(activityId:string):ActivityData {
+        const activityData = (this.get("activity-"+activityId) as ActivityData);
+        return foundry.utils.deepClone(activityData);
+    }
+
+    public getActivitySettingData(activity:Activity){
+        const skillChoices = {};
+        beaversSystemInterface.configSkills.forEach((v)=>{
+            skillChoices[v.id]={text:v.label}
+        });
+        const abilityChoices = {};
+        if(beaversSystemInterface.configCanRollAbility) {
+            beaversSystemInterface.configAbilities.forEach((v) => {
+                abilityChoices[v.id] = {text: v.label}
+            })
+        }
+        const typeChoices = {}
+        typeChoices["none"] = {text: (game as Game).i18n.localize("beaversProximityAction.activitySettings.none.label")};
+        typeChoices["skill"] = {text: (game as Game).i18n.localize("beaversProximityAction.activitySettings.skill.label")};
+        if(beaversSystemInterface.configCanRollAbility) {
+            typeChoices["ability"] = {text: (game as Game).i18n.localize("beaversProximityAction.activitySettings.ability.label")};
+        }
+        typeChoices["input"] = {text: (game as Game).i18n.localize("beaversProximityAction.activitySettings.input.label")};
+        typeChoices["gm"] = {text: (game as Game).i18n.localize("beaversProximityAction.activitySettings.gm.label")};
+        const inputTypes = {
+            "area":{text:"area"},
+            "boolean":{text:"boolean"},
+            "number":{text:"number"},
+            "selection":{text:"selection"},
+            "text":{text:"text"},
+        }
+        return {
+            types: typeChoices,
+            skills: skillChoices,
+            abilities: abilityChoices,
+            inputTypes: inputTypes,
+            canRollAbility: beaversSystemInterface.configCanRollAbility,
+            activity: activity.template,
+            localizeData: {hash: activity.template}
         }
     }
 

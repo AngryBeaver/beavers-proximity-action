@@ -1,16 +1,17 @@
 <div class="form-group">
-    <label>{{this.label}}</label>
+    <label>{{label}}</label>
     <div class="form-fields">
-        {{#if (eq this.type "area")}}
-            <textarea style="resize:vertical" name="{{name}}"
-                      {{#if this.defaultValue}}placeholder="{{this.defaultValue}}"{{/if}}
+        {{#if (eq type "area")}}
+            <textarea {{#if disabled}}disabled="true"{{/if}} style="resize:vertical" name="{{name}}"
+                      {{#if defaultValue}}placeholder="{{defaultValue}}"{{/if}}
             >{{value}}</textarea>
-        {{else if (eq this.type "selection")}}
+        {{else if (eq type "none")}}
+        {{else if (eq type "selection")}}
             <beavers-selection>
-                <select name="{{name}}">
+                <select name="{{name}}" {{#if disabled}}disabled="true"{{/if}}>
                     {{#select value}}
                         <option selected disabled value=""></option>
-                        {{#each this.choices}}
+                        {{#each choices}}
                             <option value="{{@key}}" img="{{this.img}}">
                                 {{this.text}}
                             </option>
@@ -19,11 +20,11 @@
                 </select>
             </beavers-selection>
         {{else}}
-            <input {{#unless disabled}}disabled{{/unless}} {{#unless this.defaultValue}}placeholder="{{this.defaultValue}}"{{/unless}}
-                   value="{{value}}" name="{{name}}" type="{{this.type}}"/>
+            <input {{#if disabled}}disabled=true{{/if}} {{#if defaultValue}}placeholder="{{defaultValue}}"{{/if}}
+                   value="{{value}}" name="{{name}}" type="{{type}}"/>
         {{/if}}
     </div>
-    {{#if this.note}}
-        <p class="notes">{{this.note}}</p>
+    {{#if note}}
+        <p class="notes">{{note}}</p>
     {{/if}}
 </div>

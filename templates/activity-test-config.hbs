@@ -1,0 +1,134 @@
+{{>beavers-input-field
+        type="selection"
+        label=(localize "beaversProximityAction.activitySettings.test.label")
+        note=(localize "beaversProximityAction.activitySettings.test.hint")
+        value=test.type
+        choices=types
+        name="test.type"
+        disabled=isEntityConfig
+}}
+<div style="margin:10px;padding:10px;border-radius:5px;border:1px solid grey">
+    {{#if (eq test.type "none")}}
+        {{>beavers-input-field
+                type="none"
+                label=(localize "beaversProximityAction.activitySettings.none.label")
+                note=(localize "beaversProximityAction.activitySettings.none.hint")
+        }}
+    {{/if}}
+    {{#if (eq test.type "skill")}}
+        {{>beavers-input-field
+                type="selection"
+                label=(localize "beaversProximityAction.activitySettings.skill.label")
+                note=(localize "beaversProximityAction.activitySettings.skill.hint")
+                value=test.inputField.label
+                choices=skills
+                name="test.inputField.label"
+                disabled=isEntityConfig
+        }}
+        {{>beavers-input-field
+                type="number"
+                label=(localize "beaversProximityAction.activitySettings.difficulty.label")
+                note=(localize "beaversProximityAction.activitySettings.difficulty.hint")
+                value=test.acceptedResponse
+                name="test.acceptedResponse"
+        }}
+    {{/if}}
+    {{#if (eq test.type "ability")}}
+        {{>beavers-input-field
+                type="selection"
+                label=(localize "beaversProximityAction.activitySettings.ability.label")
+                note=(localize "beaversProximityAction.activitySettings.ability.hint")
+                value=test.inputField.label
+                choices=abilities
+                name="test.inputField.label"
+                disabled=isEntityConfig
+        }}
+        {{>beavers-input-field
+                type="number"
+                label=(localize "beaversProximityAction.activitySettings.difficulty.label")
+                note=(localize "beaversProximityAction.activitySettings.difficulty.hint")
+                value=test.acceptedResponse
+                name="test.acceptedResponse"
+        }}
+    {{/if}}
+    {{#if (eq test.type "input")}}
+        {{>beavers-input-field
+                type="none"
+                label=(localize "beaversProximityAction.activitySettings.input.label")
+                note=(localize "beaversProximityAction.activitySettings.input.hint")
+        }}
+        {{>beavers-input-field
+                type="text"
+                label=(localize "beaversProximityAction.activitySettings.input.field.label.label")
+                note=(localize "beaversProximityAction.activitySettings.input.field.label.hint")
+                value=test.inputField.label
+                name="test.inputField.label"
+                disabled=isEntityConfig
+        }}
+        {{>beavers-input-field
+                type="selection"
+                label=(localize "beaversProximityAction.activitySettings.input.field.type.label")
+                note=(localize "beaversProximityAction.activitySettings.input.field.type.hint")
+                value=test.inputField.type
+                choices=inputTypes
+                name="test.inputField.type"
+                disabled=isEntityConfig
+        }}
+        {{#if (eq test.inputField.type "selection")}}
+            {{#if (not isEntityConfig)}}
+            <div style="margin:10px;padding:10px;border-radius:5px;border:1px solid grey">
+                {{#each test.inputField.choices}}
+                    <div class="form-group" data-key="{{@key}}">
+                        <label>{{@key}}</label>
+                        <div class="form-fields">
+                            <input type="text" value="{{this.text}}" name="test.inputField.choices.{{@key}}.text"/>
+                            <input type="text" value="{{this.img}}" name="test.inputField.choices.{{@key}}.img"/>
+                            <beavers-button style="flex:0" name="removeChoice" icon="trash"/>
+                        </div>
+                    </div>
+                {{/each}}
+                <div class="form-group">
+                    <label>{{localize 'beaversProximityAction.activitySettings.input.field.selection.add'}}</label>
+                    <div class="form-fields">
+                        <input onchange="event.stopPropagation()" type="text"/>
+                        <beavers-button style="flex:0" name="addChoice" icon="plus"/>
+                    </div>
+                </div>
+                {{>beavers-input-field
+                        type="text"
+                        label=(localize "beaversProximityAction.activitySettings.defaultValue.label")
+                        note=(localize "beaversProximityAction.activitySettings.defaultValue.hint")
+                        value=test.inputField.defaultValue
+                        name="test.inputField.defaultValue"
+                }}
+            </div>
+            {{/if}}
+            {{>beavers-input-field
+                    type="selection"
+                    label=(localize "beaversProximityAction.activitySettings.acceptedResponse.label")
+                    note=(localize "beaversProximityAction.activitySettings.acceptedResponse.hint")
+                    value=test.acceptedResponse
+                    choices=test.inputField.choices
+                    name="test.acceptedResponse"
+            }}
+        {{else}}
+            {{>beavers-input-field
+                    type="text"
+                    label=(localize "beaversProximityAction.activitySettings.acceptedResponse.label")
+                    note=(localize "beaversProximityAction.activitySettings.acceptedResponse.hint")
+                    value=test.acceptedResponse
+                    name="test.acceptedResponse"
+            }}
+        {{/if}}
+    {{/if}}
+    {{#if (eq test.type "gm")}}
+        {{>beavers-input-field
+                type="text"
+                label=(localize "beaversProximityAction.activitySettings.gm.label")
+                note=(localize "beaversProximityAction.activitySettings.gm.hint")
+                value=test.inputField.note
+                name="test.inputField.note"
+                disabled=isEntityConfig
+        }}
+    {{/if}}
+</div>

@@ -6,7 +6,7 @@ export abstract class TileAction extends Action{
 
     entity: Tile | undefined;
     initiator: Initiator;
-    configs: ActivityConfig[]
+    configs: EntityConfig[]
 
     protected constructor(entityId: string, initiator: Initiator){
         super();
@@ -27,7 +27,7 @@ export abstract class TileAction extends Action{
         return canvas?.["tiles"]?.get(entityId) || undefined;
     }
 
-    static getConfigs(entity: Tile):ActivityConfigs{
+    static getConfigs(entity: Tile):EntityConfigs{
         return getProperty(entity.document || {}, `flags.${NAMESPACE}`) || {activities: {}};
     }
 }

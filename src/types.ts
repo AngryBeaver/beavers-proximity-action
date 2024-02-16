@@ -1,13 +1,13 @@
-type ActivityType = "wall" | "tile";
+type EntityType = "wall" | "tile";
 type ProximityType = "close" | "cone"
 
 /**
  * ActivityConfigs is the configuration for individual Entities.
  * holds information on which activities are active on Entity and individual data stored to those activities.
  */
-interface ActivityConfigs {
+interface EntityConfigs {
     activities:{
-        [uid:string]:ActivityConfig
+        [uid:string]:EntityConfig
     }
 }
 
@@ -15,11 +15,12 @@ interface ActivityConfigs {
  * ActivityConfig is the configuration for one activity on individual Entities.
  * holds information on which activities are active on Entity and individual data stored to those activities.
  */
-interface ActivityConfig {
-   activityId:string, data: {[property:string]:any}
+interface EntityConfig {
+   activityId:string, data: {
+       [property:string]:any
+   } & Partial<Test>
 }
 
-//TODO Rename to ActivitySetting
 /**
  * ActivityData is the configuration setting for Activities.
  * can be configured globally or comes with as default from Activity declaration
@@ -90,7 +91,7 @@ interface ActivityRequest {
 interface ActivityHit {
     activityId: string,
     name: string,
-    type: ActivityType,
+    type: EntityType,
     entityIds: string[]
 }
 
@@ -101,7 +102,7 @@ interface HitAreaData {
 }
 
 interface BeaversProximityActionI {
-    getActivities: (type: ActivityType) => Activity[],
+    getActivities: (type: EntityType) => Activity[],
     getActivity: (actionId: string) => Activity,
     scanProximity: (request: ProximityRequest) => ProximityResponse;
 }
@@ -113,7 +114,7 @@ interface BeaversProximityActionI {
  */
 interface ActionI {
     entity: any;
-    configs: ActivityConfig[];
+    configs: EntityConfig[];
     initiator: InitiatorData;
     run:(testResult:TestResult)=>Promise<void>;
 }
@@ -123,6 +124,7 @@ interface ActivityLayerI {
 interface SettingsI {
     addActivity:(activity: Activity)=>void,
     getActivityData:(activityId: string)=>ActivityData,
+    getActivitySettingData:(activity:Activity)=>any,
 }
 
 

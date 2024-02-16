@@ -14,7 +14,7 @@ export class BeaversProximityAction implements BeaversProximityActionI{
             [id: string]: Activity
         }
         byType: {
-            [type in  ActivityType] : Activity[]
+            [type in  EntityType] : Activity[]
         }
     } = {byId:{},byType:{wall:[],tile:[]}}
 
@@ -41,7 +41,7 @@ export class BeaversProximityAction implements BeaversProximityActionI{
         this.game[NAMESPACE].Settings.addActivity(activity);
     }
 
-    public getActivities(type: ActivityType):Activity[] {
+    public getActivities(type: EntityType):Activity[] {
         return this.activities.byType[type];
     }
 

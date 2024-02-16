@@ -6,7 +6,7 @@ export abstract class WallAction extends Action{
 
     entity: Wall | undefined;
     initiator: Initiator;
-    configs: ActivityConfig[]
+    configs: EntityConfig[]
 
     protected constructor(entityId: string, initiator: Initiator){
         super();
@@ -27,7 +27,7 @@ export abstract class WallAction extends Action{
         return canvas?.walls?.get(entityId) || undefined;
     }
 
-    static getConfigs(entity: Wall):ActivityConfigs{
+    static getConfigs(entity: Wall):EntityConfigs{
         return getProperty(entity || {}, `flags.${NAMESPACE}`) || {};
     }
 }

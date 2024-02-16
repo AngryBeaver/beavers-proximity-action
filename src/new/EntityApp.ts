@@ -1,12 +1,12 @@
 import {NAMESPACE} from "../Settings.js";
 
-export class EntityApp<T extends ActivityType> {
+export class EntityApp<T extends EntityType> {
     app;
     element;
     document;
-    configs: ActivityConfigs;
+    configs: EntityConfigs;
     dump: {}={};
-    type: ActivityType
+    type: EntityType
 
     constructor(app, html, entity, type:T) {
         this.app = app;
@@ -106,18 +106,19 @@ export class EntityApp<T extends ActivityType> {
         let content = "";
         for(const key in this.configs.activities){
             const config = this.configs.activities[key];
-            const activityTemplate = (game as Game)[NAMESPACE].BeaversProximityAction.getActivity(config.activityId)?.template;
-            const setting = (game as Game)[NAMESPACE].Settings.getActivityData(config.activityId);
-            if (activityTemplate) {
-                content += await renderTemplate('modules/beavers-proximity-action/templates/activity-configuration.hbs', {
-                    key: key,
-                    activityId: config.activityId,
-                    path: `flags.${NAMESPACE}.activities.${key}`,
-                    name: activityTemplate.name,
-                    config: activityTemplate.config,
-                    test: setting.test,
-                    data: config.data,
-                });
+            const activity = (game as Game)[NAMESPACE].BeaversProximityAction.getActivity(config.activityId);
+            if (activity) {
+                const setting = (game as Game)[NAMESPACE].Settings.getActivitySettingData(activity);
+                const data = {
+                    key:key,
+                    id: this.document.id,
+                    type: this.type,
+                    activityId: activity.id,
+                    name: activity.template.name,
+                }
+                content += await renderTemplate('modules/beavers-proximity-action/templates/activity-configuration.hbs',
+                    data
+                );
             }
         };
         this.element.find(`div[data-id=activity-content]`).html(content);

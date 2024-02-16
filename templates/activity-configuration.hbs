@@ -5,11 +5,6 @@
             <i class="fas fa-trash"></i>
         </a>
     </h2>
-    {{>beavers-input-data type="text" label="Test" disabled=true value=test.type }}
-    <input hidden name="{{concat path ".activityId"}}" value="{{activityId}}">
-
-    {{#each config}}
-        {{>beavers-input-data name=(concat ../path ".data." @key) value=(lookup ../data @key)}}
-    {{/each}}
+    <beavers-activity-test-config entityActivityId="{{type}}-{{id}}-{{key}}" activityId="{{activityId}}"></beavers-activity-test-config>
 
 </section>

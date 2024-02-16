@@ -7,6 +7,7 @@ import {ProximityTileApp} from "./new/ProximityTileApp.js";
 import {DisplayProxy} from "./new/DisplayProxy.js";
 import {BeaversButton} from "./elements/Button.js";
 import {InvestigateActivity} from "./new/InvestigateActivity.js";
+import {BeaversActivityTestConfig} from "./elements/BeaversActivityTestConfig.js";
 
 
 export const HOOK_READY = NAMESPACE + ".ready";
@@ -63,6 +64,7 @@ Hooks.on("ready", ()=>{
 
 function initializeCustomElements(){
     customElements.define('beavers-button',BeaversButton);
+    customElements.define('beavers-activity-test-config',BeaversActivityTestConfig)
 }
 
 
@@ -72,7 +74,10 @@ function initHandlebars(){
     });
     void getTemplate('modules/beavers-proximity-action/templates/activity-setting.hbs');
     void getTemplate('modules/beavers-proximity-action/templates/activity-configuration.hbs');
-    getTemplate('modules/beavers-proximity-action/templates/beavers-input-data.hbs').then(t=>{
-        Handlebars.registerPartial('beavers-input-data', t);
+    void getTemplate('modules/beavers-proximity-action/templates/activity-test-config.hbs');
+    getTemplate('modules/beavers-proximity-action/templates/beavers-input-field.hbs').then(t=>{
+        Handlebars.registerPartial('beavers-input-field', t);
     });
+
+
 }
