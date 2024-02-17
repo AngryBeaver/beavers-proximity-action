@@ -8,6 +8,8 @@ import {DisplayProxy} from "./new/DisplayProxy.js";
 import {BeaversButton} from "./elements/Button.js";
 import {InvestigateActivity} from "./new/InvestigateActivity.js";
 import {BeaversActivityTestConfig} from "./elements/BeaversActivityTestConfig.js";
+import {ProximityWallApp} from "./new/ProximityWallApp.js";
+import {SecretDoorActivity} from "./new/SecretDoorActivity.js";
 
 
 export const HOOK_READY = NAMESPACE + ".ready";
@@ -37,13 +39,16 @@ Hooks.once("beavers-system-interface.ready", async function () {
     Hooks.on("renderTileConfig", (app, html, options) => {
         new ProximityTileApp(app, html, options);
     });
+    Hooks.on("renderWallConfig", (app, html, options) => {
+        new ProximityWallApp(app, html, options);
+    });
 
 })
 
 Hooks.on(HOOK_READY, async function () {
     if(game instanceof Game){
         game[NAMESPACE].BeaversProximityAction.addActivity(InvestigateActivity);
-        //game[NAMESPACE].BeaversProximityAction.addActivityClass(InvestigateActivity);
+        game[NAMESPACE].BeaversProximityAction.addActivity(SecretDoorActivity);
     }
 });
 
