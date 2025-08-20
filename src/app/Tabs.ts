@@ -1,13 +1,13 @@
 
 export function addTab(html, tabData:TabData){
-  if((game as Game).version.startsWith('13')){
+  if((game as ReadyGame).version.startsWith('13')){
     addTabV13(html, tabData)
     addTabContentV13(html, tabData)
   }
 }
 
 export function addTabContent(html, tabData:TabData){
-  if((game as Game).version.startsWith('13')){
+  if((game as ReadyGame).version.startsWith('13')){
     addTabV13(html, tabData)
   }
 }

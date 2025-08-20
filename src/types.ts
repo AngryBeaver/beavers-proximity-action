@@ -1,7 +1,59 @@
-
 type EntityType = "wall" | "tile" | "region";
 type ProximityType = "close" | "cone"
 type Point = Canvas.Point
+type ScopedInputField = InputField & { scope: InputFieldScope };
+type InputFieldScope = "world" | "entity" | "private"
+type BeaversDetectionMode = "sight" | "radius" | "touch";
+
+
+
+/**
+ * ActivityClass
+ * - *Entity*ActivityClass
+ * - - InvestigateActivity
+ * - - - InvestigateActivityCustomized
+ *
+ * ActivityClass is the interface of all Activities
+ * *Entity*ActivityClass is an abstract class for an entity e.g region and comes with some entity specifics e.g. how to interact with this entity
+ * InvestigateActivityClass is the concret class that is registered in a world
+ * InvestigateActivity is a customized class that
+ *
+ * An Activity consists of
+ *  optionaly conditions who can use it or see it.
+ *  optionally tests what needs to be done
+ *  an action that can consume the result of the tests
+ *
+ *  Condition
+ *  Is a method consuming the triggering user and the entity it is placed upon
+ *  Can consume userInput either globally or entity based
+ *
+ *  Tests
+ *  Is a list of Tests
+ *  uses a TestDefinition to define which attributes can be set where
+ *  - ❗attributes are part of tests can change without notice.
+ *  - ✅attributes can always change also in existing recipes this will anyway break.
+ *  - defaultValues can always be set globaly
+ *
+ *  Action
+ *  Is a method consuming the TestResult and triggering user as well as userInput
+ *
+ *
+ */
+
+interface ActivityClass {
+  new (entityId: string, initiator: InitiatorI): ActivityInstance;
+  // Required static members
+  readonly id: string;
+  readonly template: ActivityTemplate;
+  readonly defaultData: ActivityData;
+  customizationFields?: Record<string, InputField>;
+  readonly worldData: ActivityData;
+}
+
+interface ActivityDetection {
+  mode: BeaversDetectionMode;
+  radius?: number;
+}
 
 /**
  * ActivityConfigs is the configuration for individual Entities.
@@ -18,9 +70,11 @@ interface EntityConfigs {
  * holds information on which activities are active on Entity and individual data stored to those activities.
  */
 interface EntityConfig {
-   activityId:string, data: {
+   activityId:string,
+   data: {
        [property:string]:any
-   } & Partial<Test<any>>
+   },
+   activityData?: Partial<ActivityData>
 }
 
 /**
@@ -31,7 +85,7 @@ interface EntityConfig {
  */
 interface ActivityData {
     enabled: { attribute: string, value: any }[],
-    test: Test<any>
+    beaversTests?: BeaversTests,
 }
 /**
  * ActivityTemplate describes an Activity
@@ -48,18 +102,7 @@ interface ActivityTemplate {
     },
     allowSubOptions?: boolean,
     fallback?: (initiator: InitiatorData) => void,//fallback when no tile is successfull.
-}
-
-/**
- * An Activity is the class Action the instance of this class.
- * in your ActivityDeclaration you should overwrite template and defaultData.
- */
-interface Activity {
-    new(entityId: string, initiatorData: InitiatorData): ActivityInstance
-    template: ActivityTemplate,
-    data: ActivityData,
-    defaultData: ActivityData,
-    id: string,
+    detection: ActivityDetection
 }
 
 /**
@@ -104,9 +147,10 @@ interface HitAreaData {
 }
 
 interface BeaversProximityAppI {
-    addActivity:(activity: Activity) => void,
-    getActivities: (type: EntityType) => Activity[],
-    getActivity: (actionId: string) => Activity,
+    addActivity:(activityClass: ActivityClass) => void,
+    getActivities: (type: EntityType) => ActivityClass[],
+    getActivity: (actionId: string) => ActivityClass,
+    scan:(initiator: InitiatorI) => ProximityResponse
 }
 
 /**
@@ -117,40 +161,18 @@ interface BeaversProximityAppI {
 interface ActivityInstance {
     entity: any;
     configs: EntityConfig[];
-    initiator: InitiatorData;
-    run:(testResult:TestResult)=>Promise<void>;
-}
-interface ActivityLayerI {
-    drawActivity:(points: number[], id:string, color?:string)=>void
+    run:(initiator: InitiatorI, testResult:TestResult)=>Promise<void>;
+    data: ActivityData[];
 }
 interface SettingsI {
-    addActivity:(activity: Activity)=>void,
+    addActivity:(activityClass: ActivityClass)=>void,
     getActivityData:(activityId: string)=>ActivityData,
+    setActivityData:(activityId:string, activityData:ActivityData)=>Promise<any>,
     set:(key:string, value:any)=>void
     //getActivitySettingData:(activity:Activity)=>any,
 }
 
-
-
-
-
-
-
 type MsgType = "info" | "warn" | "error";
-
-
-interface TestResult {
-    type: InputType,
-    fails?: number,
-    value?: string | number | boolean,
-}
-
-interface DisplayModule {
-    msg: (msg: string, type: MsgType,initiatorData:InitiatorData ) => Promise<void>
-    prompt: (inputField:InputField,initiatorData:InitiatorData)=>Promise<boolean|null>
-    input: (inputField: InputField,initiatorData:InitiatorData)=>Promise<any>
-}
-
 
 interface Edge {
     p1: Point,
@@ -175,4 +197,31 @@ interface TabData {
     group: string,
     content: string,
     onClick: ()=>void
+}
+interface TestsResult {
+  hits: number,
+  fails: number,
+  maxFails:number,
+  maxHits: number
+}
+interface ActivityOutput {
+  msg: (msg: string, type?: MsgType, initiator?: InitiatorData) => Promise<void>;
+  choose: (options: { [key: string]: { label: string; note?: string } }, prompt: string, initiator: InitiatorData) => Promise<string | null>;
+}
+interface ActivityTestOutput extends ActivityOutput {
+  nextTest?: (infoHtml: string, current: TestsResult, initiator: InitiatorData) => Promise<boolean>;
+  progress?: (current: TestsResult, initiator: InitiatorData) => Promise<void>;
+}
+
+interface ActivityPayload {
+  activityId: string;
+  entityIds: string[];
+  initiatorData: InitiatorData;
+}
+interface GmApprovalRequest {
+  id: string;
+  moduleId: string;
+  question: string;
+  initiator: InitiatorData;
+  created: number;
 }

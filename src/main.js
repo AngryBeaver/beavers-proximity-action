@@ -1,10 +1,11 @@
 import {NAMESPACE, Settings} from "./Settings.js";
 import {ProximityRegionApp} from "./app/region/ProximityRegionApp.js";
 import { BeaversProximityApp } from "./app/BeaversProximityApp.js";
-
+import { InvestigateActivity } from "./activities/InvestigateActivity.js";
+import { registerGMInboxSocketHandlers } from "./app/GmInbox.js";
+import { registerGMExecuteActivitySocketHandler, registerGMScanSocketHandlers } from "./execute/ClientFlow.js";
+import { GmApproval } from "./tests/GmApproval.js";
 export const HOOK_READY = NAMESPACE + ".ready";
-export const SOCKET_EXECUTE_ACTIVITY = "executeActivity";
-export const SOCKET_TEST_PROMPT = "testPrompt";
 
 Hooks.on("beavers-system-interface.init", async function () {
     beaversSystemInterface.addModule(NAMESPACE);
@@ -19,17 +20,17 @@ Hooks.once("beavers-system-interface.ready", async function () {
     game[NAMESPACE] = game[NAMESPACE] || {};
     game[NAMESPACE].Settings = new Settings();
     game[NAMESPACE].BeaversProximityApp = new BeaversProximityApp();
-    //game[NAMESPACE].socket.register(SOCKET_EXECUTE_ACTIVITY, game[NAMESPACE].BeaversProximityAction.executeAction.bind(game[NAMESPACE].BeaversProximityAction));
-    //game[NAMESPACE].socket.register(SOCKET_TEST_PROMPT, game[NAMESPACE].DisplayProxy.prompt.bind(game[NAMESPACE].DisplayProxy));
     Hooks.call(HOOK_READY, game[NAMESPACE].BeaversProximityApp);
     initHandlebars();
     initializeCustomElements();
     Hooks.on("renderRegionConfig", (app, html, options) => {
         new ProximityRegionApp(app, html, options);
     });
-    //game[NAMESPACE].BeaversProximityAction.addActivity(InvestigateActivity);
-    //game[NAMESPACE].BeaversProximityAction.addActivity(SecretDoorActivity);
+    beaversSystemInterface.registerTestClass(new GmApproval());
+})
 
+Hooks.once(HOOK_READY,(bpa)=>{
+  bpa.addActivity(InvestigateActivity);
 })
 
 Hooks.once("beavers-gamepad.ready", () => {
@@ -40,9 +41,12 @@ Hooks.once("beavers-gamepad.ready", () => {
 Hooks.once("socketlib.ready", () => {
     game[NAMESPACE] = game[NAMESPACE] || {};
     game[NAMESPACE].socket = socketlib.registerModule(NAMESPACE);
+    registerGMInboxSocketHandlers();
+    registerGMScanSocketHandlers();
+    registerGMExecuteActivitySocketHandler();
+    // Scan on GM and return result
+
 });
-
-
 
 function initializeCustomElements(){
     //customElements.define('beavers-button',BeaversButton);

@@ -19,7 +19,9 @@ export class EntityApp<T extends EntityType> {
     }
 
     private getConfigs(){
-        return foundry.utils.getProperty(this.document || {}, `flags.${NAMESPACE}`) || {activities: {}};
+        // @ts-ignore
+      return foundry.utils.getProperty(this.document
+        || {}, `flags.${NAMESPACE}`) || {activities: {}};
     }
 
     public content(tabData:TabData){
@@ -43,7 +45,7 @@ export class EntityApp<T extends EntityType> {
     init() {
         this.configs = this.getConfigs();
         this.setTab();
-        void this._removeUnregisteredStoredActions();
+        void this._removeUnregisteredStoredActivities();
         this._activateTab();
         this.render();
     }
@@ -62,11 +64,11 @@ export class EntityApp<T extends EntityType> {
         console.log("addActivity");
     }
 
-    async _removeUnregisteredStoredActions() {
+    async _removeUnregisteredStoredActivities() {
         let hasChanged = false;
         Object.entries(this.configs.activities).forEach(([key,config]) => {
-            const activityData = (game as Game)[NAMESPACE].BeaversProximityApp.getActivity(config.activityId)?.data;
-            if(!activityData){
+            const activityClass = (game as Game)[NAMESPACE].BeaversProximityApp.getActivity(config.activityId);
+            if(!activityClass){
                 hasChanged = true;
                 delete this.configs.activities[key];
                 this.dump["-="+key]=null;
@@ -83,7 +85,9 @@ export class EntityApp<T extends EntityType> {
     }
 
     addActivityConfig(activityId) {
-        this.configs.activities[foundry.utils.randomID()] = { activityId: activityId, data: {}};
+        // @ts-ignore
+      const id = foundry.utils.randomID();
+        this.configs.activities[id] = { activityId: activityId, data: {}};
         void this.update();
     }
 

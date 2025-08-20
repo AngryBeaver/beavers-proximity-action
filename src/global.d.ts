@@ -9,6 +9,8 @@ declare global {
         "beavers-proximity-action":{
             BeaversProximityApp:BeaversProximityAppI,
             Settings: SettingsI,
+            socket: any,
+            GmInbox: foundry.applications.api.ApplicationV2
         }
     }
 

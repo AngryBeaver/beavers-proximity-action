@@ -2,14 +2,14 @@ import {NAMESPACE} from "./Settings.js"
 
 //TODO reset to default Data
 //when defaultData in activities changes between versions this will not get updated as it has stored the previeous data.
-export function createActivitySettings(activity: Activity) {
+export function createActivitySettings(activityClass: ActivityClass) {
 
     return class ActivitySettings extends FormApplication {
 
         data: ActivityData
 
         static get defaultOptions(): any {
-            const title = activity.template.name;
+            const title = activityClass.template.name;
             return foundry.utils.mergeObject(super.defaultOptions, {
                 title: title,
                 template: `modules/${NAMESPACE}/templates/activity-setting.hbs`,
@@ -25,10 +25,10 @@ export function createActivitySettings(activity: Activity) {
         }
 
         async getData(options): Promise<any> {
-            this.data = (game as Game)[NAMESPACE].Settings.getActivityData(activity.id);
+            this.data = (game as Game)[NAMESPACE].Settings.getActivityData(activityClass.id);
             return {
-                activity: activity.template,
-                localizeData: {hash: activity.template}
+                activity: activityClass.template,
+                localizeData: {hash: activityClass.template}
             }
         }
 
@@ -46,7 +46,7 @@ export function createActivitySettings(activity: Activity) {
         }
 
         async _updateData() {
-            await (game as Game)[NAMESPACE].Settings.set("activity-" + activity.id, this.data);
+            await (game as Game)[NAMESPACE].Settings.set("activityClass-" + activityClass.id, this.data);
             this.render();
         }
     }

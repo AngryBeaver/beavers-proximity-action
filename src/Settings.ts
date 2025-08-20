@@ -1,68 +1,62 @@
-import {createActivitySettings} from "./ActivitySetting.js";
+import { createActivitySettings } from "./ActivitySetting.js";
 
-export const NAMESPACE = "beavers-proximity-action"
+export const NAMESPACE = "beavers-proximity-action";
 
 export class Settings implements SettingsI {
 
-    constructor() {
-        if (!(game instanceof Game)) {
-            throw new Error("Settings called before game has been initialized");
-        }
-        /*game.keybindings?.register(NAMESPACE, 'current Token', {
-            name: 'beaversProximityAction.keybinding.name',
-            editable: [{key: 'KeyH', modifiers: ['Shift']}],
-            onDown: () => {
-                game[NAMESPACE].UserInteraction.request();
-            }
-        });*/
+  constructor() {
+    if (!(game instanceof Game)) {
+      throw new Error("Settings called before game has been initialized");
     }
-
-    //registerGlobalSettings for an Action
-    public addActivity(activity: Activity) {
-        if (!(game instanceof Game)) {
-            throw new Error("Settings called before game has been initialized");
+    /*game.keybindings?.register(NAMESPACE, 'current Token', {
+        name: 'beaversProximityAction.keybinding.name',
+        editable: [{key: 'KeyH', modifiers: ['Shift']}],
+        onDown: () => {
+            game[NAMESPACE].UserInteraction.request();
         }
-        var configLabel = game.i18n?.localize("beaversProximityAction.activitySettings.configuration");
+    });*/
+  }
+
+  //registerGlobalSettings for an Action
+  public addActivity(activityClass: ActivityClass) {
+    var configLabel = (game as ReadyGame).i18n?.localize("beaversProximityAction.activitySettings.configuration");
+
+    (game as ReadyGame).settings.register(NAMESPACE, "activityClass-" + activityClass.id, {
+      name: activityClass.template.name,
+      scope: "world",
+      config: false,
+      default: activityClass.defaultData,
+      // @ts-ignore
+      type: Object,
+    });
 
 
-        game.settings.register(NAMESPACE, "activity-"+activity.id, {
-            name: activity.template.name,
-            scope: "world",
-            config: false,
-            default: activity.defaultData,
-            // @ts-ignore
-            type: Object
-        });
+    (game as ReadyGame).settings.registerMenu(NAMESPACE, "activityClass-" + activityClass.id + "-button", {
+      name: activityClass.template.name,
+      label: configLabel,
+      // @ts-ignore
+      type: createActivitySettings(activityClass),
+      restricted: true,
+    });
+  }
 
+  public setActivityData(activityId: string, activityData: ActivityData): Promise<any> {
+    return this.set("activityClass-" + activityId, activityData);
+  }
 
-        game.settings.registerMenu(NAMESPACE, "activity-"+activity.id + "-button", {
-            name: activity.template.name,
-            label: configLabel,
-            // @ts-ignore
-            type: createActivitySettings(activity),
-            restricted: true
-        });
-    }
+  public getActivityData(activityId: string): ActivityData {
+    const activityData = (this.get("activityClass-" + activityId) as ActivityData);
+    return foundry.utils.deepClone(activityData);
+  }
 
-    public getActivityData(activityId:string):ActivityData {
-        const activityData = (this.get("activity-"+activityId) as ActivityData);
-        return foundry.utils.deepClone(activityData);
-    }
+  public get(key: string) {
+    return game.settings.get(NAMESPACE, key);
 
-    public get(key:string) {
-        if (!(game instanceof Game)) {
-            throw new Error("Settings called before game has been initialized");
-        }
-        return game.settings.get(NAMESPACE, key);
+  };
 
-    };
-
-    public set(key:string, value): Promise<any> {
-        if (!(game instanceof Game)) {
-            throw new Error("Settings called before game has been initialized");
-        }
-        return game.settings.set(NAMESPACE, key, value);
-    }
+  public set(key: string, value): Promise<any> {
+    return game.settings.set(NAMESPACE, key, value);
+  }
 
 
 }

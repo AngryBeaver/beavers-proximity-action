@@ -3,12 +3,12 @@
 	"title": "Beaver's Proximity Action",
 	"version": "1.0.0",
 	"description": "Enable actions available around your token",
-	"#devDir": "D:\\Vtts\\v11.315\\Data\\modules",
 	"#devDir": "c:\\vtts\\v12.331\\Data\\modules",
-	"devDir": "c:\\vtts\\v13.333\\Data\\modules",
+	"devDir": "c:\\vtts\\v13.347\\Data\\modules",
+    "types": "dist/src/bpaTypes.d.ts",
 	"main": "src/main.js",
 	"files": [
-		"src/bpaTypes.ts"
+		"src/bpaTypes.d.ts"
 	],
 	"scripts": {
 		"type": "npx -p typescript tsc src/bpaTypes.ts --declaration --emitDeclarationOnly --outDir dist/src",
@@ -30,10 +30,9 @@
 	},
 	"devDependencies": {
 		"@ethaks/fvtt-quench": "^0.6.0",
-		"@league-of-foundry-developers/foundry-vtt-types": "^12.331.3-beta",
-		"@types/jest": "^27.4.1",
+		"@league-of-foundry-developers/foundry-vtt-types": "^13.346.0-beta",
 		"beavers-gamepad": "^2.0.0",
-		"beavers-system-interface": "2.2.4",
+		"beavers-system-interface": "2.3.1",
 		"del": "^6.0.0",
 		"gulp": "^4.0.2",
 		"gulp-cli": "^2.3.0",
