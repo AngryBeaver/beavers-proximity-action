@@ -1,13 +1,13 @@
 import {NAMESPACE} from "../Settings.js";
-import { TileActivity } from "./TileActivity.js";
 import { GmApproval } from "../tests/GmApproval.js";
+import { RegionActivity } from "./RegionActivity.js";
 
-export class InvestigateActivity extends TileActivity {
-    constructor(entityId: string, initiator: InitiatorI){
-        super(entityId, initiator);
+export class InvestigateActivity extends RegionActivity {
+    constructor(entityId: string){
+        super(entityId);
     }
 
-    run(): Promise<void> {
+    run(initiator: InitiatorI, testResult:TestResult): Promise<void> {
         let msg = "";
         this.configs.forEach(c=>msg+=c.data.secretInfo);
         ui.notifications?.info?.(msg);

@@ -22,7 +22,8 @@
     ],
     "scripts": ["lib/pixi-filters.js"],
     "styles": [
-
+      "css/beavers-tests.css",
+      "css/beavers-proximity.css"
     ],
     "packs": [
     ],

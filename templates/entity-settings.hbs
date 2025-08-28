@@ -1,0 +1,10 @@
+{{#each activities}}
+<fieldset class="flexrow ">
+  <span>{{name}}</span>
+  <div class="beavers-proximity-controls">
+    <a class="control fa-solid fa-pen-to-square fa-fw activity-edit" aria-label="Edit Activity" data-id="{{@key}}"></a>
+    <a class="control fa-solid fa-rotate-left fa-fw activity-reset" aria-label="Reset Activity" data-id="{{@key}}"></a>
+    <a class="control fa-solid fa-trash fa-fw activity-delete" aria-label="Delete Activity" data-id="{{@key}}"></a>
+  </div>
+</fieldset>
+{{/each}}

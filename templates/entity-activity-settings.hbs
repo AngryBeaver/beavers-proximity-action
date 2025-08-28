@@ -1,0 +1,64 @@
+<section>
+  <fieldset class="beavers-tests">
+    <legend>{{localize "beaversTests.header"}}
+      {{#if editable}}
+        <a class="tests-add">
+          <i class="fas fa-plus"></i>
+        </a>
+      {{/if}}
+    </legend>
+    <div class="form-group">
+      {{#if data.activityData.beaversTests}}
+        <label>{{localize "beaversTests.fails"}}</label>
+        <div class="form-fields">
+          <input style="width:80px" {{#unless editable}}disabled{{/unless}}
+                 name="{{prefix}}.fails" type="number"
+                 step="any"
+                 value="{{data.activityData.beaversTests.fails}}" />
+        </div>
+        <p class="hint">{{localize "beaversTests.failsHint"}}</p>
+      {{/if}}
+    </div>
+    {{#if data.activityData.beaversTests}}
+      {{#each data.activityData.beaversTests.ands}}
+        <fieldset class="test-or" style="padding-left:20px">
+          <legend>{{localize "beaversTests.test"}}
+            {{#if ../editable}}
+              <a title="{{localize "beaversTests.orTestHint"}}" class="test-add" data-and="{{@key}}">
+                <i class="fas fa-plus"></i>
+              </a>
+            {{/if}}
+          </legend>
+          <div class="form-group">
+            <label>{{localize "beaversTests.hits"}}</label>
+            <div class="form-fields">
+              <input {{#unless ../editable}}disabled{{/unless}}
+                     name="{{../prefix}}.ands.{{@key}}.hits" type="number"
+                     step="any"
+                     value="{{this.hits}}" />
+            </div>
+            <p class="hint">{{localize "beaversTests.hitsHint"}}</p>
+          </div>
+          {{#each this.ors}}
+            <div class="flexrow" style="line-height:20px;margin:2px 0px 2px 10px;align-items:unset">
+              <div class="flexcol beavers-line" style="flex-wrap:nowrap;">
+                {{{beavers-test this
+                                (beavers-object "disabled" (not ../../editable) "minimized" true "prefixName" (concat ../../prefix ".ands."@../key ".ors." @key)) }}}
+              </div>
+              {{#if ../../editable}}
+                <div class="attribute" style="flex:0;width:30px;flex-basis:auto;margin-top:5px;text-align: center;">
+                  <a class="test-delete" data-and="{{@../key}}" data-or="{{@key}}">
+                    <i class="fas fa-trash"></i>
+                  </a>
+                </div>
+              {{/if}}
+            </div>
+            {{#unless @last}}
+              <div class="beavers-seperator" style="margin:3px 0px 3px;">or</div>
+            {{/unless}}
+          {{/each}}
+        </fieldset>
+      {{/each}}
+    {{/if}}
+  </fieldset>
+</section>

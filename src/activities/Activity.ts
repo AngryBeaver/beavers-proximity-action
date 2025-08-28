@@ -46,27 +46,19 @@ export abstract class Activity implements ActivityInstance{
     };
   }
 
-  static mergeData(configs: EntityConfig[]): ActivityData {
+  static mergeData(entityData?: ActivityData): ActivityData {
     const def = (this as any).defaultData as ActivityData;
     const world = (game as Game)[NAMESPACE].Settings.getActivityData(this.id) as ActivityData;
     // @ts-ignore
     const merged: ActivityData = foundry.utils.deepClone(def);
     // @ts-ignore
     foundry.utils.mergeObject(merged, world ?? {}, { inplace: true, insertKeys: true, overwrite: true });
-    for (const cfg of configs) {
-      if (cfg.activityData) {
+    if (entityData) {
         // @ts-ignore
-        foundry.utils.mergeObject(merged, cfg.activityData, { inplace: true, insertKeys: true, overwrite: true });
-      }
+        foundry.utils.mergeObject(merged, entityData, { inplace: true, insertKeys: true, overwrite: true });
     }
     return merged;
   }
-
-  get data(): ActivityData {
-    const ctor = this.constructor as typeof Activity;
-    return ctor.mergeData(this.configs);
-  }
-
 
   declare protected static readonly __assertAssignable: ActivityClass;
 }

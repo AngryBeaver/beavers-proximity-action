@@ -1,0 +1,41 @@
+.beavers-tests .action{
+    flex:0;
+}
+.beavers-tests .beavers-line {
+    white-space:nowrap;
+    flex-wrap:nowrap;
+}
+
+.beavers-tests .beavers-line .attribute {
+    flex:0;
+    padding-left:5px;
+    flex-basis: fit-content;
+}
+.beavers-tests .test-add{
+    padding: 0px 5px;
+}
+
+.beavers-test .form-group{
+    margin-bottom: 5px;
+}
+
+.beavers-seperator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;          /* space around the word */
+    color: var(--color-text, #888); /* line color follows text color */
+    font: inherit;
+}
+
+.beavers-seperator::before,
+.beavers-seperator::after {
+    content: "";
+    flex: 1 1 auto;
+    height: 1px;
+    /* solid near the word, fade toward the far edges */
+    background-image: linear-gradient(to right, transparent, currentColor 40%, currentColor);
+}
+
+.beavers-seperator::after {
+    background-image: linear-gradient(to right, currentColor, currentColor 60%, transparent);
+}

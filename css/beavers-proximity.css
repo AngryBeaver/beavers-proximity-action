@@ -1,0 +1,31 @@
+.beavers-proximity-controls{
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.25rem;
+}
+
+.tile-config .tab header {
+    font-weight: bold;
+    font-size: var(--font-size-16);
+}
+.tile-config .tab .tile-element-controls {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.25rem;
+}
+.wall-config .tab header {
+    font-weight: bold;
+    font-size: var(--font-size-16);
+}
+
+.wall-config .tab .tile-wall-controls {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.25rem;
+}

@@ -1,15 +1,15 @@
 import { EntitySettings } from "../EntitySettings.js";
 
-export class ProximityRegionApp extends EntitySettings<"region"> {
+export class ProximityTileApp extends EntitySettings<"tile"> {
   constructor(app, html, data) {
-    super(app, html, data, "region");
+    super(app, html, data, "tile");
   }
 
   content(tabData: TabData) {
     tabData.content = `
-  <header class="region-element flexrow">
-    <div class="region-element-name">${tabData.name}</div>
-    <div class="region-element-controls">
+  <header class="tile-element flexrow">
+    <div class="tile-element-name">${tabData.name}</div>
+    <div class="tile-element-controls">
       <a class="control" data-action="createProxmityActivity" data-tooltip="" aria-label="Create new Activity">
         <i class="fa-solid fa-plus"></i>
       </a>

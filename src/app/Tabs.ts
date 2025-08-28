@@ -14,7 +14,7 @@ export function addTabContent(html, tabData:TabData){
 
 function addTabV13(html, tabData:TabData){
   if( html.find(`nav.${tabData.group}-tabs a[data-tab="${tabData.id}"]`).length === 0) {
-    const tab = $(`<a data-action="tab" data-group="${tabData.group}" data-tab="${tabData.id}">${tabData.icon}${tabData.name}</a>`);
+    const tab = $(`<a data-action="tab" data-group="${tabData.group}" data-tab="${tabData.id}">${tabData.icon} ${tabData.name}</a>`);
     html.find(`nav.${tabData.group}-tabs`).append(tab);
     tab.on('click',tabData.onClick)
   }

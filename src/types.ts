@@ -48,6 +48,8 @@ interface ActivityClass {
   readonly defaultData: ActivityData;
   customizationFields?: Record<string, InputField>;
   readonly worldData: ActivityData;
+
+  mergeData(entityData?: Partial<ActivityData>): ActivityData
 }
 
 interface ActivityDetection {
@@ -70,6 +72,7 @@ interface EntityConfigs {
  * holds information on which activities are active on Entity and individual data stored to those activities.
  */
 interface EntityConfig {
+   name: string,
    activityId:string,
    data: {
        [property:string]:any
@@ -149,7 +152,7 @@ interface HitAreaData {
 interface BeaversProximityAppI {
     addActivity:(activityClass: ActivityClass) => void,
     getActivities: (type: EntityType) => ActivityClass[],
-    getActivity: (actionId: string) => ActivityClass,
+    getActivity: (activityId: string) => ActivityClass,
     scan:(initiator: InitiatorI) => ProximityResponse
 }
 
@@ -162,7 +165,6 @@ interface ActivityInstance {
     entity: any;
     configs: EntityConfig[];
     run:(initiator: InitiatorI, testResult:TestResult)=>Promise<void>;
-    data: ActivityData[];
 }
 interface SettingsI {
     addActivity:(activityClass: ActivityClass)=>void,

@@ -1,4 +1,29 @@
 {
+  "beaversTests":{
+    "header": "Tests",
+    "hits": "hits",
+    "test": "Test",
+    "hitsHint": "success checks needed before this Test is successfully",
+    "fails": "fails",
+    "failsHint": "failed checks before process fails",
+    "andTestHint": "add additional Test",
+    "orTestHint": "add alternative Test"
+  },
+
+  "beaversSystemInterface":{
+    "tests": {
+      "gmApproval": {
+        "info": {
+          "label": "GM Approval"
+        },
+        "question": {
+          "default": "Question the GM needs to answer with yes (success) or no (fail)",
+          "label": "Question"
+        }
+      }
+    }
+  },
+
   "beaversProximityAction": {
     "tab": {
       "label": "Proximity"

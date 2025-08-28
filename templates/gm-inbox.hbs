@@ -1,0 +1,29 @@
+<section class="bpa-gm-inbox flexcol">
+  <header class="flexrow">
+    <h3 style="margin:0">GM Inbox</h3>
+    <span style="flex:1"></span>
+  </header>
+
+  {{#if items.length}}
+    <ul class="directory-list">
+      {{#each items}}
+        <li class="directory-item flexrow" data-id="{{id}}">
+          <div class="flexcol" style="flex:1">
+            <div><strong>{{question}}</strong></div>
+            <div class="notes">From: {{who}} — {{when}}</div>
+          </div>
+          <div class="flexrow" style="gap:6px">
+            {{#if (eq state "pending")}}
+              <button type="button" class="approve" data-action="approve" data-id="{{id}}">Approve</button>
+              <button type="button" class="deny" data-action="deny" data-id="{{id}}">Deny</button>
+            {{else}}
+              <span class="tag">{{state}}</span>
+            {{/if}}
+          </div>
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p class="notes" style="margin:8px 0">No pending requests.</p>
+  {{/if}}
+</section>

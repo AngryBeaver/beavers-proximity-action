@@ -103,10 +103,11 @@ export class BeaversProximityApp implements BeaversProximityAppI {
     for (const activity of this.getActivities(type)) {
       const worldData = (game as Game)[NAMESPACE].Settings.getActivityData(activity.id);
       const enabledFilters = worldData?.enabled ?? [];
-      const match = enabledFilters.some(f =>
-        // @ts-ignore
-        foundry.utils.getProperty(entity, f.attribute) === f.value);
-      if (!match) continue;
+      const shouldSkip = enabledFilters.length > 0 &&
+        !enabledFilters.every(f =>
+          // @ts-ignore
+          foundry.utils.getProperty(entity, f.attribute) === f.value);
+      if (shouldSkip) continue;
       if (!this.isDetectable(activity, type, entity, initiator, origin)) continue;
       this.pushHit(acc, activity, type, entityId);
     }
@@ -178,7 +179,7 @@ export class BeaversProximityApp implements BeaversProximityAppI {
   private canTouch(a: Point, b: Point): boolean {
     const collided = CONFIG.Canvas.polygonBackends.move.testCollision(
       a as any, b as any,
-      { mode: "any" }
+      { mode: "any", type: "move" }
     );
     return !collided;
   }

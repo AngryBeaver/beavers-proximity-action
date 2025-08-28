@@ -17,7 +17,26 @@ export const DefaultDialogOutput: ActivityOutput = {
   },
 };
 
-export async function requestScanOnGM(initiatorData: InitiatorData, output: ActivityOutput = DefaultDialogOutput) {
+
+export function getDefaultInitiator():InitiatorData{
+  const user = (game as ReadyGame).user;
+  const initiatorData:InitiatorData = {
+    sceneId : canvas?.scene?.id || "",
+    userId: user?.id,
+    actorId: user?.character?.id || "",
+    tokenId: "",
+  };
+  if(initiatorData.actorId === ""){
+    const token = canvas?.tokens?.controlled?.[0];
+    initiatorData.tokenId = token?.id || "";
+    initiatorData.actorId = token?.actor?.id || "";
+  }else{
+    initiatorData.tokenId = canvas?.tokens?.ownedTokens.find(t=>t.actor?.id === initiatorData.actorId)?.id || "";
+  }
+  return initiatorData;
+}
+
+export async function requestScanOnGM(initiatorData: InitiatorData = getDefaultInitiator(), output: ActivityOutput = DefaultDialogOutput) {
   const socket = (game as Game)[NAMESPACE].socket;
   if (!socket) throw new Error("Socket not ready");
   const resp = (await socket.executeAsGM(SOCKET_SCAN, initiatorData)) as ProximityResponse | null;
@@ -27,7 +46,7 @@ export async function requestScanOnGM(initiatorData: InitiatorData, output: Acti
   }
   return resp;
 }
-export async function chooseAndRunActivity(resp: ProximityResponse, output: ActivityOutput = DefaultDialogOutput) {
+export async function chooseAndRunActivityClient(resp: ProximityResponse, output: ActivityOutput = DefaultDialogOutput) {
   if (!resp?.activities?.length) {
     await output.msg("Nothing found nearby.", "info", resp?.initiator);
     return;
@@ -47,17 +66,16 @@ export async function chooseAndRunActivity(resp: ProximityResponse, output: Acti
   const hit = resp.activities[idx];
   if (!hit) return;
 
-  const payload = {
-    activityId: hit.activityId,
-    entityIds: hit.entityIds,
-    initiatorData: resp.initiator,
-  };
+  await executeActivityClient(
+    { activityId: hit.activityId, entityIds: hit.entityIds, initiatorData: resp.initiator },
+    output
+  );
+}
 
-  const socket = (game as Game)[NAMESPACE].socket;
-  const res = await socket.executeAsGM(SOCKET_EXECUTE_ACTIVITY, payload);
-  if (!res?.ok) {
-    await output.msg(`Failed to execute: ${res?.error ?? "Unknown error"}`, "error", resp.initiator);
-  }
+export async function runProximityChain(initiatorData: InitiatorData = getDefaultInitiator(), output: ActivityOutput = DefaultDialogOutput) {
+  const resp = await requestScanOnGM(initiatorData, output);
+  if (!resp) return;
+  await chooseAndRunActivityClient(resp, output);
 }
 
 export async function executeActivityClient(args: ActivityPayload, output?: ActivityTestOutput | ActivityOutput) {
@@ -91,35 +109,34 @@ export async function executeActivityClient(args: ActivityPayload, output?: Acti
   }
 
   for (const entityId of entityIds) {
-    const instance = new (activityClass as any)(entityId, initiatorData as any) as ActivityInstance;
-    const merged = (activityClass as any).mergeData(instance.configs) as ActivityData; // see Part 2
+    const instance = new (activityClass as any)(entityId) as ActivityInstance;
+    const merged = (activityClass as any).mergeData(instance.configs) as ActivityData;
 
+    let finalTests: TestsResult | null = null;
     if (merged.beaversTests) {
       const handler = new TestHandler(merged.beaversTests);
-
       while (handler.hasAdditionalTests()) {
-        const previewHtml = handler.nextTest(); // optional helper in TestHandler
+        const previewHtml = handler.nextTest();
         const current = handler.getTestsResult();
         const proceed = await showNextTest(previewHtml, current);
         if (!proceed) {
           await out.msg((game as ReadyGame).i18n?.localize?.("beaversProximityAction.tests.cancelled") ?? "Cancelled", "warn", initiatorData);
           return;
         }
-
         await handler.test(initiatorData);
         const updated = handler.getTestsResult();
         await showProgress(updated);
         if (updated.fails > updated.maxFails) break;
       }
-
-      const final = handler.getTestsResult();
-      if (final.fails > final.maxFails || final.hits < final.maxHits) {
+      finalTests = handler.getTestsResult();
+      if (finalTests.fails > finalTests.maxFails || finalTests.hits < finalTests.maxHits) {
         await out.msg((game as ReadyGame).i18n?.localize?.("beaversProximityAction.tests.failed") ?? "Tests failed.", "warn", initiatorData);
         return;
       }
     }
 
-    await (instance as any).run();
+    // Pass initiator and the final test summary to run
+    await (instance as any).run(initiatorData, finalTests);
   }
 }
 

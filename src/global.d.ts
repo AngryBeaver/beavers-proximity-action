@@ -6,11 +6,15 @@ import {
 declare global {
 
     interface Game {
-        "beavers-proximity-action":{
-            BeaversProximityApp:BeaversProximityAppI,
-            Settings: SettingsI,
-            socket: any,
-            GmInbox: foundry.applications.api.ApplicationV2
+        "beavers-proximity-action": {
+          BeaversProximityApp: BeaversProximityAppI,
+          Settings: SettingsI,
+          socket: any,
+          GmInbox: InstanceType<
+            ReturnType<typeof foundry.applications.api.HandlebarsApplicationMixin<
+              typeof foundry.applications.api.ApplicationV2
+            >>
+          >;
         }
     }
 
@@ -19,3 +23,4 @@ declare global {
         export type Key = string |"enableSelection"
     }
 }
+

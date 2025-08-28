@@ -8,6 +8,8 @@ interface StoredRequest {
   state: RequestState;
 }
 
+
+
 const updateHook = `${NAMESPACE}.gmApproval.updated`;
 
 export class GmApprovalStore {
@@ -43,7 +45,12 @@ export class GmApprovalStore {
   }
 }
 
-export class GmInbox extends foundry.applications.api.ApplicationV2 {
+// Relax typing so TS doesn’t fight the generic mixin chain
+const HBSApp = (foundry.applications.api.HandlebarsApplicationMixin as any)(
+  foundry.applications.api.ApplicationV2
+);
+
+export class GmInbox extends HBSApp {
   static PARTS = {
     content: {
       template: `modules/${NAMESPACE}/templates/gm-inbox.hbs`,
@@ -77,18 +84,18 @@ export class GmInbox extends foundry.applications.api.ApplicationV2 {
       },
     });
   }
-  protected override _onClose(){
+  protected _onClose(){
     const rerender = () => this.render();
     Hooks.off(updateHook, rerender);
   }
 
   // Subscribe to the rerender Hook after the first render; auto-unsubscribe on close
-  protected override async _onFirstRender(_ctx: unknown, _opts: unknown): Promise<void> {
+  protected async _onFirstRender(_ctx: unknown, _opts: unknown): Promise<void> {
     const rerender = () => this.render();
     Hooks.on(updateHook, rerender);
   }
 
-  protected override async _prepareContext(_options?: object): Promise<any> {
+  protected async _prepareContext(_options?: object): Promise<any> {
     const items = GmApprovalStore.instance.list().map((it) => {
       const user = (game as ReadyGame).users?.get(it.data.initiator.userId);
       const who = user ? user.roleLabel : it.data.initiator.userId;
@@ -110,7 +117,7 @@ export class GmInbox extends foundry.applications.api.ApplicationV2 {
 
   static getOrCreate(): GmInbox {
     const mod = (game as Game)[NAMESPACE] || (((game as any)[NAMESPACE] = {}) as any);
-    if (!mod.GmInbox) mod.GmInbox = new GmInbox({});
+    if (!mod.GmInbox) mod.GmInbox = new GmInbox();
     return mod.GmInbox as GmInbox;
   }
 }
@@ -126,8 +133,8 @@ export function registerGMInboxSocketHandlers() {
     return await waitUntilResolved(req.id);
   });
 
-  async function  ensureInboxOpen() {
-    await GmInbox.getOrCreate().render();
+  async function ensureInboxOpen() {
+    await GmInbox.getOrCreate().render(true);
   }
 
   function waitUntilResolved(id: string): Promise<boolean> {

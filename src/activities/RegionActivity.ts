@@ -17,8 +17,7 @@ export abstract class RegionActivity extends Activity {
   }
 
   static getEntity(entityId: string): any | undefined {
-    const layer: any = canvas ? (canvas as any)["region"] : undefined;
-    return layer?.get?.(entityId) || undefined;
+    return (canvas as Canvas).regions?.get(entityId)|| undefined;
   }
 
   static getConfigs(entity: any): EntityConfigs {

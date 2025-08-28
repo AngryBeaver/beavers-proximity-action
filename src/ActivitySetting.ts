@@ -10,6 +10,7 @@ export function createActivitySettings(activityClass: ActivityClass) {
 
         static get defaultOptions(): any {
             const title = activityClass.template.name;
+            // @ts-ignore
             return foundry.utils.mergeObject(super.defaultOptions, {
                 title: title,
                 template: `modules/${NAMESPACE}/templates/activity-setting.hbs`,
