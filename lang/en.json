@@ -1,11 +1,11 @@
 {
   "beaversTests":{
     "header": "Tests",
-    "hits": "hits",
+    "success": "success",
     "test": "Test",
-    "hitsHint": "success checks needed before this Test is successfully",
-    "fails": "fails",
-    "failsHint": "failed checks before process fails",
+    "successHint": "success checks needed before this Test is successfully",
+    "fail": "fail",
+    "failHint": "failed checks before process fail",
     "andTestHint": "add additional Test",
     "orTestHint": "add alternative Test"
   },
@@ -28,79 +28,34 @@
     "tab": {
       "label": "Proximity"
     },
-    "keybinding": {
-      "name": "Show Current Token 's Activities"
-    },
-    "error": {
-      "canvasGridError": "no canvas grid detected",
-      "noActorOnToken": "token does not have an actor",
-      "noAvailableActionsFound": "no available Actions found for your request",
-      "noActorFound": "no actor found for your request"
-    },
-    "uiSettings": {
-      "label": "tiny UI",
-      "hint": ""
-    },
     "activitySettings": {
       "configuration": "Configuration",
-      "submit": "Save changes",
-      "warning": "Warning when you change TestOptions you will loose individual configured values e.g. on tiles,walls,tokens",
-      "defaultValue": {
-        "label": "Default value",
-        "hint": ""
-      },
-      "acceptedResponse": {
-        "label": "Accept Response",
-        "hint": "The Response the user needs to give in order to pass the Test"
-      },
-      "difficulty": {
-        "label": "Difficulty",
-        "hint": "The Result the user needs to hit in order to pass the Test"
+      "description": {
+        "region": {
+          "label": "Region activity",
+          "hint":"This is an activity that will be triggered near a region"
+        },
+        "wall": {
+          "label": "Wall activity",
+          "hint": "This is an activity that will be triggered near a wall"
+        },
+        "tile": {
+          "label": "Tile activity",
+          "hint":"This is an activity that will be triggered near a tile"
+        }
       },
       "enabled": {
-        "label": "enable activity",
-        "hint": "enable {name}"
+        "label": "Enable activity",
+        "hint": "Enables this activity on all entities that matches the attributes and values defined below"
+      },
+      "config": {
+        "label": "Configuration",
+        "hint": ""
       },
       "test": {
         "label": "Test",
         "hint": "set a Test the user has to pass in order to activate the activity action"
-      },
-      "gm": {
-        "label": "GM Request",
-        "hint": "Question to answer with yes (success) or no (fail)"
-      },
-      "input": {
-        "label": "UserInput",
-        "hint": "A user input field the user has to fill",
-        "field": {
-          "label": {
-            "label": "The label of the inputField",
-            "hint": "This describes the inputField the user needs to fill"
-          },
-          "type": {
-            "label": "The type of the inputField",
-            "hint": "This describes the type and form of the input the user needs to fill"
-          },
-          "selection": {
-            "add": "add choice"
-          }
-        }
-      },
-      "none": {
-        "label": "None",
-        "hint": "No user input needed. It just succeeds"
-      },
-      "ability": {
-        "label": "Ability",
-        "hint": "Ability check of the current actor"
-      },
-      "skill": {
-        "label": "Skill",
-        "hint": "Skill check of the current actor"
       }
-    },
-    "userInteraction": {
-      "noActivity": "do nothing"
     },
     "secretDoor": {
       "name": "Secret door activity",

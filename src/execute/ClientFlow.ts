@@ -1,22 +1,9 @@
 import { NAMESPACE } from "../Settings.js";
 import { executeActivityGM } from "./ActivityExecution.js";
 import { TestHandler } from "./TestHandler.js";
+import { TinyProximityUI } from "../app/TinyProximityUI.js";
 export const SOCKET_SCAN = "scan";
 export const SOCKET_EXECUTE_ACTIVITY = "executeActivity";
-
-
-export const DefaultDialogOutput: ActivityOutput = {
-  async msg(msg, type = "info", _initiator) {
-    ui.notifications?.[type === "error" ? "error" : type === "warn" ? "warn" : "info"]?.(msg);
-  },
-  async choose(options, prompt, _initiator) {
-    // Adapt this to your UI system; reusing beaversSystemInterface if preferred
-    const choices = Object.fromEntries(Object.entries(options).map(([k, v]) => [k, { text: v.label }]));
-    const sel = await (beaversSystemInterface as any).uiDialogSelect({ choices });
-    return sel ?? null;
-  },
-};
-
 
 export function getDefaultInitiator():InitiatorData{
   const user = (game as ReadyGame).user;
@@ -36,30 +23,27 @@ export function getDefaultInitiator():InitiatorData{
   return initiatorData;
 }
 
-export async function requestScanOnGM(initiatorData: InitiatorData = getDefaultInitiator(), output: ActivityOutput = DefaultDialogOutput) {
-  const socket = (game as Game)[NAMESPACE].socket;
-  if (!socket) throw new Error("Socket not ready");
-  const resp = (await socket.executeAsGM(SOCKET_SCAN, initiatorData)) as ProximityResponse | null;
-  if (!resp) {
-    await output.msg("No GM available or scan failed", "warn", initiatorData);
-    return null;
-  }
-  return resp;
+export async function runProximityChain(initiatorData: InitiatorData = getDefaultInitiator(), output: ActivityOutput = new TinyProximityUI()) {
+  const resp = await requestScanOnGM(initiatorData, output);
+  if (!resp) return;
+  await chooseAndRunActivity(resp, output);
 }
-export async function chooseAndRunActivityClient(resp: ProximityResponse, output: ActivityOutput = DefaultDialogOutput) {
+
+export async function chooseAndRunActivity(resp: ProximityResponse, output: ActivityOutput = getDefaultOutput()) {
   if (!resp?.activities?.length) {
-    await output.msg("Nothing found nearby.", "info", resp?.initiator);
+    await output.clear();
+    await output.msg("Nothing found nearby.", "info");
     return;
   }
 
   const options: { [k: string]: { label: string; note?: string } } = {};
   resp.activities.forEach((a, idx) => {
     const key = String(idx);
-    const label = `${a.name} (${a.entityIds.length})`;
+    const label = `${a.name}`;
     options[key] = { label };
   });
-
-  const chosen = await output.choose(options, "Choose an activity", resp.initiator);
+  await output.clear();
+  const chosen = await output.choose(options, "Choose an activity");
   if (chosen == null) return;
 
   const idx = Number(chosen);
@@ -72,76 +56,79 @@ export async function chooseAndRunActivityClient(resp: ProximityResponse, output
   );
 }
 
-export async function runProximityChain(initiatorData: InitiatorData = getDefaultInitiator(), output: ActivityOutput = DefaultDialogOutput) {
-  const resp = await requestScanOnGM(initiatorData, output);
-  if (!resp) return;
-  await chooseAndRunActivityClient(resp, output);
-}
-
-export async function executeActivityClient(args: ActivityPayload, output?: ActivityTestOutput | ActivityOutput) {
+export async function executeActivityClient(args: {activityId:string, entityIds:string[], initiatorData:InitiatorData }, output: ActivityOutput) {
   const { activityId, entityIds, initiatorData } = args;
   const bpa = (game as Game)[NAMESPACE].BeaversProximityApp;
   const activityClass = bpa.getActivity(activityId) as ActivityClass;
   if (!activityClass) throw new Error(`Activity not found: ${activityId}`);
 
-  const out = (output ?? getDefaultOutput()) as ActivityTestOutput | ActivityOutput;
+  const out = (output ?? getDefaultOutput()) as ActivityOutput;
 
-  async function showNextTest(infoHtml: string, current: TestsResult): Promise<boolean> {
+  async function progressTest(infoHtml: string, current: TestResults): Promise<boolean> {
     const testOut = out as ActivityTestOutput;
     if (testOut.nextTest) return await testOut.nextTest(infoHtml, current, initiatorData);
-    const progress = `(hits: ${current.hits}/${current.maxHits}, fails: ${current.fails}/${current.maxFails})`;
-    await out.msg(`${progress}\n${infoHtml}`, "info", initiatorData);
-    const chosen = await out.choose(
-      {
-        continue: { label: (game as ReadyGame).i18n?.localize?.("CONTINUE") ?? "Continue" },
-        cancel: { label: (game as ReadyGame).i18n?.localize?.("Cancel") ?? "Cancel" },
-      },
-      (game as ReadyGame).i18n?.localize?.("beaversProximityAction.tests.next") ?? "Next Test",
-      initiatorData
-    );
-    return chosen === "continue";
+    await out.clear();
+    if(current.success !== 0 && current.fail !== 0) {
+      const progress = `(success: ${current.success}/${current.maxHits}, fail: ${current.success}/${current.maxFails})`;
+      await out.msg(`${progress}`, "info");
+    }
+    const chosen = await out.akk(infoHtml);
+    return chosen || false;
   }
 
-  async function showProgress(current: TestsResult) {
+  async function showProgress(current: TestResults) {
     const testOut = out as ActivityTestOutput;
     if (testOut.progress) return await testOut.progress(current, initiatorData);
-    return out.msg(`Progress: hits ${current.hits}/${current.maxHits}, fails ${current.fails}/${current.maxFails}`, "info", initiatorData);
+    await out.clear();
+    return out.msg(`Progress: success ${current.success}/${current.maxHits}, fail ${current.fail}/${current.maxFails}`, "info");
   }
 
   for (const entityId of entityIds) {
     const instance = new (activityClass as any)(entityId) as ActivityInstance;
-    const merged = (activityClass as any).mergeData(instance.configs) as ActivityData;
+    const merged = instance.data;
 
-    let finalTests: TestsResult | null = null;
+    let testResults: TestResults = { success: 0, fail: 0, maxHits: 0, maxFails: 0 } as TestResults;
     if (merged.beaversTests) {
       const handler = new TestHandler(merged.beaversTests);
       while (handler.hasAdditionalTests()) {
         const previewHtml = handler.nextTest();
         const current = handler.getTestsResult();
-        const proceed = await showNextTest(previewHtml, current);
+        const proceed = await progressTest(previewHtml, current);
         if (!proceed) {
-          await out.msg((game as ReadyGame).i18n?.localize?.("beaversProximityAction.tests.cancelled") ?? "Cancelled", "warn", initiatorData);
+          await out.clear();
+          await out.msg((game as ReadyGame).i18n?.localize?.("beaversProximityAction.tests.cancelled") ?? "Cancelled", "warn");
           return;
         }
+        await out.clear();
+        await out.msg("waiting for test", "info");
         await handler.test(initiatorData);
         const updated = handler.getTestsResult();
         await showProgress(updated);
-        if (updated.fails > updated.maxFails) break;
+        if (updated.fail > 0 && updated.fail >= updated.maxFails) break;
       }
-      finalTests = handler.getTestsResult();
-      if (finalTests.fails > finalTests.maxFails || finalTests.hits < finalTests.maxHits) {
-        await out.msg((game as ReadyGame).i18n?.localize?.("beaversProximityAction.tests.failed") ?? "Tests failed.", "warn", initiatorData);
+      testResults = handler.getTestsResult();
+      if (testResults.fail > 0 && testResults.fail >= testResults.maxFails || testResults.success < testResults.maxHits) {
+        await out.clear();
+        await out.msg((game as ReadyGame).i18n?.localize?.("beaversProximityAction.tests.failed") ?? "Tests failed.", "warn");
         return;
       }
     }
-
-    // Pass initiator and the final test summary to run
-    await (instance as any).run(initiatorData, finalTests);
+    void executeActivityonGM({activityId, entityId, testResults, initiatorData},out);
   }
 }
 
+
 function getDefaultOutput(): ActivityOutput {
   return {
+    async clear(){
+    },
+    async akk(label: string){
+      return new Promise((resolve) => {
+        const buttons = {"x":{label:label, callback:()=>resolve(true)}};
+        const d = new Dialog({ title: label, content: "",buttons, default:"x", close: () => resolve(null) });
+        d.render(true);
+      });
+    },
     async msg(msg, type = "info") {
       if (type === "error") ui.notifications?.error?.(msg);
       else if (type === "warn") ui.notifications?.warn?.(msg);
@@ -160,17 +147,35 @@ function getDefaultOutput(): ActivityOutput {
   };
 }
 
+export async function requestScanOnGM(initiatorData: InitiatorData = getDefaultInitiator(), output: ActivityOutput = getDefaultOutput()) {
+  const socket = (game as Game)[NAMESPACE].socket;
+  if (!socket) throw new Error("Socket not ready");
+  const resp = (await socket.executeAsGM(SOCKET_SCAN, initiatorData)) as ProximityResponse | null;
+  if (!resp) {
+    await output.clear();
+    await output.msg("No GM available or scan failed", "warn");
+    return null;
+  }
+  return resp;
+}
+
+export async function executeActivityonGM(payload: ActivityPayload,output: ActivityOutput = getDefaultOutput()):Promise<string | null>{
+  const socket = (game as Game)[NAMESPACE].socket;
+  if (!socket) throw new Error("Socket not ready");
+  await output.clear();
+  const string = (await socket.executeAsGM(SOCKET_EXECUTE_ACTIVITY, payload)) as string | null;
+  if (!string) {
+    await output.msg("No GM available or scan failed", "warn");
+    return null;
+  }
+  await output.msg(string);
+  return string;
+}
 export function registerGMExecuteActivitySocketHandler() {
   (game as Game)[NAMESPACE].socket.register(SOCKET_EXECUTE_ACTIVITY, async (payload:ActivityPayload) => {
-    if (!(game as ReadyGame).user?.isGM) return { ok: false, error: "Not GM" };
-    const { activityId, entityIds, initiatorData } = payload;
-    try {
-      await executeActivityGM({ activityId, entityIds, initiatorData });
-      return { ok: true };
-    } catch (e) {
-      console.error(`[${NAMESPACE}] executeActivityGM failed`, e);
-      return { ok: false, error: String(e?.message ?? e) };
-    }
+    if (!(game as ReadyGame).user?.isGM) return null;
+    const { activityId, entityId, initiatorData, testResults } = payload;
+    return await executeActivityGM({ activityId, entityId, initiatorData, testResults });
   });
 }
 export function registerGMScanSocketHandlers() {

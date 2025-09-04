@@ -20,8 +20,8 @@ const tests:BeaversTests = {
 export class EntityActivitySettings extends HandlebarsApplicationMixin(ApplicationV2) {
   document: any;
   entityActivityId: string;
+  activity: ActivityClass;
   config: EntityConfig;
-  readonly prefix = "activityData.beaversTests";
 
   constructor(document:any, entityActivityId:string, config?:any){
     super(config);
@@ -30,7 +30,8 @@ export class EntityActivitySettings extends HandlebarsApplicationMixin(Applicati
     // @ts-ignore
     this.config = foundry.utils.getProperty(this.document|| {}, `flags.${NAMESPACE}`)
       ?.activities[this.entityActivityId];
-    this.config.activityData = (game as ReadyGame)[NAMESPACE].BeaversProximityApp.getActivity(this.config.activityId).mergeData(this.config.activityData);
+    this.activity = (game as ReadyGame)[NAMESPACE].BeaversProximityApp.getActivity(this.config.activityId);
+    this.config.activityData = this.activity.mergeData(this.config.activityData);
   }
 
   _trash =  {
@@ -63,31 +64,19 @@ export class EntityActivitySettings extends HandlebarsApplicationMixin(Applicati
 
   async _preparePartContext(partId, context) {
     context.editable = true;
-    context.data = this.config;
-    context.prefix = this.prefix;
+    context.activityData = this.config.activityData;
+    context.inputs = this.activity.template.inputs;
     return context;
   }
 
   static myFormHandler(event, form, formData) {
-    console.log(formData);
-
     const app = this as unknown as EntityActivitySettings;
-   // @ts-ignore
-    const expanded = foundry.utils.expandObject(formData.object);
-
-    // Pull just the subtree the template edited (e.g., "beaversTests")
-    // @ts-ignore
-    const patch = foundry.utils.getProperty(expanded, app.prefix);
-    if (patch !== undefined) {
-      // Merge into the app's in-memory config
+    for(const [key, value] of Object.entries(formData.object)){
       // @ts-ignore
-      const merged = foundry.utils.deepClone(app.config);
-      // @ts-ignore
-      foundry.utils.setProperty(merged, app.prefix, patch);
-      app.config = merged;
-
-      void app.update();
+      foundry.utils.setProperty(app.config, key, value);
     }
+
+    void app.update();
   }
 
 

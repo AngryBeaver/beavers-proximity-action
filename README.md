@@ -139,6 +139,21 @@ No order needed
 do we need activities
 -> do we need multiple namedChecks per activity ?
 -> do we need multiple actions per activity ?
+----------
+SecretDoorActivity
+- first iteration:
+  - Each wall has the activity search for Secret door.
+  - When you search all doors in range triggers there executeable and most will return nothing.
+    - When all return nothing i want to display nothing found.
+    - When at least one return something i want to all of those secret doors to become normal doors then display you found n secret doors.
+    - does work when all sdoors have the same test check and it can not be individualised.
+      - check once for all sdoors.
+- secret doors can be individualised by having a different test checks.
+  - same type but different values.
+    -> testTypes would need a way to identify the easier of two of it.
+    -   only show the easiest secret door and only make a check for that one.
+    -  you will firstly find the easiest one
+    -> testTypes can reuse the roll -> not possible some systems have their dc in the roll included.
 
 
 

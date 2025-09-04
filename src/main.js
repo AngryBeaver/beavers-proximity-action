@@ -75,9 +75,4 @@ function initHandlebars() {
   void getTemplate("modules/beavers-proximity-action/templates/activity-setting.hbs");
   void getTemplate("modules/beavers-proximity-action/templates/activity-configuration.hbs");
   void getTemplate("modules/beavers-proximity-action/templates/activity-test-config.hbs");
-  getTemplate("modules/beavers-proximity-action/templates/beavers-input-field.hbs").then(t => {
-    Handlebars.registerPartial("beavers-input-field", t);
-  });
-
-
 }

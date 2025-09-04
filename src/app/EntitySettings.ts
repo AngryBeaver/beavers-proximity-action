@@ -155,8 +155,7 @@ export class EntitySettings<T extends EntityType> {
   }
 
   resetActivity(key:string){
-    this.configs.activities[key].data = {};
-    this.configs.activities[key].activityData = {enabled:[]};
+    this.configs.activities[key].activityData = {enabled:[], data: {}};
     void this.update();
   }
 

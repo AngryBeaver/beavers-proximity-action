@@ -68,7 +68,7 @@ class GmApprovalCustomized implements Test<"question"> {
   };
 
   public render = (): string => {
-    return String(this.data?.question ?? "");
+    return String("Ask GM for approval");
   };
 }
 

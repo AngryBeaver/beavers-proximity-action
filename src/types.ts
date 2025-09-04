@@ -36,20 +36,19 @@ type BeaversDetectionMode = "sight" | "radius" | "touch";
  *
  *  Action
  *  Is a method consuming the TestResult and triggering user as well as userInput
- *
- *
  */
 
 interface ActivityClass {
   new (entityId: string, initiator: InitiatorI): ActivityInstance;
   // Required static members
   readonly id: string;
+  readonly type: EntityType;
   readonly template: ActivityTemplate;
   readonly defaultData: ActivityData;
   customizationFields?: Record<string, InputField>;
   readonly worldData: ActivityData;
-
-  mergeData(entityData?: Partial<ActivityData>): ActivityData
+  mergeData: (activityData?: Partial<ActivityData>)=> ActivityData
+  getConfigs: (any) => EntityConfigs;
 }
 
 interface ActivityDetection {
@@ -74,9 +73,6 @@ interface EntityConfigs {
 interface EntityConfig {
    name: string,
    activityId:string,
-   data: {
-       [property:string]:any
-   },
    activityData?: Partial<ActivityData>
 }
 
@@ -87,8 +83,11 @@ interface EntityConfig {
  * holds information on how the Test needs to look like for this Activity.
  */
 interface ActivityData {
-    enabled: { attribute: string, value: any }[],
+    enabled?: { attribute: string, value: any }[],
     beaversTests?: BeaversTests,
+    data: {
+      [property:string]:any
+    },
 }
 /**
  * ActivityTemplate describes an Activity
@@ -100,7 +99,7 @@ interface ActivityTemplate {
     id: string,
     name: string,
     desc: string,
-    config: {
+    inputs: {
         [configId: string]: InputField,
     },
     allowSubOptions?: boolean,
@@ -160,11 +159,13 @@ interface BeaversProximityAppI {
  * An ActivityInstance
  * configured with the entity it is activated on the initiator that activates it and all global and individual configurations.
  * it has one Run method that is executed with the TestResult given.
+ * run returns a string that is displayed to the user.
  */
 interface ActivityInstance {
     entity: any;
-    configs: EntityConfig[];
-    run:(initiator: InitiatorI, testResult:TestResult)=>Promise<void>;
+    config: EntityConfig;
+    data: ActivityData;
+    run:(initiator: InitiatorI, testResults:TestResults)=>Promise<string>;
 }
 interface SettingsI {
     addActivity:(activityClass: ActivityClass)=>void,
@@ -200,24 +201,25 @@ interface TabData {
     content: string,
     onClick: ()=>void
 }
-interface TestsResult {
-  hits: number,
-  fails: number,
+interface TestResults extends TestResult {
   maxFails:number,
   maxHits: number
 }
 interface ActivityOutput {
-  msg: (msg: string, type?: MsgType, initiator?: InitiatorData) => Promise<void>;
-  choose: (options: { [key: string]: { label: string; note?: string } }, prompt: string, initiator: InitiatorData) => Promise<string | null>;
+  clear: () => Promise<void>;
+  msg: (msg: string, type?: MsgType) => Promise<void>;
+  akk: (label: string) => Promise<boolean|null>;
+  choose: (options: { [key: string]: { label: string; note?: string } }, prompt: string) => Promise<string | null>;
 }
 interface ActivityTestOutput extends ActivityOutput {
-  nextTest?: (infoHtml: string, current: TestsResult, initiator: InitiatorData) => Promise<boolean>;
-  progress?: (current: TestsResult, initiator: InitiatorData) => Promise<void>;
+  nextTest?: (infoHtml: string, current: TestResults, initiator: InitiatorData) => Promise<boolean>;
+  progress?: (current: TestResults, initiator: InitiatorData) => Promise<void>;
 }
 
 interface ActivityPayload {
   activityId: string;
-  entityIds: string[];
+  entityId: string;
+  testResults: TestResults;
   initiatorData: InitiatorData;
 }
 interface GmApprovalRequest {
@@ -227,3 +229,10 @@ interface GmApprovalRequest {
   initiator: InitiatorData;
   created: number;
 }
+
+type Deferred<T> = {
+  promise: Promise<T>;
+  resolve: (v: T) => void;
+  reject: (e?: unknown) => void;
+  settled: boolean;
+};

@@ -7,7 +7,8 @@ export abstract class Activity implements ActivityInstance{
   // The concrete entity (Tile, Wall, Region...), set by subclasses.
   abstract entity: any;
   // Per-entity stored configs (flags) for this activity.
-  abstract configs: EntityConfig[];
+  abstract config: EntityConfig;
+  abstract data: ActivityData
   // The actor/user who triggered this activity.
 
   // Activity registration hooks into Foundry settings
@@ -18,9 +19,10 @@ export abstract class Activity implements ActivityInstance{
   static get id(): string {
     return this.template.id;
   }
+  static type: EntityType;
 
   // Run the activity with a test result
-  abstract run(initiator: InitiatorI, testResult:TestResult): Promise<void>;
+  abstract run(initiator: InitiatorI, testResults:TestResults): Promise<string>;
 
   // Activity template (override in concrete activities)
   static get template(): ActivityTemplate {
@@ -28,7 +30,7 @@ export abstract class Activity implements ActivityInstance{
       id: this.name,
       name: this.name,
       desc: "",
-      config: {},
+      inputs: {},
       allowSubOptions: false,
       detection: { mode: "sight" },
       fallback: (_initiator: InitiatorI) => {
@@ -42,11 +44,23 @@ export abstract class Activity implements ActivityInstance{
 
   static get defaultData(): ActivityData {
     return {
+      data:{},
       enabled: [],
     };
   }
 
-  static mergeData(entityData?: ActivityData): ActivityData {
+  getData():ActivityData{
+    const entityConfig = this.getConfig();
+    return (this.constructor as typeof Activity).mergeData(entityConfig.activityData);
+  }
+
+  getConfig(): EntityConfig {
+    const id = (this.constructor as typeof Activity).template.id;
+    return Object.values(Activity.getConfigs(this.entity).activities)
+      .find((a) => a.activityId === id) as EntityConfig;
+  }
+
+  static mergeData(entityData?: Partial<ActivityData>): ActivityData {
     const def = (this as any).defaultData as ActivityData;
     const world = (game as Game)[NAMESPACE].Settings.getActivityData(this.id) as ActivityData;
     // @ts-ignore
@@ -58,6 +72,11 @@ export abstract class Activity implements ActivityInstance{
         foundry.utils.mergeObject(merged, entityData, { inplace: true, insertKeys: true, overwrite: true });
     }
     return merged;
+  }
+
+  static getConfigs(entity: any): EntityConfigs {
+    // @ts-ignore
+    return foundry.utils.getProperty(entity.document || {}, `flags.${NAMESPACE}`) || { activities: {} };
   }
 
   declare protected static readonly __assertAssignable: ActivityClass;

@@ -12,15 +12,7 @@ export class BeaversProximityApp implements BeaversProximityAppI {
 
   public addActivity(activityClass: ActivityClass) {
     this.activities.byId[activityClass.id] = activityClass;
-    if (activityClass.prototype instanceof TileActivity) {
-      this.activities.byType.tile.push(activityClass);
-    } else if (activityClass.prototype instanceof WallActivity) {
-      this.activities.byType.wall.push(activityClass);
-    } else if (activityClass.prototype instanceof RegionActivity) {
-      this.activities.byType.region.push(activityClass);
-    } else {
-      console.warn(`${NAMESPACE} | Unknown Activity entity type for ${activityClass.id}`);
-    }
+    this.activities.byType[activityClass.type].push(activityClass);
     (game as ReadyGame)[NAMESPACE].Settings.addActivity(activityClass);
   }
 
@@ -88,28 +80,30 @@ export class BeaversProximityApp implements BeaversProximityAppI {
     origin: Point,
     acc: { [id: string]: ActivityHit },
   ) {
+    const activities = new Array<string>();
     const entityId = entity.id;
-
     // 1) Entity-attached activities (per-entity configs)
     const attached = this.getEntityConfigs(type, entity);
     for (const config of Object.values(attached.activities) as EntityConfig[]) {
       const activity = this.getActivity(config.activityId);
       if (!activity) continue;
       if (!this.isDetectable(activity, type, entity, initiator, origin)) continue;
+      activities.push(activity.id);
       this.pushHit(acc, activity, type, entityId);
     }
-
     // 2) Globally enabled activities (ActivityData.enabled filters)
     for (const activity of this.getActivities(type)) {
       const worldData = (game as Game)[NAMESPACE].Settings.getActivityData(activity.id);
-      const enabledFilters = worldData?.enabled ?? [];
-      const shouldSkip = enabledFilters.length > 0 &&
-        !enabledFilters.every(f =>
-          // @ts-ignore
-          foundry.utils.getProperty(entity, f.attribute) === f.value);
-      if (shouldSkip) continue;
-      if (!this.isDetectable(activity, type, entity, initiator, origin)) continue;
-      this.pushHit(acc, activity, type, entityId);
+      if(worldData?.enabled && !activities.includes(activity.id)){
+        const enabledFilters = worldData?.enabled ?? [];
+        const shouldSkip = enabledFilters.length > 0 &&
+          !enabledFilters.every(f =>
+            // @ts-ignore
+            foundry.utils.getProperty(entity, f.attribute) === f.value);
+        if (shouldSkip) continue;
+        if (!this.isDetectable(activity, type, entity, initiator, origin)) continue;
+        this.pushHit(acc, activity, type, entityId);
+      }
     }
   }
 

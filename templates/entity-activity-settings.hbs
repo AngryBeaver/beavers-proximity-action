@@ -1,4 +1,9 @@
 <section>
+  {{#each inputs}}
+    {{>beavers-input-field
+      value=(lookup ../activityData.data @key)
+      prefixName=(concat "activityData.data")}}
+  {{/each}}
   <fieldset class="beavers-tests">
     <legend>{{localize "beaversTests.header"}}
       {{#if editable}}
@@ -8,19 +13,19 @@
       {{/if}}
     </legend>
     <div class="form-group">
-      {{#if data.activityData.beaversTests}}
-        <label>{{localize "beaversTests.fails"}}</label>
+      {{#if activityData.beaversTests}}
+        <label>{{localize "beaversTests.fail"}}</label>
         <div class="form-fields">
           <input style="width:80px" {{#unless editable}}disabled{{/unless}}
-                 name="{{prefix}}.fails" type="number"
+                 name="activityData.beaversTests.fails" type="number"
                  step="any"
-                 value="{{data.activityData.beaversTests.fails}}" />
+                 value="{{activityData.beaversTests.fails}}" />
         </div>
-        <p class="hint">{{localize "beaversTests.failsHint"}}</p>
+        <p class="hint">{{localize "beaversTests.failHint"}}</p>
       {{/if}}
     </div>
-    {{#if data.activityData.beaversTests}}
-      {{#each data.activityData.beaversTests.ands}}
+    {{#if activityData.beaversTests}}
+      {{#each activityData.beaversTests.ands}}
         <fieldset class="test-or" style="padding-left:20px">
           <legend>{{localize "beaversTests.test"}}
             {{#if ../editable}}
@@ -30,20 +35,20 @@
             {{/if}}
           </legend>
           <div class="form-group">
-            <label>{{localize "beaversTests.hits"}}</label>
+            <label>{{localize "beaversTests.success"}}</label>
             <div class="form-fields">
               <input {{#unless ../editable}}disabled{{/unless}}
-                     name="{{../prefix}}.ands.{{@key}}.hits" type="number"
+                     name="activityData.beaversTests.ands.{{@key}}.hits" type="number"
                      step="any"
                      value="{{this.hits}}" />
             </div>
-            <p class="hint">{{localize "beaversTests.hitsHint"}}</p>
+            <p class="hint">{{localize "beaversTests.successHint"}}</p>
           </div>
           {{#each this.ors}}
             <div class="flexrow" style="line-height:20px;margin:2px 0px 2px 10px;align-items:unset">
               <div class="flexcol beavers-line" style="flex-wrap:nowrap;">
                 {{{beavers-test this
-                                (beavers-object "disabled" (not ../../editable) "minimized" true "prefixName" (concat ../../prefix ".ands."@../key ".ors." @key)) }}}
+                                (beavers-object "disabled" (not ../../editable) "minimized" true "prefixName" (concat "activityData.beaversTests.ands."@../key ".ors." @key)) }}}
               </div>
               {{#if ../../editable}}
                 <div class="attribute" style="flex:0;width:30px;flex-basis:auto;margin-top:5px;text-align: center;">

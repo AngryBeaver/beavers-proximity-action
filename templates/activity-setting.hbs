@@ -1,24 +1,61 @@
 <form autocomplete="off">
-    <h2>{{activity.name}}</h2>
-    <div class="form-group">
-        <p class="notes">
-            {{activity.desc}}
-        </p>
-    </div>
-    <h3> {{localize "beaversProximityAction.activitySettings.configuration"}}</h3>
-    <div style="box-shadow:0 0 0 1px #c9ba9b inset, 0 0 0 0 transparent;background-color: #fffaf3;
-    color: #573a08;padding:10px;border-radius:5px;margin:2px;">
-        <i class="fas fa-exclamation-triangle"></i>
-        {{localize "beaversProximityAction.activitySettings.warning"}}
-    </div>
-    <div class="form-group">
-        <label>{{localize "beaversProximityAction.activitySettings.enabled.label"}}</label>
-        <div class="form-fields">
-            TODO
+    <p class="notes hint">
+      {{template.desc}}<br/>
+    </p>
+  {{>beavers-input-field
+    disabled=true
+    label="Type"
+    type=text
+    value=type
+    note=(localize (concat "beaversProximityAction.activitySettings.description." type ".hint"))}}
+  <fieldset class="enabled">
+    <legend>{{localize "beaversProximityAction.activitySettings.enabled.label"}}
+      {{#if editable}}
+        <a class="enabled-add">
+          <i class="fas fa-plus"></i>
+        </a>
+      {{/if}}
+    </legend>
+    <div class="notes hint">{{localize "beaversProximityAction.activitySettings.enabled.hint"}}</div>
+
+    {{#if activityData.enabled}}
+      {{#each activityData.enabled}}
+        <div class="flexrow">
+          {{>beavers-input-field
+            type="text"
+            value=attribute
+            label="attribute"
+            prefixName=(concat "activityData.enabled."@key)
+            name="attribute"
+          }}
+          {{>beavers-input-field
+            type="text"
+            value=value
+            label="value"
+            prefixName=(concat "activityData.enabled."@key)
+            name="value"
+          }}
+          {{#if ../editable}}
+            <div class="attribute" style="flex:0;width:30px;flex-basis:auto;margin-top:5px;text-align: center;">
+              <a class="enabled-delete" data-index="{{@key}}">
+                <i class="fas fa-trash"></i>
+              </a>
+            </div>
+          {{/if}}
         </div>
-        <p class="notes">
-            {{localize "beaversProximityAction.activitySettings.enabled.hint" localizeData}}
-        </p>
-    </div>
-    <beavers-activity-test-config activityId="{{activity.id}}"></beavers-activity-test-config>
+      {{/each}}
+    {{/if}}
+  </fieldset>
+  <fieldset class="config">
+    <legend>{{localize "beaversProximityAction.activitySettings.config.label"}}</legend>
+    {{#each inputs}}
+      {{>beavers-input-field
+        value=(lookup ../activityData.data @key)
+        prefixName=(concat "data")}}
+    {{/each}}
+  </fieldset>
+  <fieldset class="tests">
+    <legend>{{localize "beaversProximityAction.activitySettings.tests.label"}}</legend>
+    TODO
+  </fieldset>
 </form>

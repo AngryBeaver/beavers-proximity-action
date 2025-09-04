@@ -115,7 +115,7 @@ export class CollisionDetection {
         return point;
     }
     static isPointInside(edges:Edge[],point:Point) {
-        //inside when the pointRay hits an odd time edges.
+        //inside when the pointRay success an odd time edges.
         let inside = false;
         var pointEdge:Edge = {
             p1: point,

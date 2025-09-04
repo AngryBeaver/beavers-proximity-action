@@ -6,12 +6,9 @@ export class InvestigateActivity extends RegionActivity {
     constructor(entityId: string){
         super(entityId);
     }
-
-    run(initiator: InitiatorI, testResult:TestResult): Promise<void> {
-        let msg = "";
-        this.configs.forEach(c=>msg+=c.data.secretInfo);
-        ui.notifications?.info?.(msg);
-        return Promise.resolve(undefined);
+    run(initiator: InitiatorI, testResult:TestResults): Promise<string> {
+        let msg = "Your investigation revealed:</br>"+this.data.data.secretInfo;
+        return Promise.resolve(msg);
     }
 
     static get template():ActivityTemplate {
@@ -20,7 +17,7 @@ export class InvestigateActivity extends RegionActivity {
             id:`${NAMESPACE}.${this.name}`,
             name: (game as ReadyGame)["i18n"].localize("beaversProximityAction.action.investigate.name"),
             desc: (game as ReadyGame)["i18n"].localize("beaversProximityAction.action.investigate.desc"),
-            config:{
+            inputs:{
                 "secretInfo":{
                     name:"secretInfo",
                     type:"area",
@@ -38,7 +35,8 @@ export class InvestigateActivity extends RegionActivity {
 
     static get defaultData(): ActivityData{
         return {
-            enabled: [],
+            enabled:[{attribute:"test", value:true}],
+            data:{},
             beaversTests: {
               fails: 0,
               ands: {

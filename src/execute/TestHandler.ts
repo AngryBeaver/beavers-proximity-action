@@ -1,20 +1,20 @@
 export class TestHandler{
     beaversTests:BeaversTests
-    _testsResult: TestsResult
+    _testResults: TestResults
 
     getTestsResult(){
-      return this._testsResult;
+      return this._testResults;
     }
 
-    constructor(beaversTests:BeaversTests,testsResult?:TestsResult){
+    constructor(beaversTests:BeaversTests,testResults?:TestResults){
         this.beaversTests = beaversTests;
-        if(!testsResult){
-          this._testsResult = {hits:0,fails:0,maxHits:1,maxFails:1};
+        if(!testResults){
+          this._testResults = {success:0,fail:0,maxHits:1,maxFails:1};
         }else{
-          this._testsResult = testsResult;
+          this._testResults = testResults;
         }
-        this._testsResult.maxHits=TestHandler.getMaxHits(beaversTests);
-        this._testsResult.maxFails=beaversTests.fails;
+        this._testResults.maxHits=TestHandler.getMaxHits(beaversTests);
+        this._testResults.maxFails=beaversTests.fails;
     }
 
     static getMaxHits(beaversTests:BeaversTests):number{
@@ -29,7 +29,7 @@ export class TestHandler{
         let iterate = 0;
         for(const and of Object.values(this.beaversTests.ands)){
             iterate += and.hits;
-            if(this._testsResult.hits<iterate){
+            if(this._testResults.success<iterate){
                 return and;
             }
         }
@@ -49,7 +49,7 @@ export class TestHandler{
     }
 
     hasAdditionalTests():boolean{
-        if(TestHandler.getMaxHits(this.beaversTests)<=this._testsResult.hits){
+        if(TestHandler.getMaxHits(this.beaversTests)<=this._testResults.success){
             return false
         }
         try{
@@ -61,17 +61,17 @@ export class TestHandler{
         return true;
     }
 
-    async test(initiatorData:InitiatorData):Promise<TestsResult>{
+    async test(initiatorData:InitiatorData):Promise<TestResults>{
       if(this.hasAdditionalTests()) {
         const testOr = await this.selectTestChoice();
         const test = this.getTest(testOr);
         var result: TestResult = await test.action(initiatorData);
         const testAnd = this.getCurrentTestAnd();
-        var hits = Math.min(result.success, testAnd.hits);
-        this._testsResult.hits += hits;
-        this._testsResult.fails += result.fail;
+        var success = Math.min(result.success, testAnd.hits);
+        this._testResults.success += success;
+        this._testResults.fail += result.fail;
       }
-      return this._testsResult;
+      return this._testResults;
     }
 
     async selectTestChoice():Promise<SerializedTest<any>>{
