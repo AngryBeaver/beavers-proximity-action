@@ -1,5 +1,6 @@
 import {NAMESPACE} from "../Settings.js";
 import { addTab } from "./Tabs.js";
+import { TestSettings } from "./TestSettings.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 const defaultTest: SerializedTest<any> = {
@@ -22,6 +23,7 @@ export class EntityActivitySettings extends HandlebarsApplicationMixin(Applicati
   entityActivityId: string;
   activity: ActivityClass;
   config: EntityConfig;
+  testSettings: TestSettings;
 
   constructor(document:any, entityActivityId:string, config?:any){
     super(config);
@@ -32,6 +34,19 @@ export class EntityActivitySettings extends HandlebarsApplicationMixin(Applicati
       ?.activities[this.entityActivityId];
     this.activity = (game as ReadyGame)[NAMESPACE].BeaversProximityApp.getActivity(this.config.activityId);
     this.config.activityData = this.activity.mergeData(this.config.activityData);
+    this.testSettings = new TestSettings(this,this.config.activityData.beaversTests,
+      async (beaversTests:BeaversTests|undefined)=>{
+        let path = `flags.${NAMESPACE}.activities.${this.entityActivityId}.activityData.-=beaversTests`;
+        this.config.activityData.beaversTests = beaversTests;
+        if(beaversTests != undefined){
+          path = `flags.${NAMESPACE}.activities.${this.entityActivityId}.activityData.beaversTests`;
+        }
+        await this.document.update({ [path]: beaversTests });
+        // @ts-ignore
+        await this.render(true);
+        }
+    );
+
   }
 
   _trash =  {
@@ -75,116 +90,23 @@ export class EntityActivitySettings extends HandlebarsApplicationMixin(Applicati
       // @ts-ignore
       foundry.utils.setProperty(app.config, key, value);
     }
-
+    app.testSettings.onChange(app.config.activityData.beaversTests)
     void app.update();
   }
 
 
     async update(){
       const path = `flags.${NAMESPACE}.activities.${this.entityActivityId}`;
-
-      if(this.config.activityData?.beaversTests?.ands) {
-        const stored = this.config.activityData?.beaversTests?.ands;
-        const ands = { ...JSON.parse(JSON.stringify(this.config.activityData.beaversTests.ands)), ...this._trash.beaversTests.ands }
-        Object.keys(ands).forEach(key => {
-          if (this._trash.beaversTests.ors[key] !== undefined) {
-            ands[key].ors = { ...ands[key].ors, ...this._trash.beaversTests.ors[key] }
-          }
-        })
-        this.config.activityData.beaversTests.ands = ands;
-        this.document = await this.document.update({ [path]: this.config });
-        this.config.activityData.beaversTests.ands = stored;
-      } else {
-        if(this.config.activityData && this.config.activityData.beaversTests == undefined){
-          this.config.activityData["-=beaversTests"] = null;
-        }
-        this.document = await this.document.update({ [path]: this.config });
-        if(this.config.activityData) {
-          for (const k of Object.keys(this.config.activityData)) {
-            if (k.startsWith("-=beaversTests")) delete (this.config.activityData as any)[k];
-          }
-        }
-
-      }
+      this.document = await this.document.update({ [path]: this.config });
       // @ts-ignore
       await this.render(true);
     }
 
 
   _onRender(context, options) {
-    //@ts-ignore
-    const element = this.element;
-    element.querySelectorAll(".tests-add").forEach(i=>i.addEventListener("click",
-      this.addTestAnd.bind(this)
-    ));
-    element.querySelectorAll(".test-or .test-delete").forEach(i=>i.addEventListener("click",(e)=>{
-      const and = $(e.currentTarget).data("and");
-      const or = $(e.currentTarget).data("or");
-      this.removeTestOr(and,or);
-    }));
-    element.querySelectorAll(".test-or .test-add").forEach(i=>i.addEventListener("click",(e)=>{
-      const and = $(e.currentTarget).data("and");
-      this.addTestOr(and);
-    }));
-
-    element.querySelectorAll(".beavers-test-selection select").forEach(i=>i.addEventListener("change", async (e) => {
-      const name = e.target.name;
-      const { ands: and, ors: or } = name.split(".").reduce((result, item, index, array) =>
-        (item === "ands" || item === "ors") ? { ...result, [item]: array[index + 1] } : result, {});
-      const type = $(e.target).val() as string;
-      this.changeSelection(and, or, type);
-    }));
+    this.testSettings.onRender(context, options)
   }
 
 
-  changeSelection(and:string, or:string, type:string){
-    if (this.config.activityData?.beaversTests?.ands[and]?.ors[or]) {
-      this.config.activityData.beaversTests.ands[and].ors[or].type = type;
-      this.config.activityData.beaversTests.ands[and].ors[or].data = {};
-      void this.update();
-    }
-  }
-
-  addTestAnd() {
-    if (this.config.activityData?.beaversTests == undefined) {
-      this.config.activityData = {beaversTests:tests}
-    }else {
-      const sorted = Object.keys(this.config.activityData.beaversTests.ands).sort();
-      // @ts-ignore
-      const nextId = sorted[sorted.length - 1] - 1 + 2;
-      this.config.activityData.beaversTests.ands[nextId] = testAnd;
-    }
-    void this.update();
-  }
-
-  addTestOr(and) {
-    if (this.config.activityData?.beaversTests?.ands[and] != undefined) {
-      const sorted = Object.keys(this.config.activityData.beaversTests?.ands[and].ors).sort();
-      // @ts-ignore
-      const nextId = sorted[sorted.length - 1] - 1 + 2;
-      this.config.activityData.beaversTests.ands[and].ors[nextId] = {type:"IncrementStep",data:{}}
-    }
-    void this.update();
-  }
-
-  removeTestOr(and, or) {
-    if (this.config.activityData?.beaversTests?.ands[and]?.ors[or] != undefined) {
-      if (Object.keys(this.config.activityData.beaversTests.ands[and]?.ors).length <= 1) {
-        if (Object.keys(this.config.activityData.beaversTests.ands).length <= 1) {
-          this.config.activityData.beaversTests = undefined;
-        } else {
-          delete this.config.activityData.beaversTests.ands[and];
-          this._trash.beaversTests.ands["-=" + and] = null;
-        }
-      } else {
-        delete this.config.activityData.beaversTests.ands[and].ors[or];
-        if (this._trash.beaversTests.ors[and] == undefined) {
-          this._trash.beaversTests.ors[and] = {};
-        }
-        this._trash.beaversTests.ors[and]["-=" + or] = null;
-      }
-    }
-    void this.update();
-  }
 
 }

@@ -58,4 +58,67 @@
     <legend>{{localize "beaversProximityAction.activitySettings.tests.label"}}</legend>
     TODO
   </fieldset>
+  <fieldset class="beavers-tests">
+    <legend>{{localize "beaversTests.header"}}
+      {{#if editable}}
+        <a class="tests-add">
+          <i class="fas fa-plus"></i>
+        </a>
+      {{/if}}
+    </legend>
+    <div class="form-group">
+      {{#if activityData.beaversTests}}
+        <label>{{localize "beaversTests.fail"}}</label>
+        <div class="form-fields">
+          <input style="width:80px" {{#unless editable}}disabled{{/unless}}
+                 name="activityData.beaversTests.fails" type="number"
+                 step="any"
+                 value="{{activityData.beaversTests.fails}}" />
+        </div>
+        <p class="hint">{{localize "beaversTests.failHint"}}</p>
+      {{/if}}
+    </div>
+    {{#if activityData.beaversTests}}
+      {{#each activityData.beaversTests.ands}}
+        <fieldset class="test-or" style="padding-left:20px">
+          <legend>{{localize "beaversTests.test"}}
+            {{#if ../editable}}
+              <a title="{{localize "beaversTests.orTestHint"}}" class="test-add" data-and="{{@key}}">
+                <i class="fas fa-plus"></i>
+              </a>
+            {{/if}}
+          </legend>
+          <div class="form-group">
+            <label>{{localize "beaversTests.success"}}</label>
+            <div class="form-fields">
+              <input {{#unless ../editable}}disabled{{/unless}}
+                     name="activityData.beaversTests.ands.{{@key}}.hits" type="number"
+                     step="any"
+                     value="{{this.hits}}" />
+            </div>
+            <p class="hint">{{localize "beaversTests.successHint"}}</p>
+          </div>
+          {{#each this.ors}}
+            <div class="flexrow" style="line-height:20px;margin:2px 0px 2px 10px;align-items:unset">
+              <div class="flexcol beavers-line" style="flex-wrap:nowrap;">
+                {{{beavers-test this
+                                (beavers-object "disabled" (not ../../editable) "minimized" true "prefixName" (concat "activityData.beaversTests.ands."@../key ".ors." @key)) }}}
+              </div>
+              {{#if ../../editable}}
+                <div class="attribute" style="flex:0;width:30px;flex-basis:auto;margin-top:5px;text-align: center;">
+                  <a class="test-delete" data-and="{{@../key}}" data-or="{{@key}}">
+                    <i class="fas fa-trash"></i>
+                  </a>
+                </div>
+              {{/if}}
+            </div>
+            {{#unless @last}}
+              <div class="beavers-seperator" style="margin:3px 0px 3px;">or</div>
+            {{/unless}}
+          {{/each}}
+        </fieldset>
+      {{/each}}
+    {{/if}}
+  </fieldset>
+
 </form>

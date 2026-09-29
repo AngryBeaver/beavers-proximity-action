@@ -24,7 +24,7 @@ export function createActivitySettings(activityClass: ActivityClass) {
           submitOnChange: true,
           closeOnSubmit: false,
         },
-        position:{width: 660 }
+        position:{width: 660, height: 500 }
       }
 
       static PARTS = {

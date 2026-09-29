@@ -73,7 +73,7 @@ interface EntityConfigs {
 interface EntityConfig {
    name: string,
    activityId:string,
-   activityData?: Partial<ActivityData>
+   activityData: ActivityData
 }
 
 /**
